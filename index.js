@@ -33,8 +33,8 @@ let mainWindow;
 const createMainWindow = async () => {
 	const win = new BrowserWindow({
 		title: app.getName(),
-		width: 600,
-		height: 400
+		width: 1024,
+		height: 768
 	});
 
 	win.on('closed', () => {
@@ -80,6 +80,6 @@ app.on('activate', () => {
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
 
-	const favoriteAnimal = config.get('favoriteAnimal');
-	mainWindow.webContents.executeJavaScript(`document.querySelector('header p').textContent = 'Your favorite animal is ${favoriteAnimal}'`);
+	// const favoriteAnimal = config.get('favoriteAnimal');
+	// mainWindow.webContents.executeJavaScript(`document.querySelector('section.main').textContent = 'Your favorite animal is ${favoriteAnimal}'`);
 })();

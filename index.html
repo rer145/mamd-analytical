@@ -2,17 +2,207 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Electron boilerplate</title>
+		<title>MaMD Analytical</title>
+		<link rel="stylesheet" href="bootstrap.custom.css">
 		<link rel="stylesheet" href="index.css">
+		<link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
+		<script type="text/javascript" src="node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
 	</head>
 	<body>
-		<div class="container">
-			<header>
-				<h1>Electron boilerplate</h1>
-				<p></p>
-			</header>
-			<section class="main"></section>
-			<footer></footer>
-		</div>
+		<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+			<a class="navbar-brand" href="#">MaMD Analytical (v0.2 Beta)</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarColor01">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link" href="#"></a>
+					</li>
+				</ul>
+				<form class="my-2 my-lg-0">
+					<a class="btn btn-secondary" href="#"><i class="far fa-plus-square"></i> New</a> 
+					<a class="btn btn-secondary" href="#"><i class="far fa-folder-open"></i> Open</a>
+				</form>
+			</div>
+		</nav>
+
+		<section class="main">
+			<div class="container">
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="true">Analysis</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="results-tab" data-toggle="tab" href="#results" role="tab" aria-controls="results" aria-selected="false">Results</a>
+					</li>
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+						<div class="card">
+							<div class="card-header">Groups (select all that apply)</div>
+							<div class="card-body">
+								<form>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="chkAmericanBlack" value="AmericanBlack">
+										<label class="form-check-label" for="chkAmericanBlack">American Black</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="chkAmericanWhite" value="AmericanWhite">
+										<label class="form-check-label" for="chkAmericanWhite">American White</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="chkAmericanIndian" value="Amerindian">
+										<label class="form-check-label" for="chkAmericanIndian">American Indian</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="chkAsian" value="Asian">
+										<label class="form-check-label" for="chkAsian">Asian</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="chkGuatemalan" value="Guatemalan">
+										<label class="form-check-label" for="chkGuatemalan">Guatemalan</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="chkSWHispanic" value="SWHispanic">
+										<label class="form-check-label" for="chkSWHispanic">SW Hispanic</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="chkThailand" value="Thailand">
+										<label class="form-check-label" for="chkThailand">Thailand</label>
+									</div>
+								</form>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-header">MMS Traits</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col">Anterior Nasal Spine (ANS) <a href="#"><i class="far fa-question-circle"></i></a></div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-default">
+											<img src="assets/img/ANS_1.png" class="img-fluid" alt="ANS 1" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-primary">
+											<img src="assets/img/ANS_2.png" class="img-fluid" alt="ANS 2" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-default">
+											<img src="assets/img/ANS_3.png" class="img-fluid" alt="ANS 3" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+									<div class="col text-center"></div>
+									<div class="col text-center"></div>
+								</div>
+								<div class="row">
+									<div class="col">Inferior Nasal Aperture (INA) <a href="#"><i class="far fa-question-circle"></i></a></div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-default">
+											<img src="assets/img/INA_1.png" class="img-fluid" alt="INA 1" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-default">
+											<img src="assets/img/INA_2.png" class="img-fluid" alt="INA 2" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-default">
+											<img src="assets/img/INA_3.png" class="img-fluid" alt="INA 3" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-default">
+											<img src="assets/img/INA_4.png" class="img-fluid" alt="INA 4" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+									<div class="col text-center">
+										<a href="#" class="btn btn-primary">
+											<img src="assets/img/INA_5.png" class="img-fluid" alt="INA 5" /><br />
+											<a href="#">Details</a>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-header">Run Analysis</div>
+							<div class="card-body">
+								<a href="#" class="btn btn-success">Run Analysis</a>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
+						<h5>Predicted Ancestry</h5>
+						<pre>
+Asian
+						</pre>
+						<h5>Posterior Probabilities</h5>
+						<pre>
+	AmericanBlack AmericanWhite Amerindian Asian   Guatemalan
+1 "0.061"       "0.046"       "0.384"    "0.421" "0.088"   
+						</pre>
+						<h5>Classification Matrix</h5>
+						<pre>
+Confusion Matrix and Statistics
+
+				Reference
+Prediction      AmericanBlack AmericanWhite Amerindian Asian Guatemalan
+AmericanBlack           150            12          1    16          9
+AmericanWhite            13            84          6     8         14
+Amerindian               11             9         33    30          6
+Asian                     5             0          9    59          2
+Guatemalan               13            27          3    12         41
+
+Overall Statistics
+												
+				Accuracy : 0.6405               
+				95% CI : (0.5997, 0.6798)     
+	No Information Rate : 0.3351               
+	P-Value [Acc > NIR] : < 0.00000000000000022
+												
+				Kappa : 0.5368               
+Mcnemar's Test P-Value : 0.0000009305         
+
+Statistics by Class:
+
+					Class: AmericanBlack Class: AmericanWhite
+Sensitivity                        0.7812               0.6364
+Specificity                        0.9003               0.9070
+Pos Pred Value                     0.7979               0.6720
+Neg Pred Value                     0.8909               0.8929
+Prevalence                         0.3351               0.2304
+Detection Rate                     0.2618               0.1466
+Detection Prevalence               0.3281               0.2182
+Balanced Accuracy                  0.8408               0.7717
+					Class: Amerindian Class: Asian Class: Guatemalan
+Sensitivity                    0.63462       0.4720           0.56944
+Specificity                    0.89251       0.9643           0.89022
+Pos Pred Value                 0.37079       0.7867           0.42708
+Neg Pred Value                 0.96074       0.8675           0.93501
+Prevalence                     0.09075       0.2182           0.12565
+Detection Rate                 0.05759       0.1030           0.07155
+Detection Prevalence           0.15532       0.1309           0.16754
+Balanced Accuracy              0.76356       0.7181           0.72983
+						</pre>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<script src="jquery.min.js"></script>
+		<script src="popper.min.js"></script>
+		<script src="bootstrap.min.js"></script>
 	</body>
 </html>

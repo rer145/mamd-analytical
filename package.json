@@ -1,14 +1,13 @@
 {
-	"name": "app-name",
-	"productName": "App Name",
+	"name": "mamd-analytical",
+	"productName": "MaMD Analytical",
 	"version": "0.0.0",
-	"description": "The best app ever",
-	"license": "MIT",
-	"repository": "sindresorhus/electron-boilerplate",
+	"description": "MaMDAnalytical uses an artificial neural network (aNN) to classify an unknown cranium into a reference group.",
+	"license": "",
+	"repository": "rer145/hefner-electron-boilerplate",
 	"author": {
-		"name": "Your Name",
-		"email": "user@gmail.com",
-		"url": "https://sindresorhus.com"
+		"name": "Ron Richardson",
+		"email": "ron.richardson@gmail.com"
 	},
 	"scripts": {
 		"postinstall": "electron-builder install-app-deps",
@@ -28,6 +27,7 @@
 		"electron-util": "^0.11.0"
 	},
 	"devDependencies": {
+		"@fortawesome/fontawesome-free": "^5.9.0",
 		"electron": "^5.0.3",
 		"electron-builder": "^20.43.0",
 		"np": "^5.0.3",
@@ -44,9 +44,9 @@
 		"releaseDraft": false
 	},
 	"build": {
-		"appId": "com.company.AppName",
+		"appId": "edu.msu.MaMDAnalytical",
 		"mac": {
-			"category": "public.app-category.social-networking",
+			"category": "public.app-category.education",
 			"darkModeSupport": true
 		},
 		"dmg": {

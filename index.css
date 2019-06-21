@@ -1,11 +1,58 @@
-html,
+.main {
+	margin-top: 70px;
+}
+
+.nav-tabs .nav-link.active {
+	background-color: #4e5d6c;
+}
+
+.tab-pane {
+	padding-top: 20px;
+}
+
+.card,
+.row {
+	margin-bottom: 20px;
+}
+
+pre {
+	display: block;
+    padding: 10px;
+    margin: 0 0 10.5px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    word-break: break-all;
+    word-wrap: break-word;
+    color: #333333;
+    background-color: #f5f5f5;
+    border: 1px solid #cccccc;
+    border-radius: 0;
+}
+
+body {
+	font-family: -apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		Roboto,
+		Oxygen-Sans,
+		Ubuntu,
+		Cantarell,
+		'Helvetica Neue',
+		sans-serif,
+		'Apple Color Emoji',
+		'Segoe UI Emoji',
+		'Segoe UI Symbol';
+	text-rendering: optimizeLegibility;
+	font-feature-settings: 'liga', 'clig', 'kern';
+}
+
+/* html,
 body {
 	padding: 0;
 	margin: 0;
 	background: transparent;
 }
 
-/* Use OS default fonts */
 body {
 	font-family: -apple-system,
 		BlinkMacSystemFont,
@@ -40,4 +87,4 @@ header h1 {
 	margin: 0;
 	padding: 0;
 	opacity: 0.7;
-}
+} */
