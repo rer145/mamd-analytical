@@ -34,7 +34,10 @@ const createMainWindow = async () => {
 	const win = new BrowserWindow({
 		title: app.getName(),
 		width: 1024,
-		height: 768
+		height: 768,
+		webPreferences: {
+			nodeIntegration: true
+		}
 	});
 
 	win.on('closed', () => {
