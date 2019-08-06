@@ -63,41 +63,15 @@
 							<div class="card-header">Groups (select all that apply)</div>
 							<div class="card-body">
 								<form>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="chkAmericanBlack" value="AmericanBlack">
-										<label class="form-check-label" for="chkAmericanBlack">American Black</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="chkAmericanWhite" value="AmericanWhite">
-										<label class="form-check-label" for="chkAmericanWhite">American White</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="chkAmericanIndian" value="Amerindian">
-										<label class="form-check-label" for="chkAmericanIndian">American Indian</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="chkAsian" value="Asian">
-										<label class="form-check-label" for="chkAsian">Asian</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="chkGuatemalan" value="Guatemalan">
-										<label class="form-check-label" for="chkGuatemalan">Guatemalan</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="chkSWHispanic" value="SWHispanic">
-										<label class="form-check-label" for="chkSWHispanic">SW Hispanic</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="chkThailand" value="Thailand">
-										<label class="form-check-label" for="chkThailand">Thailand</label>
-									</div>
+									<div id="group-list"></div>
 								</form>
 							</div>
 						</div>
 						<div class="card">
 							<div class="card-header">MMS Traits</div>
 							<div class="card-body">
-								<div class="row">
+								<div id="trait-list"></div>
+								<!-- <div class="row">
 									<div class="col">Anterior Nasal Spine (ANS) <a href="#"><i class="far fa-question-circle"></i></a></div>
 									<div class="col text-center">
 										<a href="#" class="btn btn-default">
@@ -152,7 +126,7 @@
 											<a href="#">Details</a>
 										</a>
 									</div>
-								</div>
+								</div> -->
 							</div>
 						</div>
 						<div class="card">
@@ -219,6 +193,25 @@ Balanced Accuracy              0.76356       0.7181           0.72983
 				</div>
 			</div>
 		</section>
+
+
+
+		<div id="trait-template" class="template">
+			<div class="row">
+				<div class="col"><span class="trait-name"></span> (<span class="trait-abbreviation"></span>) <a href="#"><i class="far fa-question-circle"></i></a></div>
+				<div class="col text-center trait-col1"></div>
+				<div class="col text-center trait-col2"></div>
+				<div class="col text-center trait-col3"></div>
+				<div class="col text-center trait-col4"></div>
+				<div class="col text-center trait-col5"></div>
+			</div>
+		</div>
+		<div id="trait-image-template" class="template">
+			<a href="#" class="btn btn-default">
+				<img class="trait-image img-fluid" /><br />
+				<a href="#">Details</a>
+			</a>
+		</div>
 
 		<!-- <script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/popper.min.js"></script>

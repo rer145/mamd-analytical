@@ -46,6 +46,10 @@ body {
 	font-feature-settings: 'liga', 'clig', 'kern';
 }
 
+.template {
+	display: none;
+}
+
 /* html,
 body {
 	padding: 0;

@@ -14,7 +14,7 @@ const path = require('path');
 //const walk = require('walk');
 
 $(document).ready(function() {
-	//window.appdb = app_preload();
+	window.appdb = app_preload();
 	app_init();
 
 	// ipcRenderer.on('userdata-path', (event, message) => {
@@ -25,12 +25,14 @@ $(document).ready(function() {
 
 
 function app_preload() {
-	var db = JSON.parse(fs.readFileSync(path.join(__dirname, "/assets/db/db.min.json")).toString());
+	var db = JSON.parse(fs.readFileSync(path.join(__dirname, "/assets/db/db.json")).toString());
 	return db;
 }
 
 function app_init() {
-    show_suggested_rscript_paths();
+	show_suggested_rscript_paths();
+	show_groups();
+	show_traits();
 }
 
 function search_for_rscript(path) {
@@ -65,4 +67,60 @@ function show_suggested_rscript_paths() {
 	}
 	
 	span.find("p.loading").remove();
+}
+
+function show_groups() {
+	var div = $("#group-list");
+	div.empty();
+
+	var groups = window.appdb["groups"];
+
+	for (var i = 0; i < groups.length; i++) {
+		var wrapper = $("<div></div>");
+		wrapper.addClass("form-check").addClass("form-check-inline");
+		
+		var input = $("<input></input>");
+		input
+			.addClass("form-check-input")
+			.attr("type", "checkbox")
+			.attr("id", "chk" + groups[i].code)
+			.attr("value", groups[i].code);
+		
+		var label = $("<label></label>");
+		label
+			.addClass("form-check-label")
+			.attr("for", "chk" + groups[i].code)
+			.text(groups[i].display);
+
+		wrapper.append(input).append(label);
+		div.append(wrapper);
+	}
+}
+
+function show_traits() {
+	var div = $("#trait-list");
+	div.empty();
+
+	var traits = window.appdb["traits"];
+
+	for (var i = 0; i < traits.length; i++) {
+		var ttemplate = $("#trait-template").clone();
+		ttemplate.removeClass("template")
+			.attr("id", "trait-" + traits[i].abbreviation);
+		ttemplate.find(".trait-name").text(traits[i].name);
+		ttemplate.find(".trait-abbreviation").text(traits[i].abbreviation);
+		
+		for (var j = 0; j < traits[i].num_images; j++) {
+			var itemplate = $("#trait-image-template").clone();
+			itemplate.removeClass("template")
+				.attr("id", "trait-image-" + j);
+			itemplate.find(".trait-image")
+				.attr("src", "img/" + traits[i].abbreviation + "_" + j + ".png")
+				.attr("alt", traits[i].abbreviation + " " + j);
+
+			var col = ttemplate.find(".trait-col" + (j+1).toString());
+			col.append(itemplate);
+		}
+		div.append(ttemplate);
+	}
 }
