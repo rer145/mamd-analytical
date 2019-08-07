@@ -3,12 +3,14 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 # command arguments
 args = commandArgs(trailingOnly=TRUE)
 packages_path<-trim(args[1])	# path to packages
-data_path<-trim(args[2])	# path to data files
-input_file<-trim(args[3])	# file where user inputs will be saved
-output_file<-trim(args[4])	# file where analysis output will be saved
+#analysis_path<-trim(args[2])	# path to analysis files
+input_file<-trim(args[2])	# file where user inputs will be saved
+output_file<-trim(args[3])	# file where analysis output will be saved
 
 
-
+#if (!require("Rcpp", lib.loc=packages_path)) { 
+#	install.packages("Rcpp", lib=packages_path)
+#}
 if (!require("ModelMetrics", lib.loc=packages_path)) { 
 	install.packages("ModelMetrics", lib=packages_path)
 } 

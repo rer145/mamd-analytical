@@ -224,14 +224,14 @@ function toggleSelection(code, value) {
 }
 
 function generate_inputfile() {
-	var filepath = path.join(store.get("userdata_path"), new Date().valueOf().toString() + "-input.csv");
+	var filepath = path.join(store.get("analysis_path"), new Date().valueOf().toString() + "-input.csv");
 	// TODO: write window.selections to file
 	return filepath;
 }
 
 function generate_outputfile(input_file) {
-	var ts = input_file.replace("-input.csv", "").replace(store.get("userdata_path"), "");
-	var filepath = path.join(store.get("userdata_path"), ts + "-output.txt");
+	var ts = input_file.replace("-input.csv", "").replace(store.get("analysis_path"), "");
+	var filepath = path.join(store.get("analysis_path"), ts + "-output.txt");
 	return filepath;
 }
 
@@ -241,17 +241,17 @@ function run_analysis() {
 	$("#analysis-error").hide();
 	$("#analysis-loading").show();
 	
-	var r_script = path.join(__dirname, "/assets/r/mamd.R");
 	var packages_path = store.get("packages_path");
-	var data_path = store.get("userdata_path");
+	//var data_path = store.get("userdata_path");
+	var analysis_path = store.get("analysis_path");
 	var input_file = generate_inputfile();
 	var output_file = generate_outputfile(input_file);
+	var r_script = path.join(analysis_path, "mamd.R");
 
 	var proc = require('child_process');
 	var parameters = [
 		r_script,
 		packages_path,
-		data_path,
 		input_file,
 		output_file
 	];

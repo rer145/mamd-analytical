@@ -101,21 +101,42 @@ app.on('activate', () => {
 });
 
 (async () => {
+	prep_files_and_settings();
+	
 	await app.whenReady();
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
-
-	store.set("userdata_path", app.getPath("userData"));
-
-	var packages_path = path.join(app.getPath("userData"), "packages");
-	make_directory(packages_path);
-	store.set("packages_path", packages_path);
 
 	// const favoriteAnimal = config.get('favoriteAnimal');
 	// mainWindow.webContents.executeJavaScript(`document.querySelector('section.main').textContent = 'Your favorite animal is ${favoriteAnimal}'`);
 })();
 
 
+function prep_files_and_settings() {
+	store.set("userdata_path", app.getPath("userData"));
+
+	var packages_path = path.join(app.getPath("userData"), "packages");
+	make_directory(packages_path);
+	store.set("packages_path", packages_path);
+
+	var analysis_path = path.join(app.getPath("userData"), "analysis");
+	make_directory(analysis_path);
+	store.set("analysis_path", analysis_path);
+
+	var r_path = path.join(__dirname, "assets/r");
+	copy_file(
+        path.join(r_path, "mamd.csv"), 
+        path.join(analysis_path, "mamd.csv"), 
+		true);
+	copy_file(
+		path.join(r_path, "Geo.Origin.csv"), 
+		path.join(analysis_path, "Geo.Origin.csv"), 
+		true);
+	copy_file(
+		path.join(r_path, "mamd.R"), 
+		path.join(analysis_path, "mamd.R"), 
+		true);
+};
 
 
 function make_directory(dir) {
@@ -125,5 +146,23 @@ function make_directory(dir) {
 		} catch (err) {
 			console.log("Unable to create directory: " + err);
 		}
+	}
+};
+
+function copy_file(src, dest, replace) {
+	var do_replace = replace;
+	if (!replace) {
+		do_replace = !fs.existsSync(dest);
+	}
+
+	if (do_replace) {
+		fs.copyFile(src, dest, (err) => {
+			if (err) {
+                console.error("Error copying over " + src + " to " + dest);
+                console.error(err);
+            } else {
+                console.log(src + " was copied to " + dest);
+            }
+		});
 	}
 };
