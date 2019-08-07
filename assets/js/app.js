@@ -15,7 +15,28 @@ const path = require('path');
 
 $(document).ready(function() {
 	window.appdb = app_preload();
+	window.selections = app_setupselections();
 	app_init();
+
+	$(".trait-image-button").on('click', function(e) {
+		e.preventDefault();
+		
+		var code = $(this).parent().attr("data-trait");
+		var value = $(this).parent().attr("data-value");
+		var currentValue = window.selections[code];
+		var parent = $("#trait-" + code);
+
+		if ($(this).hasClass("btn-primary")) {
+			$(this).removeClass("btn-primary");
+			toggleSelection(code, -1);
+		} else {
+			$.each(parent.find(".trait-image-button"), function(i,v) {
+				$(v).removeClass("btn-primary").addClass("btn-default");
+			});
+			$(this).addClass("btn-primary");
+			toggleSelection(code, value);
+		}
+	});
 
 	// ipcRenderer.on('userdata-path', (event, message) => {
 	// 	//console.log('UserData Path: ' + message);
@@ -27,6 +48,15 @@ $(document).ready(function() {
 function app_preload() {
 	var db = JSON.parse(fs.readFileSync(path.join(__dirname, "/assets/db/db.json")).toString());
 	return db;
+}
+
+function app_setupselections() {
+	var output = {};
+	var traits = window.appdb["traits"];
+	for (var i = 0; i < traits.length; i++) {
+		output[traits[i].abbreviation] = -1;
+	}
+	return output;
 }
 
 function app_init() {
@@ -110,17 +140,28 @@ function show_traits() {
 		ttemplate.find(".trait-name").text(traits[i].name);
 		ttemplate.find(".trait-abbreviation").text(traits[i].abbreviation);
 		
-		for (var j = 0; j < traits[i].num_images; j++) {
+		for (var j = 0; j < traits[i].images.length; j++) {
 			var itemplate = $("#trait-image-template").clone();
 			itemplate.removeClass("template")
-				.attr("id", "trait-image-" + j);
+				.attr("id", "trait-image-" + j)
+				.attr("data-trait", traits[i].abbreviation)
+				.attr("data-value", traits[i].images[j].value);
 			itemplate.find(".trait-image")
-				.attr("src", "img/" + traits[i].abbreviation + "_" + j + ".png")
-				.attr("alt", traits[i].abbreviation + " " + j);
+				.attr("src", path.join(__dirname, "/assets/img/" + traits[i].images[j].filename))
+				.attr("alt", traits[i].images[j].text + " " + j);
 
 			var col = ttemplate.find(".trait-col" + (j+1).toString());
 			col.append(itemplate);
 		}
 		div.append(ttemplate);
 	}
+}
+
+function toggleSelection(code, value) {
+	if (window.selections[code] === value) 
+		window.selections[code] = -1;
+	else
+		window.selections[code] = value;
+		
+	console.log(window.selections);
 }
