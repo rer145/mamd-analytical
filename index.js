@@ -6,8 +6,13 @@ const {is} = require('electron-util');
 const unhandled = require('electron-unhandled');
 const debug = require('electron-debug');
 const contextMenu = require('electron-context-menu');
-const config = require('./config');
+const fs = require('fs');
+
+//const config = require('./config');
 const menu = require('./menu');
+
+const Store = require('electron-store');
+const store = new Store();
 
 unhandled();
 debug();
@@ -30,13 +35,21 @@ app.setAppUserModelId('com.company.AppName');
 // Prevent window from being garbage collected
 let mainWindow;
 
+// var image = electron.nativeImage.createFromPath(__dirname + '/assets/img/icons/icon.png'); 
+// image.setTemplateImage(true);
+
 const createMainWindow = async () => {
 	const win = new BrowserWindow({
 		title: app.getName(),
-		width: 1024,
+		width: 1024, 
 		height: 768,
+		backgroundColor: '#4e5d6c',
+		transparent: false,
+		show: false,
+		//icon: image,
 		webPreferences: {
-			nodeIntegration: true
+			nodeIntegration: true,
+            defaultEncoding: 'UTF-8'
 		}
 	});
 
@@ -45,6 +58,15 @@ const createMainWindow = async () => {
 		// For multiple windows store them in an array
 		mainWindow = undefined;
 	});
+
+	win.webContents.on('did-finish-load', () => {
+        win.webContents.setZoomFactor(1);
+	});
+	
+	win.once('ready-to-show', () => {
+        //win.setMenu(null);
+        win.show();
+    });
 
 	await win.loadFile(path.join(__dirname, 'index.html'));
 
@@ -83,6 +105,25 @@ app.on('activate', () => {
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
 
+	store.set("userdata_path", app.getPath("userData"));
+
+	var packages_path = path.join(app.getPath("userData"), "packages");
+	make_directory(packages_path);
+	store.set("packages_path", packages_path);
+
 	// const favoriteAnimal = config.get('favoriteAnimal');
 	// mainWindow.webContents.executeJavaScript(`document.querySelector('section.main').textContent = 'Your favorite animal is ${favoriteAnimal}'`);
 })();
+
+
+
+
+function make_directory(dir) {
+	if (!fs.existsSync(dir)){ 
+		try {
+			fs.mkdirSync(dir);
+		} catch (err) {
+			console.log("Unable to create directory: " + err);
+		}
+	}
+};

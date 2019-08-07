@@ -3,15 +3,15 @@ window.$ = window.jQuery = require('jquery')
 window.Tether = require('tether')
 window.Bootstrap = require('bootstrap')
 
-//const { ipcRenderer } = require('electron');
 const settings = require('electron-settings');
 
 const fs = require('fs');
 const find = require('find');
-//const log = require('electron-log');
 const { ipcRenderer } = require('electron');
 const path = require('path');
-//const walk = require('walk');
+
+const Store = require('electron-store');
+const store = new Store();
 
 $(document).ready(function() {
 	window.appdb = app_preload();
@@ -73,6 +73,8 @@ function app_init() {
 	init_results();
 	//check_offline_status();
 	check_settings();
+
+	disable_button("save-button");
 }
 
 function search_for_rscript(path) {
@@ -82,8 +84,14 @@ function search_for_rscript(path) {
 			for (var i = 0; i < files.length; i++) {
 				span.append(
 					$("<a></a>")
+						.attr("href", "#")
 						.addClass("rscript-settings-link")
 						.text(files[i])
+						.on("click", function(e) {
+							e.preventDefault();
+							store.set("rscript_path", $(this).text());
+							check_settings();
+						})
 				).append($("<br></br>"));
 			}
 		}
@@ -101,6 +109,11 @@ function init_results() {
 function check_offline_status() {
 	// TODO: if offline, show warning message (no impact)
 	window.is_offline = false;
+
+	if (window.is_offline)
+		$("#offline-alert").show();
+	else
+		$("#offline-alert").hide();
 }
 
 function check_for_updates() {
@@ -114,6 +127,15 @@ function check_settings() {
 	// TODO: if no rscript selected, 
 	//   go to settings tab
 	//   disable run analysis button
+	if (store.get("rscript_path") === undefined) {
+		$("#settings-alert").show();
+		disable_button("analysis-button");
+		$('#tabs a[href="#settings"]').tab('show');
+	} else {
+		$("#settings-alert").hide();
+		$('#tabs a[href="#analysis"]').tab('show');
+		enable_button("analysis-button");
+	}
 }
 
 function show_suggested_rscript_paths() {
@@ -201,17 +223,78 @@ function toggleSelection(code, value) {
 	console.log(window.selections);
 }
 
+function generate_inputfile() {
+	var filepath = path.join(store.get("userdata_path"), new Date().valueOf().toString() + "-input.csv");
+	// TODO: write window.selections to file
+	return filepath;
+}
+
+function generate_outputfile(input_file) {
+	var ts = input_file.replace("-input.csv", "").replace(store.get("userdata_path"), "");
+	var filepath = path.join(store.get("userdata_path"), ts + "-output.txt");
+	return filepath;
+}
+
 function run_analysis() {
 	$("#analysis-pending").hide();
 	$("#analysis-results").hide();
+	$("#analysis-error").hide();
 	$("#analysis-loading").show();
+	
+	var r_script = path.join(__dirname, "/assets/r/mamd.R");
+	var packages_path = store.get("packages_path");
+	var data_path = store.get("userdata_path");
+	var input_file = generate_inputfile();
+	var output_file = generate_outputfile(input_file);
 
-	// TODO: run analysis
+	var proc = require('child_process');
+	var parameters = [
+		r_script,
+		packages_path,
+		data_path,
+		input_file,
+		output_file
+	];
 
-	var timeout = window.setTimeout(show_results, 2000);
+	// D:\work\hefner\hefner-electron-boilerplate\assets\r\mamd.r
+	// C:\Users\ronri\AppData\Roaming\MaMD Analytical
+	// C:\Users\ronri\AppData\Roaming\MaMD Analytical\1565151398636-input.csv
+	// C:\Users\ronri\AppData\Roaming\MaMD Analytical\1565151398636-output.txt
+
+	$("#analysis-parameters").empty();
+	$.each(parameters, function(i,v) {
+		$("#analysis-parameters").append(v).append("<br />");
+	});
+	
+
+	proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+		if(err){
+			$("#analysis-error-message").empty().text(err);
+			$("#analysis-error").show();
+			return;
+		}
+
+		$("#analysis-results-1").text(data);
+		show_results(output_file);
+	});
+
+	//var timeout = setTimeout(show_results, 5000);
 }
 
-function show_results() {
+function show_results(output_file) {
+	// TODO: read output_file and parse
+	//   populate #analysis-results-1, 2, 3
+	
 	$("#analysis-loading").hide();
+	$("#analysis-error").hide();
 	$("#analysis-results").show();
+	enable_button("save-button");
+}
+
+function enable_button(id) {
+	$("#" + id).removeAttr("disabled").removeClass("disabled");
+}
+
+function disable_button(id) {
+	$("#" + id).attr("disabled", "disabled").addClass("disabled");
 }

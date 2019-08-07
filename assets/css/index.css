@@ -50,6 +50,8 @@ body {
 	display: none;
 }
 
+#offline-alert,
+#settings-alert,
 #analysis-pending,
 #analysis-loading,
 #analysis-error,

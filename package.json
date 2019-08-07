@@ -1,7 +1,7 @@
 {
 	"name": "mamd-analytical",
 	"productName": "MaMD Analytical",
-	"version": "0.0.0",
+	"version": "0.2.0",
 	"description": "MaMDAnalytical uses an artificial neural network (aNN) to classify an unknown cranium into a reference group.",
 	"license": "",
 	"repository": "rer145/hefner-electron-boilerplate",
@@ -16,6 +16,8 @@
 		"start": "electron .",
 		"pack": "electron-builder --dir",
 		"dist": "electron-builder --macos --linux --windows",
+		"dist-win": "electron-builder --windows",
+		"dist-mac": "electron-builder --macos",
 		"release": "np"
 	},
 	"dependencies": {

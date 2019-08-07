@@ -22,14 +22,22 @@
 					</li>
 				</ul>
 				<form class="my-2 my-lg-0">
-					<a class="btn btn-secondary" href="#"><i class="far fa-plus-square"></i> New</a> 
-					<a class="btn btn-secondary" href="#"><i class="far fa-folder-open"></i> Open</a>
+					<a id="new-button" class="btn btn-secondary" href="#"><i class="far fa-plus-square"></i> New</a> 
+					<a id="open-button" class="btn btn-secondary" href="#"><i class="far fa-folder-open"></i> Open</a>
+					<a id="save-button" class="btn btn-secondary" href="#"><i class="far fa-save"></i> Save</a>
 				</form>
 			</div>
 		</nav>
 
 		<section class="main">
 			<div class="container">
+				<div id="settings-alert" class="alert alert-danger" role="alert">
+					The setting for the RScript path is missing. Please check your settings before continuing.
+				</div>
+				<div id="offline-alert" class="alert alert-warning" role="alert">
+					You are currently working offline. Analysis can continue to be peformed, but no updates to the application can be downloaded and applied until an internet connection has been established.
+				</div>
+
 				<ul class="nav nav-tabs" id="tabs" role="tablist">
 					<li class="nav-item">
 						<a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
@@ -82,10 +90,14 @@
 					</div>
 					<div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
 						<div id="analysis-pending" class="alert alert-warning" role="alert">
-							<p>Use the Analysis tab to make your selections and click the "Run Analysis" button to see the results.</p>
+							Use the Analysis tab to make your selections and click the "Run Analysis" button to see the results.
 						</div>
 						<div id="analysis-loading" class="alert alert-info" role="alert">
 							<p>Please wait while the analysis is running...</p>
+							<p>
+								<strong>Parameters:</strong><br />
+								<span id="analysis-parameters"></span>
+							</p>
 						</div>
 						<div id="analysis-error" class="alert alert-danger" role="alert">
 							<p>There was an error while running the analysis:</p>
@@ -93,16 +105,16 @@
 						</div>
 						<div id="analysis-results">
 							<h5>Predicted Ancestry</h5>
-							<pre>
+							<pre id="analysis-results-1">
 Asian
 							</pre>
 							<h5>Posterior Probabilities</h5>
-							<pre>
+							<pre id="analysis-results-2">
 	AmericanBlack AmericanWhite Amerindian Asian   Guatemalan
 1 "0.061"       "0.046"       "0.384"    "0.421" "0.088"   
 						</pre>
 						<h5>Classification Matrix</h5>
-						<pre>
+						<pre id="analysis-results-3">
 Confusion Matrix and Statistics
 
 				Reference
