@@ -50,6 +50,13 @@ body {
 	display: none;
 }
 
+#analysis-pending,
+#analysis-loading,
+#analysis-error,
+#analysis-results {
+	display: none;
+}
+
 /* html,
 body {
 	padding: 0;

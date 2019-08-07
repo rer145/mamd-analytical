@@ -18,6 +18,13 @@ $(document).ready(function() {
 	window.selections = app_setupselections();
 	app_init();
 
+	$("#analysis-button").on('click', function(e) {
+		e.preventDefault();
+		$("html, body").animate({ scrollTop: 0 }, "fast");
+		$('#tabs a[href="#results"]').tab('show');
+		run_analysis();
+	});
+
 	$(".trait-image-button").on('click', function(e) {
 		e.preventDefault();
 		
@@ -63,6 +70,9 @@ function app_init() {
 	show_suggested_rscript_paths();
 	show_groups();
 	show_traits();
+	init_results();
+	//check_offline_status();
+	check_settings();
 }
 
 function search_for_rscript(path) {
@@ -79,6 +89,31 @@ function search_for_rscript(path) {
 		}
 	})
     .error(function(err) { console.error(err); });
+}
+
+function init_results() {
+	$("#analysis-pending").show();
+	$("#analysis-loading").hide();
+	$("#analysis-error").hide();
+	$("#analysis-results").hide();
+}
+
+function check_offline_status() {
+	// TODO: if offline, show warning message (no impact)
+	window.is_offline = false;
+}
+
+function check_for_updates() {
+	// TODO: show message if updates are available
+	if (!window.is_offline) {
+		//do check
+	}
+}
+
+function check_settings() {
+	// TODO: if no rscript selected, 
+	//   go to settings tab
+	//   disable run analysis button
 }
 
 function show_suggested_rscript_paths() {
@@ -164,4 +199,19 @@ function toggleSelection(code, value) {
 		window.selections[code] = value;
 		
 	console.log(window.selections);
+}
+
+function run_analysis() {
+	$("#analysis-pending").hide();
+	$("#analysis-results").hide();
+	$("#analysis-loading").show();
+
+	// TODO: run analysis
+
+	var timeout = window.setTimeout(show_results, 2000);
+}
+
+function show_results() {
+	$("#analysis-loading").hide();
+	$("#analysis-results").show();
 }
