@@ -113,6 +113,10 @@ app.on('activate', () => {
 
 
 function prep_files_and_settings() {
+	const appVersion = require(path.join(app.getAppPath(), "package.json")).version;
+	store.set("version", appVersion);
+
+	
 	store.set("userdata_path", app.getPath("userData"));
 
 	var packages_path = path.join(app.getPath("userData"), "packages");

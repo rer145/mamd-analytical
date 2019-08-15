@@ -75,6 +75,10 @@ function app_init() {
 	check_settings();
 
 	disable_button("save-button");
+	disable_button("open-button");
+	disable_button("new-button");
+
+	$("#app-version").text(store.get("version"));
 }
 
 function search_for_rscript(path) {
