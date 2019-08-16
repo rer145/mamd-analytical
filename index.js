@@ -35,9 +35,6 @@ app.setAppUserModelId('com.company.AppName');
 // Prevent window from being garbage collected
 let mainWindow;
 
-// var image = electron.nativeImage.createFromPath(__dirname + '/assets/img/icons/icon.png'); 
-// image.setTemplateImage(true);
-
 const createMainWindow = async () => {
 	const win = new BrowserWindow({
 		title: app.getName(),
@@ -46,7 +43,7 @@ const createMainWindow = async () => {
 		backgroundColor: '#4e5d6c',
 		transparent: false,
 		show: false,
-		//icon: image,
+		icon: path.join(__dirname, 'assets/icons/mamd.ico'),
 		webPreferences: {
 			nodeIntegration: true,
             defaultEncoding: 'UTF-8'
