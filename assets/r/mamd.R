@@ -8,22 +8,40 @@ input_file<-trim(args[2])	# file where user inputs will be saved
 output_file<-trim(args[3])	# file where analysis output will be saved
 
 
-#if (!require("Rcpp", lib.loc=packages_path)) { 
-#	install.packages("Rcpp", lib=packages_path)
-#}
-if (!require("ModelMetrics", lib.loc=packages_path)) { 
-	install.packages("ModelMetrics", lib=packages_path)
-} 
-if (!require("nnet", lib.loc=packages_path)) { 
-	install.packages("nnet", lib=packages_path)
-} 
-if (!require("dplyr", lib.loc=packages_path)) {
-	install.packages("dplyr", lib=packages_path)
-} 
+##if (!require("Rcpp", lib.loc=packages_path)) { 
+##	install.packages("Rcpp", lib=packages_path)
+##}
+#if (!require("ModelMetrics", lib.loc=packages_path)) { 
+#	install.packages("ModelMetrics", lib=packages_path)
+#} 
+#if (!require("nnet", lib.loc=packages_path)) { 
+	#install.packages("nnet", lib=packages_path)
+#} 
+#if (!require("dplyr", lib.loc=packages_path)) {
+	#install.packages("dplyr", lib=packages_path)
+#} 
+#
+#library(ModelMetrics, lib.loc=packages_path)
+#library(nnet, lib.loc=packages_path)
+#library(dplyr, lib.loc=packages_path)
 
-library(ModelMetrics, lib.loc=packages_path)
-library(nnet, lib.loc=packages_path)
-library(dplyr, lib.loc=packages_path)
+
+if (!require("ModelMetrics")) { 
+	install.packages("ModelMetrics", repos = "http://cran.us.r-project.org")
+}
+if (!require("nnet")) { 
+	install.packages("nnet", repos = "http://cran.us.r-project.org")
+}
+if (!require("dplyr")) { 
+	install.packages("dplyr", repos = "http://cran.us.r-project.org")
+}
+
+library(ModelMetrics)
+library(nnet)
+library(dplyr)
+
+
+
 #library(knitr)
 #library(reshape2)
 #library(httr)

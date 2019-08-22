@@ -55,9 +55,13 @@
 	},
 	"build": {
 		"appId": "edu.msu.MaMDAnalytical",
+		"win": {
+			"icon": "assets/icons/mamd.ico"
+		},
 		"mac": {
 			"category": "public.app-category.education",
-			"darkModeSupport": true
+			"darkModeSupport": true,
+			"icon": "assets/icons/mamd.ico"
 		},
 		"dmg": {
 			"iconSize": 160,

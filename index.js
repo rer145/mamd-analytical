@@ -137,6 +137,10 @@ function prep_files_and_settings() {
 		path.join(r_path, "mamd.R"), 
 		path.join(analysis_path, "mamd.R"), 
 		true);
+	copy_file(
+		path.join(r_path, "install_package.R"), 
+		path.join(analysis_path, "install_package.R"), 
+		true);
 };
 
 

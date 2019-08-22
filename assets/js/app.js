@@ -13,6 +13,12 @@ const path = require('path');
 const Store = require('electron-store');
 const store = new Store();
 
+const requiredPackages = [
+	'ModelMetrics',
+	'nnet',
+	'dplyr'
+];
+
 $(document).ready(function() {
 	window.appdb = app_preload();
 	window.selections = app_setupselections();
@@ -45,6 +51,30 @@ $(document).ready(function() {
 		}
 	});
 
+	$(".r-package-install-button").on('click', function(e) {
+		e.preventDefault();
+
+		var parent = $(this).parent();
+		var pkg = $(this).attr("data-package");
+		var badge = parent.find(".badge");
+
+		var success = install_package(pkg);
+
+		if (success) {
+			//verify_package_install(package);
+			badge.removeClass("badge-danger")
+				.addClass("badge-success")
+				.html("Installed");
+
+		} else {
+			badge.removeClass("badge-success")
+				.addClass("badge-danger")
+				.html("Not Installed");
+			// TODO: notify user of failed install
+			//   message box?
+		}
+	});
+
 	// ipcRenderer.on('userdata-path', (event, message) => {
 	// 	//console.log('UserData Path: ' + message);
 	// 	settings.set('config.userdata_path', message);
@@ -74,7 +104,7 @@ function app_init() {
 	//check_offline_status();
 	check_settings();
 
-	disable_button("save-button");
+	//disable_button("save-button");
 	disable_button("open-button");
 	disable_button("new-button");
 
@@ -140,6 +170,34 @@ function check_settings() {
 		$('#tabs a[href="#analysis"]').tab('show');
 		enable_button("analysis-button");
 	}
+
+
+	var div = $("#settings-r-packages");
+	div.empty();
+
+	$.each(requiredPackages, function(i, v) {
+		//verify_package_install(v);
+		var template = $("#r-package-template").clone();
+		template.removeClass("template");
+		template.removeAttr("id");
+
+		template.find(".r-package-name").html(v);
+		
+		var badge = template.find(".badge");
+		var button = template.find(".r-package-install-button");
+		button.attr("data-package", v);
+
+		var installed = verify_package_install(v);
+		if (installed) {
+			badge.removeClass("badge-danger").addClass("badge-success").html("Installed");
+			button.hide();
+		} else {
+			badge.removeClass("badge-success").addClass("badge-danger").html("Not Installed");
+			button.show();
+		}
+
+		div.append(template);
+	});
 }
 
 function show_suggested_rscript_paths() {
@@ -301,4 +359,28 @@ function enable_button(id) {
 
 function disable_button(id) {
 	$("#" + id).attr("disabled", "disabled").addClass("disabled");
+}
+
+function install_package(pkg) {
+	var proc = require('child_process');
+
+	var analysis_path = store.get("analysis_path");
+	var r_script = path.join(analysis_path, "install_package.R");
+	var parameters = [
+		r_script,
+		pkg
+	];
+
+	proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+		if(err){
+			console.error(err);
+			return false;
+		}
+		console.log("exec done");
+		return true;
+	});
+}
+
+function verify_package_install(pkg) {
+	return false;
 }
