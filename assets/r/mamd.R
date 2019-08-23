@@ -3,9 +3,9 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 # command arguments
 args = commandArgs(trailingOnly=TRUE)
 packages_path<-trim(args[1])	# path to packages
-#analysis_path<-trim(args[2])	# path to analysis files
-input_file<-trim(args[2])	# file where user inputs will be saved
-output_file<-trim(args[3])	# file where analysis output will be saved
+analysis_path<-trim(args[2])	# path to analysis files
+input_file<-trim(args[3])	# file where user inputs will be saved
+output_file<-trim(args[4])	# file where analysis output will be saved
 
 
 ##if (!require("Rcpp", lib.loc=packages_path)) { 
@@ -58,8 +58,8 @@ options(scipen = 999)
 
 
 # settings and configuration files
-mamd<-read.csv(file.path(data_path, "mamd.csv"), sep=',', header = T)         
-geo.origin<-read.csv(file.path(data_path, "Geo.Origin.csv"), sep=',', header = T) 
+mamd<-read.csv(file.path(analysis_path, "mamd.csv"), sep=',', header = T)         
+geo.origin<-read.csv(file.path(analysis_path, "Geo.Origin.csv"), sep=',', header = T) 
 
 
 # mamd analysis

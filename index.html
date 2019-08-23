@@ -5,8 +5,8 @@
 		<title>MaMD Analytical</title>
 		<link rel="stylesheet" href="assets/css/bootstrap.custom.css">
 		<link rel="stylesheet" href="assets/css/index.css">
-		<link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
-		<script type="text/javascript" src="node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
+		<link rel="stylesheet" href="assets/css/all.min.css" />
+		<script type="text/javascript" src="assets/js/all.min.js"></script>
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -66,7 +66,7 @@
 							</div>
 						</div>
 
-						<div class="card">
+						<!-- <div class="card">
 							<div class="card-header">Required R Packages</div>
 							<div class="card-body">
 								<div class="row">
@@ -76,7 +76,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 					</div>
 					<div class="tab-pane fade show active" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
 						<div class="card">
@@ -108,12 +108,12 @@
 							<p>Please wait while the analysis is running...</p>
 							<p>
 								<strong>Parameters:</strong><br />
-								<span id="analysis-parameters"></span>
+								<pre id="analysis-parameters"></pre>
 							</p>
 						</div>
 						<div id="analysis-error" class="alert alert-danger" role="alert">
 							<p>There was an error while running the analysis:</p>
-							<p><span id="analysis-error-message"></span></p>
+							<pre id="analysis-error-message"></pre>
 						</div>
 						<div id="analysis-results">
 							<h5>Predicted Ancestry</h5>

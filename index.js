@@ -141,6 +141,10 @@ function prep_files_and_settings() {
 		path.join(r_path, "install_package.R"), 
 		path.join(analysis_path, "install_package.R"), 
 		true);
+	copy_file(
+		path.join(r_path, "verify_package.R"), 
+		path.join(analysis_path, "verify_package.R"), 
+		true);
 };
 
 

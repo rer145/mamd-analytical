@@ -1,18 +1,18 @@
 'use strict';
-window.$ = window.jQuery = require('jquery')
-window.Tether = require('tether')
-window.Bootstrap = require('bootstrap')
-
-const settings = require('electron-settings');
+window.$ = window.jQuery = require('jquery');
+window.Tether = require('tether');
+window.Bootstrap = require('bootstrap');
 
 const fs = require('fs');
 const find = require('find');
-const { ipcRenderer } = require('electron');
 const path = require('path');
 
 const Store = require('electron-store');
-const store = new Store();
+const lib = require('./assets/js/modules');
 
+var sudo = require('sudo-prompt');
+
+const store = new Store();
 const requiredPackages = [
 	'ModelMetrics',
 	'nnet',
@@ -31,6 +31,15 @@ $(document).ready(function() {
 		run_analysis();
 	});
 
+	$("input.group-checkbox").on('click', function(e) {
+		var group = $(this).val();
+		if ($(this).is(':checked')) {
+			toggleSelection(group, 1, true);
+		} else {
+			toggleSelection(group, 0, true);
+		}
+	});
+
 	$(".trait-image-button").on('click', function(e) {
 		e.preventDefault();
 		
@@ -41,13 +50,13 @@ $(document).ready(function() {
 
 		if ($(this).hasClass("btn-primary")) {
 			$(this).removeClass("btn-primary");
-			toggleSelection(code, -1);
+			toggleSelection(code, -1, false);
 		} else {
 			$.each(parent.find(".trait-image-button"), function(i,v) {
 				$(v).removeClass("btn-primary").addClass("btn-default");
 			});
 			$(this).addClass("btn-primary");
-			toggleSelection(code, value);
+			toggleSelection(code, value, false);
 		}
 	});
 
@@ -89,10 +98,17 @@ function app_preload() {
 
 function app_setupselections() {
 	var output = {};
+	
 	var traits = window.appdb["traits"];
 	for (var i = 0; i < traits.length; i++) {
 		output[traits[i].abbreviation] = -1;
 	}
+	
+	var groups = window.appdb["groups"];
+	for (var i = 0; i < groups.length; i++) {
+		output[groups[i].code] = 0;
+	}
+
 	return output;
 }
 
@@ -103,12 +119,13 @@ function app_init() {
 	init_results();
 	//check_offline_status();
 	check_settings();
+	//check_packages();
 
 	//disable_button("save-button");
 	disable_button("open-button");
 	disable_button("new-button");
 
-	$("#app-version").text(store.get("version"));
+	//$("#app-version").text(store.get("version"));
 }
 
 function search_for_rscript(path) {
@@ -170,8 +187,9 @@ function check_settings() {
 		$('#tabs a[href="#analysis"]').tab('show');
 		enable_button("analysis-button");
 	}
+}
 
-
+function check_packages() {
 	var div = $("#settings-r-packages");
 	div.empty();
 
@@ -231,6 +249,7 @@ function show_groups() {
 		var input = $("<input></input>");
 		input
 			.addClass("form-check-input")
+			.addClass("group-checkbox")
 			.attr("type", "checkbox")
 			.attr("id", "chk" + groups[i].code)
 			.attr("value", groups[i].code);
@@ -276,19 +295,41 @@ function show_traits() {
 	}
 }
 
-function toggleSelection(code, value) {
-	if (window.selections[code] === value) 
-		window.selections[code] = -1;
-	else
+function toggleSelection(code, value, isExplicit) {
+	if (isExplicit) {
 		window.selections[code] = value;
+	} else {
+		if (window.selections[code] === value) 
+			window.selections[code] = -1;
+		else
+			window.selections[code] = value;
+	}
 		
-	console.log(window.selections);
+	//console.log(window.selections);
 }
 
 function generate_inputfile() {
-	var filepath = path.join(store.get("analysis_path"), new Date().valueOf().toString() + "-input.csv");
-	// TODO: write window.selections to file
-	return filepath;
+	console.log("Generating input file...");
+	console.log(window.selections);
+
+	var keys = [];
+	var values = [];
+	for (var key in window.selections) {
+		keys.push(key);
+		values.push(window.selections[key]);
+	}
+
+	var header = keys.join(",");
+	var inputs = values.join(",");
+
+	try {
+		var filepath = path.join(store.get("analysis_path"), new Date().valueOf().toString() + "-input.csv");
+		fs.writeFileSync(filepath, header + '\n' + inputs + '\n');
+		return filepath;
+	} catch(err) { 
+		console.log(err);
+		return "";
+	}
 }
 
 function generate_outputfile(input_file) {
@@ -314,6 +355,7 @@ function run_analysis() {
 	var parameters = [
 		r_script,
 		packages_path,
+		analysis_path,
 		input_file,
 		output_file
 	];
@@ -328,17 +370,46 @@ function run_analysis() {
 		$("#analysis-parameters").append(v).append("<br />");
 	});
 	
+	if (input_file.length > 0) {
+		// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+		// 	if(err){
+		// 		$("#analysis-error-message").empty().text(err);
+		// 		$("#analysis-error").show();
+		// 		return;
+		// 	}
 
-	proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
-		if(err){
-			$("#analysis-error-message").empty().text(err);
-			$("#analysis-error").show();
-			return;
-		}
+		// 	$("#analysis-results-1").text(data);
+		// 	show_results(output_file);
+		// });
 
-		$("#analysis-results-1").text(data);
-		show_results(output_file);
-	});
+		var options = {
+			name: 'MaMD Analysis Subprocess'
+		};
+		var cmd = '"' + store.get("rscript_path") + '"';
+		$.each(parameters, function(i,v) {
+			cmd = cmd + ' "' + v + '"';
+		});
+		//cmd = cmd.replace("\\", "\\\\g");
+
+		sudo.exec(cmd, options,
+			function(error, stdout, stderr) {
+				if (error) {
+					//console.error(error);
+					$("#analysis-error-message").empty().text(error);
+					$("#analysis-error").show();
+					return;
+				}
+				console.log('stdout: ' + JSON.stringify(stderr));
+				$("#analysis-results-1").text(stderr);
+				show_results(output_file);
+			}
+		);
+
+	} else {
+		$("#analysis-error-message").empty().text("No inut file was generated.");
+		$("#analysis-error").show();
+		return;
+	}
 
 	//var timeout = setTimeout(show_results, 5000);
 }
@@ -382,5 +453,33 @@ function install_package(pkg) {
 }
 
 function verify_package_install(pkg) {
-	return false;
+	console.log("Verifying package install: " + pkg);
+
+	var proc = require('child_process');
+
+	var analysis_path = store.get("analysis_path");
+	var r_script = path.join(analysis_path, "verify_package.R");
+	var parameters = [
+		r_script,
+		pkg
+	];
+
+	proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+		if(err){
+			console.error(err);
+			return false;
+		} else {
+			console.log(pkg + " INCLUDES FALSE: " + data.includes("FALSE"));
+			console.log(pkg + " INCLUDES TRUE: " + data.includes("TRUE"));
+			if (data.includes("FALSE"))
+				return false;
+			if (data.includes("TRUE"))
+				return true;
+		}
+		
+		// fallthrough
+		return false;
+	});
+
+	console.log("Done verifying " + pkg);
 }

@@ -11,6 +11,9 @@ const {
 } = require('electron-util');
 const config = require('./config');
 
+//window.$ = window.jQuery = require('jquery');
+const lib = require('./assets/js/modules');
+
 const showPreferences = () => {
 	// Show the app's preferences here
 };
@@ -18,11 +21,11 @@ const showPreferences = () => {
 const helpSubmenu = [
 	openUrlMenuItem({
 		label: 'Website',
-		url: 'https://github.com/sindresorhus/electron-boilerplate'
+		url: 'https://github.com/rer145/hefner-electron-boilerplate'
 	}),
 	openUrlMenuItem({
 		label: 'Source Code',
-		url: 'https://github.com/sindresorhus/electron-boilerplate'
+		url: 'https://github.com/rer145/hefner-electron-boilerplate'
 	}),
 	{
 		label: 'Report an Issue…',
@@ -36,8 +39,8 @@ const helpSubmenu = [
 ${debugInfo()}`;
 
 			openNewGitHubIssue({
-				user: 'sindresorhus',
-				repo: 'electron-boilerplate',
+				user: 'rer145',
+				repo: 'hefner-electron-boilerplate',
 				body
 			});
 		}
@@ -50,8 +53,8 @@ if (!is.macos) {
 			type: 'separator'
 		},
 		aboutMenuItem({
-			icon: path.join(__dirname, '..', 'static', 'Icon.png'),
-			text: 'Created by Your Name'
+			icon: path.join(__dirname, 'assets', 'icons', 'mamd.ico'),
+			text: 'Created by Dr. Joe Hefner and Ron Richardson'
 		})
 	);
 }
@@ -135,7 +138,17 @@ const otherTemplate = [
 		role: 'fileMenu',
 		submenu: [
 			{
-				label: 'Custom'
+				label: 'New',
+				click() {
+					console.log("Clicking new");
+					//lib.reset_analysis();
+				}
+			},
+			{
+				label: 'Open'
+			},
+			{
+				label: 'Save'
 			},
 			{
 				type: 'separator'
