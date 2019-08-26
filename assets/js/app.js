@@ -101,20 +101,20 @@ function app_setupselections() {
 	
 	var traits = window.appdb["traits"];
 	for (var i = 0; i < traits.length; i++) {
-		output[traits[i].abbreviation] = -1;
+		output[traits[i].abbreviation] = "NA";
 	}
 	
-	var groups = window.appdb["groups"];
-	for (var i = 0; i < groups.length; i++) {
-		output[groups[i].code] = 0;
-	}
+	// var groups = window.appdb["groups"];
+	// for (var i = 0; i < groups.length; i++) {
+	// 	output[groups[i].code] = 0;
+	// }
 
 	return output;
 }
 
 function app_init() {
 	show_suggested_rscript_paths();
-	show_groups();
+	//show_groups();
 	show_traits();
 	init_results();
 	//check_offline_status();
@@ -300,7 +300,7 @@ function toggleSelection(code, value, isExplicit) {
 		window.selections[code] = value;
 	} else {
 		if (window.selections[code] === value) 
-			window.selections[code] = -1;
+			window.selections[code] = "NA";
 		else
 			window.selections[code] = value;
 	}
