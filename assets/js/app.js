@@ -26,6 +26,8 @@ $(document).ready(function() {
 	window.is_dirty = false;
 	app_init();
 
+	$('[data-toggle="tooltip"]').tooltip();
+
 	$("#new-button").on('click', function(e) {
 		e.preventDefault();
 		new_case();
@@ -46,6 +48,12 @@ $(document).ready(function() {
 		$("html, body").animate({ scrollTop: 0 }, "fast");
 		$('#tabs a[href="#results"]').tab('show');
 		run_analysis();
+	});
+
+	$("#settings-rscript-button").on('change', function(e) {
+		//console.log(document.getElementById("settings-rscript-button").files[0].path);
+		store.set("rscript_path", document.getElementById("settings-rscript-button").files[0].path);
+		check_settings();
 	});
 
 	$(document).on('click', "input.group-checkbox", function(e) {
@@ -280,8 +288,8 @@ function show_suggested_rscript_paths() {
 	}
 
 	if (process.platform === "darwin") {
-		search_for_rscript('/usr/bin/Rscript');
         search_for_rscript('/Library/Frameworks/R.framework/Resources/bin');
+		search_for_rscript('/usr/bin/Rscript');
         search_for_rscript("/Library/Frameworks/R.framework/Versions/3.5.1-MRO/Resources/bin/");
 	}
 	
@@ -329,6 +337,7 @@ function show_traits() {
 			.attr("id", "trait-" + traits[i].abbreviation);
 		ttemplate.find(".trait-name").text(traits[i].name);
 		ttemplate.find(".trait-abbreviation").text(traits[i].abbreviation);
+		ttemplate.find(".trait-title").attr("title", traits[i].title);
 		
 		for (var j = 0; j < traits[i].images.length; j++) {
 			var itemplate = $("#trait-image-template").clone();
@@ -476,12 +485,14 @@ function run_analysis() {
 		sudo.exec(cmd, options,
 			function(error, stdout, stderr) {
 				if (error) {
-					//console.error(error);
+					console.error(error);
+					console.log(stderr);
 					$("#analysis-error-message").empty().text(error);
 					$("#analysis-error").show();
 					return;
 				}
 				console.log('stdout: ' + JSON.stringify(stdout));
+				console.log('stderr: ' + JSON.stringify(stderr));
 				$("#analysis-results-1").text(stdout);
 				show_results(output_file);
 			}
