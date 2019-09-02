@@ -6,6 +6,8 @@ window.Bootstrap = require('bootstrap');
 const fs = require('fs');
 const find = require('find');
 const path = require('path');
+const {ipcRenderer} = require('electron');
+const {dialog} = require('electron').remote;
 
 const Store = require('electron-store');
 const lib = require('./assets/js/modules');
@@ -21,8 +23,23 @@ const requiredPackages = [
 
 $(document).ready(function() {
 	window.appdb = app_preload();
-	window.selections = app_setupselections();
+	window.is_dirty = false;
 	app_init();
+
+	$("#new-button").on('click', function(e) {
+		e.preventDefault();
+		new_case();
+	});
+
+	$("#open-button").on('click', function(e) {
+		e.preventDefault();
+		open_case();
+	});
+
+	$("#save-button").on('click', function(e) {
+		e.preventDefault();
+		save_case();
+	});
 
 	$("#analysis-button").on('click', function(e) {
 		e.preventDefault();
@@ -31,7 +48,7 @@ $(document).ready(function() {
 		run_analysis();
 	});
 
-	$("input.group-checkbox").on('click', function(e) {
+	$(document).on('click', "input.group-checkbox", function(e) {
 		var group = $(this).val();
 		if ($(this).is(':checked')) {
 			toggleSelection(group, 1, true);
@@ -40,27 +57,15 @@ $(document).ready(function() {
 		}
 	});
 
-	$(".trait-image-button").on('click', function(e) {
+	$(document).on('click', ".trait-image-button", function(e) {
 		e.preventDefault();
 		
 		var code = $(this).parent().attr("data-trait");
 		var value = $(this).parent().attr("data-value");
-		var currentValue = window.selections[code];
-		var parent = $("#trait-" + code);
-
-		if ($(this).hasClass("btn-primary")) {
-			$(this).removeClass("btn-primary");
-			toggleSelection(code, -1, false);
-		} else {
-			$.each(parent.find(".trait-image-button"), function(i,v) {
-				$(v).removeClass("btn-primary").addClass("btn-default");
-			});
-			$(this).addClass("btn-primary");
-			toggleSelection(code, value, false);
-		}
+		toggleTraitUISelection($(this), code, value);
 	});
 
-	$(".r-package-install-button").on('click', function(e) {
+	$(document).on('click', ".r-package-install-button", function(e) {
 		e.preventDefault();
 
 		var parent = $(this).parent();
@@ -116,16 +121,63 @@ function app_init() {
 	show_suggested_rscript_paths();
 	//show_groups();
 	show_traits();
-	init_results();
 	//check_offline_status();
 	check_settings();
 	//check_packages();
 
 	//disable_button("save-button");
-	disable_button("open-button");
-	disable_button("new-button");
+	//disable_button("open-button");
+	//disable_button("new-button");
 
-	//$("#app-version").text(store.get("version"));
+	$("#app-version").text(store.get("version"));
+
+	new_case();
+}
+
+function new_case() {
+	window.selections = app_setupselections();
+	window.is_dirty = false;
+	init_results();
+	show_traits();
+	$('#tabs a[href="#analysis"]').tab('show');
+}
+
+function open_case() {
+	dialog.showOpenDialog({
+		properties: ['openFile']
+	}, function(files) {
+		if (files != undefined) {
+			if (files.length == 1) {
+				new_case();
+				var filePath = files[0];
+			
+				fs.readFile(filePath, 'utf8', (err, data) => {
+					if (err) console.error(err);
+			
+					var json = JSON.parse(data);
+			
+					$.each(json['traits'], function(key, data) {
+						if (data != "NA") {
+							var row = $("#trait-" + key);
+							console.log("searching in " + key);
+							$.each(row.find(".trait-image-button"), function (i, v) {
+								if ($(this).attr("data-trait") === key && 
+									$(this).attr("data-value") === data) {
+										toggleTraitUISelection($(this), key, data);
+									}
+							});
+						}
+					});
+
+					// TODO: populate results if applicable
+				});
+			}
+		}
+	})
+}
+
+function save_case() {
+
 }
 
 function search_for_rscript(path) {
@@ -281,7 +333,10 @@ function show_traits() {
 		for (var j = 0; j < traits[i].images.length; j++) {
 			var itemplate = $("#trait-image-template").clone();
 			itemplate.removeClass("template")
-				.attr("id", "trait-image-" + j)
+				.attr("id", traits[i].abbreviation + "-trait-image-" + j)
+				.attr("data-trait", traits[i].abbreviation)
+				.attr("data-value", traits[i].images[j].value);
+			itemplate.find(".trait-image-button")
 				.attr("data-trait", traits[i].abbreviation)
 				.attr("data-value", traits[i].images[j].value);
 			itemplate.find(".trait-image")
@@ -295,7 +350,24 @@ function show_traits() {
 	}
 }
 
+function toggleTraitUISelection(obj, code, value) {
+	var parent = $("#trait-" + code);
+
+	if (obj.hasClass("btn-primary")) {
+		obj.removeClass("btn-primary");
+		toggleSelection(code, "NA", false);
+	} else {
+		$.each(parent.find(".trait-image-button"), function(i,v) {
+			$(v).removeClass("btn-primary").addClass("btn-default");
+		});
+		obj.addClass("btn-primary");
+		toggleSelection(code, value, false);
+	}
+}
+
 function toggleSelection(code, value, isExplicit) {
+	window.is_dirty = true;
+	
 	if (isExplicit) {
 		window.selections[code] = value;
 	} else {
@@ -304,8 +376,18 @@ function toggleSelection(code, value, isExplicit) {
 		else
 			window.selections[code] = value;
 	}
-		
-	//console.log(window.selections);
+	
+	console.log(window.selections);
+}
+
+function toggleIsDirty() {
+	if (window.is_dirty) {
+		window.is_dirty = false;
+		disable_button("save-button");
+	} else {
+		window.is_dirty = true;
+		enable_button("save-button");
+	}
 }
 
 function generate_inputfile() {
@@ -399,8 +481,8 @@ function run_analysis() {
 					$("#analysis-error").show();
 					return;
 				}
-				console.log('stdout: ' + JSON.stringify(stderr));
-				$("#analysis-results-1").text(stderr);
+				console.log('stdout: ' + JSON.stringify(stdout));
+				$("#analysis-results-1").text(stdout);
 				show_results(output_file);
 			}
 		);
@@ -483,3 +565,27 @@ function verify_package_install(pkg) {
 
 	console.log("Done verifying " + pkg);
 }
+
+
+
+
+
+
+
+
+/***** IPC RENDERER *****/
+ipcRenderer.on('new-case', (event, arg) => {
+	new_case();
+});
+
+ipcRenderer.on('open-case', (event, arg) => {
+	open_case();
+});
+
+ipcRenderer.on('save-case', (event, arg) => {
+	save_case();
+});
+
+ipcRenderer.on('settings', (event, arg) => {
+	$('#tabs a[href="#settings"]').tab('show');
+});

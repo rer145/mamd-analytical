@@ -1,6 +1,7 @@
 'use strict';
 const path = require('path');
 const {app, Menu, shell} = require('electron');
+const win = require('electron').BrowserWindow;
 const {
 	is,
 	appMenu,
@@ -15,7 +16,7 @@ const config = require('./config');
 const lib = require('./assets/js/modules');
 
 const showPreferences = () => {
-	// Show the app's preferences here
+	win.getFocusedWindow().webContents.send('settings');
 };
 
 const helpSubmenu = [
@@ -140,15 +141,20 @@ const otherTemplate = [
 			{
 				label: 'New',
 				click() {
-					console.log("Clicking new");
-					//lib.reset_analysis();
+					win.getFocusedWindow().webContents.send('new-case');
 				}
 			},
 			{
-				label: 'Open'
+				label: 'Open',
+				click() {
+					win.getFocusedWindow().webContents.send('open-case');
+				}
 			},
 			{
-				label: 'Save'
+				label: 'Save',
+				click() {
+					win.getFocusedWindow().webContents.send('save-case');
+				}
 			},
 			{
 				type: 'separator'

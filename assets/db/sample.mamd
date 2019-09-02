@@ -1,0 +1,23 @@
+{
+	"traits": {
+		"ANS": "3",
+		"INA": "NA",
+		"IOB": "NA",
+		"MT": "NA",
+		"NAW": "NA",
+		"NBC": "NA",
+		"NO": "NA",
+		"PBD": "NA",
+		"PZT": "NA",
+		"ZS": "NA"
+	},
+	"results": {
+		"ancestry": "",
+		"probabilities": "",
+		"matrix": ""
+	},
+	"properties": {
+		"case_number": "",
+		"analyst": ""
+	}
+}
