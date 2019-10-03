@@ -163,6 +163,8 @@ function open_case() {
 					if (err) console.error(err);
 			
 					var json = JSON.parse(data);
+
+					// TODO: populate case info
 			
 					$.each(json['traits'], function(key, data) {
 						if (data != "NA") {

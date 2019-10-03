@@ -43,6 +43,9 @@
 						<a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
 					</li>
 					<li class="nav-item">
+						<a class="nav-link" id="case-tab" data-toggle="tab" href="#case" role="tab" aria-controls="case" aria-selected="false">Case Info</a>
+					</li>
+					<li class="nav-item">
 						<a class="nav-link active" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="true">Analysis</a>
 					</li>
 					<li class="nav-item">
@@ -77,6 +80,25 @@
 								</div>
 							</div>
 						</div> -->
+					</div>
+					<div class="tab-pane fade show" id="case" role="tabpanel" aria-labelledby="case-tab">
+						<div class="card">
+							<div class="card-header">Case Info</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col">
+										<div>
+											<label for="case_number_input">Case #</label>
+											<input type="text" id="case_number_input" class="form-control" placeholder="Case #" />
+										</div>
+										<div>
+											<label for="observation_date_input">Observation Date</label>
+											<input type="text" id="observation_date_input" class="form-control" placeholder="Date" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="tab-pane fade show active" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
 						<!-- <div class="card">
