@@ -158,7 +158,12 @@ function new_case() {
 
 function open_case() {
 	dialog.showOpenDialog({
-		properties: ['openFile']
+		properties: ['openFile'],
+		title: "Open MaMD Analytical File",
+		buttonLabel : "Open MaMD File",
+		filters :[
+			{name: 'MaMD Analytical', extensions: ['mamd']}
+		]
 	}, function(files) {
 		if (files != undefined) {
 			if (files.length == 1) {
@@ -222,7 +227,14 @@ function save_case() {
 	console.log(output);
 
 	if (window.current_file == "") {
-		window.current_file = dialog.showSaveDialog(null);
+		var options = {
+			title: "Save MaMD Analytical File",
+			buttonLabel : "Save MaMD File",
+			filters :[
+				{name: 'MaMD Analytical', extensions: ['mamd']}
+			]
+		};
+		window.current_file = dialog.showSaveDialog(null, options);
 	}
 
 	fs.writeFile(window.current_file, output, function(err) {
