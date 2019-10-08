@@ -24,6 +24,8 @@ const requiredPackages = [
 $(document).ready(function() {
 	window.appdb = app_preload();
 	window.is_dirty = false;
+	window.current_file = "";
+
 	app_init();
 
 	$('[data-toggle="tooltip"]').tooltip();
@@ -145,6 +147,10 @@ function app_init() {
 function new_case() {
 	window.selections = app_setupselections();
 	window.is_dirty = false;
+	window.current_file = "";
+	disable_button("save-button");
+
+	init_case_info();
 	init_results();
 	show_traits();
 	$('#tabs a[href="#analysis"]').tab('show');
@@ -165,11 +171,14 @@ function open_case() {
 					var json = JSON.parse(data);
 
 					// TODO: populate case info
+					$("#case_number_input").val(json['properties']['case_number']);
+					$("#observation_date_input").val(json['properties']['observation_date']);
+					$("#analyst_input").val(json['properties']['analyst']);
 			
 					$.each(json['traits'], function(key, data) {
 						if (data != "NA") {
 							var row = $("#trait-" + key);
-							console.log("searching in " + key);
+							//console.log("searching in " + key);
 							$.each(row.find(".trait-image-button"), function (i, v) {
 								if ($(this).attr("data-trait") === key && 
 									$(this).attr("data-value") === data) {
@@ -180,6 +189,19 @@ function open_case() {
 					});
 
 					// TODO: populate results if applicable
+					if (json["results"] != undefined) {
+						$("#analysis-results-1").html(json["results"]["ancestry"]);
+						$("#analysis-results-2").html(json["results"]["probabilities"]);
+						$("#analysis-results-3").html(json["results"]["matrix"]);
+
+						$("#analysis-pending").hide();
+						$("#analysis-loading").hide();
+						$("#analysis-error").hide();
+						$("#analysis-results").show();
+					}
+
+					// set properties for file checking
+					window.current_file = filePath;
 				});
 			}
 		}
@@ -187,7 +209,31 @@ function open_case() {
 }
 
 function save_case() {
+	// TODO: encode results strings to form valid JSON
+	var output = '{"traits":' + JSON.stringify(window.selections) + ',';
+	output += '"properties":{"case_number":"' + $("#case_number_input").val() + '",';
+	output += '"analyst":"' + $("#analyst_input").val() + '",';
+	output += '"observation_date":"' + $("#observation_date_input").val() + '"},';
+	output += '"results":{"ancenstry":"' + JSON.stringify($("#analysis-results-1").html()) + '",';
+	output += '"probabilities":"' + JSON.stringify($("#analysis-results-2").html()) + '",';
+	output += '"matrix":"' + JSON.stringify($("#analysis-results-3").html()) + '"}';
+	output += '}';
 
+	console.log(output);
+
+	if (window.current_file == "") {
+		window.current_file = dialog.showSaveDialog(null);
+	}
+
+	fs.writeFile(window.current_file, output, function(err) {
+		if (err) {
+			console.error(err);
+		}
+		console.log("File saved");
+	});
+	
+	window.is_dirty = false;
+	disable_button("save-button");
 }
 
 function search_for_rscript(path) {
@@ -217,6 +263,12 @@ function init_results() {
 	$("#analysis-loading").hide();
 	$("#analysis-error").hide();
 	$("#analysis-results").hide();
+}
+
+function init_case_info() {
+	$("#case_number_input").val("");
+	$("#observation_date_input").val("");
+	$("#analyst_input").val("");
 }
 
 function check_offline_status() {
@@ -378,6 +430,7 @@ function toggleTraitUISelection(obj, code, value) {
 
 function toggleSelection(code, value, isExplicit) {
 	window.is_dirty = true;
+	enable_button("save-button");
 	
 	if (isExplicit) {
 		window.selections[code] = value;
@@ -391,15 +444,15 @@ function toggleSelection(code, value, isExplicit) {
 	console.log(window.selections);
 }
 
-function toggleIsDirty() {
-	if (window.is_dirty) {
-		window.is_dirty = false;
-		disable_button("save-button");
-	} else {
-		window.is_dirty = true;
-		enable_button("save-button");
-	}
-}
+// function toggleIsDirty() {
+// 	if (window.is_dirty) {
+// 		window.is_dirty = false;
+// 		disable_button("save-button");
+// 	} else {
+// 		window.is_dirty = true;
+// 		enable_button("save-button");
+// 	}
+// }
 
 function generate_inputfile() {
 	console.log("Generating input file...");

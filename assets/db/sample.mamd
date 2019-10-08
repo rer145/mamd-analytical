@@ -2,7 +2,7 @@
 	"traits": {
 		"ANS": "3",
 		"INA": "NA",
-		"IOB": "NA",
+		"IOB": "2",
 		"MT": "NA",
 		"NAW": "NA",
 		"NBC": "NA",
@@ -12,12 +12,13 @@
 		"ZS": "NA"
 	},
 	"results": {
-		"ancestry": "",
-		"probabilities": "",
-		"matrix": ""
+		"ancestry": "American",
+		"probabilities": "asf",
+		"matrix": "asdfasdfasdf"
 	},
 	"properties": {
-		"case_number": "",
-		"analyst": ""
+		"case_number": "124",
+		"analyst": "Ron",
+		"observation_date": "10/1/2019"
 	}
 }
