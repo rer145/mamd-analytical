@@ -56,7 +56,7 @@ body {
 #analysis-loading,
 #analysis-error,
 #analysis-results,
-#r-package-install-button {
+.r-package-install-button {
 	display: none;
 }
 
