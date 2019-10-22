@@ -60,6 +60,7 @@
 								<div class="row">
 									<div class="col">
 										<p>Use the button below to select the location of Rscript, or choose from the list below.</p>
+										<p><strong>Current RScript Path: </strong><span id="rscript-current-path"></span></p>
 										<p>
 											<input type="file" id="settings-rscript-button" value="Select Rscript" />
 										</p>
@@ -69,7 +70,7 @@
 							</div>
 						</div>
 
-						<!-- <div class="card">
+						<div class="card">
 							<div class="card-header">Required R Packages</div>
 							<div class="card-body">
 								<div class="row">
@@ -79,7 +80,7 @@
 									</div>
 								</div>
 							</div>
-						</div> -->
+						</div>
 					</div>
 					<div class="tab-pane fade show" id="case" role="tabpanel" aria-labelledby="case-tab">
 						<div class="card">
@@ -204,7 +205,10 @@ Balanced Accuracy              0.76356       0.7181           0.72983
 
 		<div id="trait-template" class="template">
 			<div class="row">
-				<div class="col"><span class="trait-name"></span> (<span class="trait-abbreviation"></span>) <a href="#" class="trait-title" data-toggle="tooltip" data-placement="right"><i class="far fa-question-circle"></i></a></div>
+				<div class="col">
+					<span class="trait-name"></span> (<span class="trait-abbreviation"></span>) 
+					<!-- <a href="#" class="trait-title" data-toggle="popover" data-placement="right"><i class="far fa-question-circle"></i></a> -->
+				</div>
 				<div class="col text-center trait-col1"></div>
 				<div class="col text-center trait-col2"></div>
 				<div class="col text-center trait-col3"></div>
@@ -215,7 +219,7 @@ Balanced Accuracy              0.76356       0.7181           0.72983
 		<div id="trait-image-template" class="template">
 			<a href="#" class="btn btn-default trait-image-button">
 				<img class="trait-image img-fluid" /><br />
-				<a href="#">Details</a>
+				<!-- <a href="#">Details</a> -->
 			</a>
 		</div>
 		<div id="r-package-template" class="template">

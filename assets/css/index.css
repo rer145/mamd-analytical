@@ -55,7 +55,8 @@ body {
 #analysis-pending,
 #analysis-loading,
 #analysis-error,
-#analysis-results {
+#analysis-results,
+#r-package-install-button {
 	display: none;
 }
 

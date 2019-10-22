@@ -2,8 +2,8 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
 # command arguments
 args = commandArgs(trailingOnly=TRUE)
-package<-trim(args[1])	# package to verify
+p<-trim(args[1])	# package to verify
 
-installed<-require(package)
+installed<-require(p, character.only=TRUE)
 #print("INSTALLATION: [" + installed + "]")
 installed

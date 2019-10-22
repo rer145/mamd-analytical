@@ -25,10 +25,15 @@ $(document).ready(function() {
 	window.appdb = app_preload();
 	window.is_dirty = false;
 	window.current_file = "";
+	
+	//$('[data-toggle="tooltip"]').tooltip();
+	//$('[data-toggle="popover"]').popover();
 
 	app_init();
 
-	$('[data-toggle="tooltip"]').tooltip();
+	$('[data-toggle="tooltip"]').tooltip({
+		trigger: 'focus'
+	});
 
 	$("#new-button").on('click', function(e) {
 		e.preventDefault();
@@ -55,7 +60,17 @@ $(document).ready(function() {
 	$("#settings-rscript-button").on('change', function(e) {
 		//console.log(document.getElementById("settings-rscript-button").files[0].path);
 		store.set("rscript_path", document.getElementById("settings-rscript-button").files[0].path);
+		$("#rscript-current-path").text(store.get("rscript_path"));
 		check_settings();
+	});
+
+	$('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+		// console.log(e.target.id);
+		// console.log(e.relatedTarget.id);
+		if (e.target.id == "settings-tab") {
+			$("#rscript-current-path").text(store.get("rscript_path"));
+			check_packages();
+		}
 	});
 
 	$(document).on('click', "input.group-checkbox", function(e) {
@@ -82,7 +97,7 @@ $(document).ready(function() {
 		var pkg = $(this).attr("data-package");
 		var badge = parent.find(".badge");
 
-		var success = install_package(pkg);
+		var success = install_package(pkg, parent);
 
 		if (success) {
 			//verify_package_install(package);
@@ -194,16 +209,16 @@ function open_case() {
 					});
 
 					// TODO: populate results if applicable
-					if (json["results"] != undefined) {
-						$("#analysis-results-1").html(json["results"]["ancestry"]);
-						$("#analysis-results-2").html(json["results"]["probabilities"]);
-						$("#analysis-results-3").html(json["results"]["matrix"]);
+					// if (json["results"] != undefined) {
+					// 	$("#analysis-results-1").html(json["results"]["ancestry"]);
+					// 	$("#analysis-results-2").html(json["results"]["probabilities"]);
+					// 	$("#analysis-results-3").html(json["results"]["matrix"]);
 
-						$("#analysis-pending").hide();
-						$("#analysis-loading").hide();
-						$("#analysis-error").hide();
-						$("#analysis-results").show();
-					}
+					// 	$("#analysis-pending").hide();
+					// 	$("#analysis-loading").hide();
+					// 	$("#analysis-error").hide();
+					// 	$("#analysis-results").show();
+					// }
 
 					// set properties for file checking
 					window.current_file = filePath;
@@ -218,10 +233,10 @@ function save_case() {
 	var output = '{"traits":' + JSON.stringify(window.selections) + ',';
 	output += '"properties":{"case_number":"' + $("#case_number_input").val() + '",';
 	output += '"analyst":"' + $("#analyst_input").val() + '",';
-	output += '"observation_date":"' + $("#observation_date_input").val() + '"},';
-	output += '"results":{"ancenstry":"' + JSON.stringify($("#analysis-results-1").html()) + '",';
-	output += '"probabilities":"' + JSON.stringify($("#analysis-results-2").html()) + '",';
-	output += '"matrix":"' + JSON.stringify($("#analysis-results-3").html()) + '"}';
+	output += '"observation_date":"' + $("#observation_date_input").val() + '"}';
+	// output += '"results":{"ancenstry":"' + JSON.stringify($("#analysis-results-1").html()) + '",';
+	// output += '"probabilities":"' + JSON.stringify($("#analysis-results-2").html()) + '",';
+	// output += '"matrix":"' + JSON.stringify($("#analysis-results-3").html()) + '"}';
 	output += '}';
 
 	console.log(output);
@@ -326,22 +341,25 @@ function check_packages() {
 		template.removeAttr("id");
 
 		template.find(".r-package-name").html(v);
-		
-		var badge = template.find(".badge");
-		var button = template.find(".r-package-install-button");
-		button.attr("data-package", v);
-
-		var installed = verify_package_install(v);
-		if (installed) {
-			badge.removeClass("badge-danger").addClass("badge-success").html("Installed");
-			button.hide();
-		} else {
-			badge.removeClass("badge-success").addClass("badge-danger").html("Not Installed");
-			button.show();
-		}
-
+		verify_package_install(v, template);
 		div.append(template);
 	});
+}
+
+function toggle_package_status(pkg, template, installed) {
+	var badge = template.find(".badge");
+	var button = template.find(".r-package-install-button");
+	button.attr("data-package", pkg);
+	
+	if (installed) {
+		badge.removeClass("badge-danger").addClass("badge-success").html("Installed");
+		button.hide();
+	} else {
+		badge.removeClass("badge-success").addClass("badge-danger").html("Not Installed");
+		button.show();
+	}
+
+	return template;
 }
 
 function show_suggested_rscript_paths() {
@@ -403,7 +421,8 @@ function show_traits() {
 			.attr("id", "trait-" + traits[i].abbreviation);
 		ttemplate.find(".trait-name").text(traits[i].name);
 		ttemplate.find(".trait-abbreviation").text(traits[i].abbreviation);
-		ttemplate.find(".trait-title").attr("title", traits[i].title);
+		// ttemplate.find(".trait-title").attr("title", traits[i].name + " (" + traits[i].abbreviation + ")");
+		// ttemplate.find(".trait-title").attr("data-content", traits[i].description);
 		
 		for (var j = 0; j < traits[i].images.length; j++) {
 			var itemplate = $("#trait-image-template").clone();
@@ -592,7 +611,7 @@ function disable_button(id) {
 	$("#" + id).attr("disabled", "disabled").addClass("disabled");
 }
 
-function install_package(pkg) {
+function install_package(pkg, template) {
 	var proc = require('child_process');
 
 	var analysis_path = store.get("analysis_path");
@@ -602,18 +621,41 @@ function install_package(pkg) {
 		pkg
 	];
 
-	proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
-		if(err){
-			console.error(err);
-			return false;
-		}
-		console.log("exec done");
-		return true;
+	var options = {
+		name: 'MaMD Analysis Subprocess'
+	};
+	var cmd = '"' + store.get("rscript_path") + '"';
+	$.each(parameters, function(i,v) {
+		cmd = cmd + ' "' + v + '"';
 	});
+
+	sudo.exec(cmd, options, 
+		function(error, stdout, stderr) {
+			if (error) {
+				console.error(error);
+				console.log(stderr);
+				toggle_package_status(pkg, template, false); 
+				return false;
+			}
+			console.log('stdout: ' + JSON.stringify(stdout));
+			console.log('stderr: ' + JSON.stringify(stderr));
+			toggle_package_status(pkg, template, true);
+			return true;
+		}
+	);
+
+	// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+	// 	if(err){
+	// 		console.error(err);
+	// 		return false;
+	// 	}
+	// 	console.log("exec done");
+	// 	return true;
+	// });
 }
 
-function verify_package_install(pkg) {
-	console.log("Verifying package install: " + pkg);
+function verify_package_install(pkg, template) {
+	//console.log("Verifying package install: " + pkg);
 
 	var proc = require('child_process');
 
@@ -624,24 +666,49 @@ function verify_package_install(pkg) {
 		pkg
 	];
 
-	proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
-		if(err){
-			console.error(err);
-			return false;
-		} else {
-			console.log(pkg + " INCLUDES FALSE: " + data.includes("FALSE"));
-			console.log(pkg + " INCLUDES TRUE: " + data.includes("TRUE"));
-			if (data.includes("FALSE"))
-				return false;
-			if (data.includes("TRUE"))
-				return true;
-		}
-		
-		// fallthrough
-		return false;
+	var options = {
+		name: 'MaMD Analysis Subprocess'
+	};
+	var cmd = '"' + store.get("rscript_path") + '"';
+	$.each(parameters, function(i,v) {
+		cmd = cmd + ' "' + v + '"';
 	});
 
-	console.log("Done verifying " + pkg);
+	sudo.exec(cmd, options, 
+		function(error, stdout, stderr) {
+			if (error) {
+				console.error(error);
+				console.error(stderr);
+				return false;
+			}
+			var output = JSON.stringify(stdout);
+			console.log("verify stdout: " + output);
+			toggle_package_status(pkg, template, output.includes("TRUE"));
+			// if (output.includes("TRUE"))
+			// 	return true;
+			// else
+			// 	return false;
+		}
+	);
+
+	// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+	// 	if(err){
+	// 		console.error(err);
+	// 		return false;
+	// 	} else {
+	// 		//console.log(pkg + " INCLUDES FALSE: " + data.includes("FALSE"));
+	// 		//console.log(pkg + " INCLUDES TRUE: " + data.includes("TRUE"));
+	// 		if (data.includes("FALSE"))
+	// 			return false;
+	// 		if (data.includes("TRUE"))
+	// 			return true;
+	// 	}
+		
+	// 	// fallthrough
+	// 	return false;
+	// });
+
+	//console.log("Done verifying " + pkg);
 }
 
 
