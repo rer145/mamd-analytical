@@ -60,12 +60,12 @@
 	"build": {
 		"appId": "edu.msu.MaMDAnalytical",
 		"win": {
-			"icon": "assets/icons/mamd.ico"
+			"icon": "assets/icons/mamd.png"
 		},
 		"mac": {
 			"category": "public.app-category.education",
 			"darkModeSupport": true,
-			"icon": "assets/icons/mamd.ico"
+			"icon": "assets/icons/mamd.png"
 		},
 		"dmg": {
 			"iconSize": 160,
