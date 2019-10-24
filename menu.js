@@ -22,11 +22,11 @@ const showPreferences = () => {
 const helpSubmenu = [
 	openUrlMenuItem({
 		label: 'Website',
-		url: 'https://github.com/rer145/hefner-electron-boilerplate'
+		url: 'http://macromorphoscopic.com/'
 	}),
 	openUrlMenuItem({
 		label: 'Source Code',
-		url: 'https://github.com/rer145/hefner-electron-boilerplate'
+		url: 'https://github.com/rer145/mamd-analytical'
 	}),
 	{
 		label: 'Report an Issue…',
@@ -41,7 +41,7 @@ ${debugInfo()}`;
 
 			openNewGitHubIssue({
 				user: 'rer145',
-				repo: 'hefner-electron-boilerplate',
+				repo: 'mamd-analytical',
 				body
 			});
 		}

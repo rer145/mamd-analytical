@@ -18,7 +18,8 @@ const store = new Store();
 const requiredPackages = [
 	'ModelMetrics',
 	'nnet',
-	'dplyr'
+	'dplyr',
+	'caret'
 ];
 
 $(document).ready(function() {
@@ -489,8 +490,8 @@ function generate_inputfile() {
 	console.log("Generating input file...");
 	console.log(window.selections);
 
-	var keys = [];
-	var values = [];
+	var keys = ['Group'];
+	var values = ['Unknown'];
 	for (var key in window.selections) {
 		keys.push(key);
 		values.push(window.selections[key]);
@@ -612,8 +613,7 @@ function disable_button(id) {
 }
 
 function install_package(pkg, template) {
-	var proc = require('child_process');
-
+	console.log('installing : ' + pkg);
 	var analysis_path = store.get("analysis_path");
 	var r_script = path.join(analysis_path, "install_package.R");
 	var parameters = [
