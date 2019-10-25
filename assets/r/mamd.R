@@ -18,10 +18,18 @@ if (!require("nnet")) {
 if (!require("dplyr")) { 
 	install.packages("dplyr", repos = "http://cran.us.r-project.org")
 }
+if (!require("caret")) { 
+	install.packages("caret", repos = "http://cran.us.r-project.org")
+}
+if (!require("e1071")) { 
+	install.packages("e1071", repos = "http://cran.us.r-project.org")
+}
 
 library(ModelMetrics)
 library(nnet)
 library(dplyr)
+library(caret)
+library(e1071)
 
 
 # global options
@@ -39,10 +47,11 @@ inputs<-read.csv(input_file, sep=',', header=T)
 # mamd analysis
 aNN_data = aNN_data[,!sapply(inputs, function(x) mean(is.na(x)))>0.5]
 aNN_data = na.omit(aNN_data)
+aNN_data$Group<-as.factor(aNN_data$Group)
 
 aNN_formula<-as.formula(Group ~ .)
 
-fit<-nnet(aNN_formula, data=aNN_data, size=10, rang=0.1, decay=5e-4, maxit=2000, trace=FALSE)
+fit<-nnet::nnet(aNN_formula, data=aNN_data, size=10, rang=0.1, decay=5e-4, maxit=2000, trace=FALSE)
 f<-fitted(fit)
 mod<-predict(fit, type="class")
 mod<-as.factor(mod)
@@ -58,26 +67,13 @@ pred.post<-format(round(pred,3), nsmall=3)
 aNNpred<-colnames(pred)[apply(pred, 1, which.max)]
 
 # populate output file
-write(aNNpred, 
-		file=output_file,
-		ncolumns=if(is.character(aNNpred) 1 else 5),
-		append=TRUE,
-		sep=" ")
 
+lapply(trim(aNNpred), write, output_file, append=TRUE, ncolumns=ifelse(is.character(aNNpred), 1, 5))
 write("\n\n-----\n\n", file=output_file, append=TRUE)
 
-write(pred.post, 
-		file=output_file,
-		ncolumns=if(is.character(pred.post) 1 else 5),
-		append=TRUE,
-		sep=" ")
 
+write.table(pred.post, output_file, append=TRUE, sep=" ", dec=".", row.names=TRUE, col.names=TRUE)
 write("\n\n-----\n\n", file=output_file, append=TRUE)
 
-write(ctab, 
-		file=output_file,
-		ncolumns=if(is.character(ctab) 1 else 5),
-		append=TRUE,
-		sep=" ")
-
+write.table(ctab$table, output_file, append=TRUE, sep=" ", dec=".", row.names=TRUE, col.names=TRUE)
 write("\n\n-----\n\n", file=output_file, append=TRUE)

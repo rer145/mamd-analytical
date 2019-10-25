@@ -19,7 +19,8 @@ const requiredPackages = [
 	'ModelMetrics',
 	'nnet',
 	'dplyr',
-	'caret'
+	'caret',
+	'e1071'
 ];
 
 $(document).ready(function() {
@@ -580,7 +581,7 @@ function run_analysis() {
 				}
 				console.log('stdout: ' + JSON.stringify(stdout));
 				console.log('stderr: ' + JSON.stringify(stderr));
-				$("#analysis-results-1").text(stdout);
+				//$("#analysis-results-1").text(stdout);
 				show_results(output_file);
 			}
 		);
@@ -597,6 +598,23 @@ function run_analysis() {
 function show_results(output_file) {
 	// TODO: read output_file and parse
 	//   populate #analysis-results-1, 2, 3
+	fs.readFile(output_file, 'utf8', (err, data) => {
+		if (err) console.error(err);
+
+		var sep = '-----';
+		var sep1 = data.indexOf(sep);
+		var sep2 = data.substring(sep1 + sep.length, data.length-1).indexOf(sep);
+		var sep3 = data.lastIndexOf(sep);
+
+		var result1 = data.substring(0, sep1).trim();
+		var result2 = data.substring(sep1 + sep.length, sep2 + sep1 + sep.length).trim();
+		var result3 = data.substring(sep2 + sep1 + (sep.length*2), sep3).trim();
+
+		$("#analysis-results-1").text(result1);
+		$("#analysis-results-2").text(result2);
+		$("#analysis-results-3").text(result3);
+	});
+
 	
 	$("#analysis-loading").hide();
 	$("#analysis-error").hide();
