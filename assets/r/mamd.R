@@ -66,14 +66,48 @@ pred.post<-format(round(pred,3), nsmall=3)
 
 aNNpred<-colnames(pred)[apply(pred, 1, which.max)]
 
+
 # populate output file
-
-lapply(trim(aNNpred), write, output_file, append=TRUE, ncolumns=ifelse(is.character(aNNpred), 1, 5))
-write("\n\n-----\n\n", file=output_file, append=TRUE)
+write("{", file=output_file, append=TRUE, sep="")
 
 
-write.table(pred.post, output_file, append=TRUE, sep=" ", dec=".", row.names=TRUE, col.names=TRUE)
-write("\n\n-----\n\n", file=output_file, append=TRUE)
+write(paste("\"prediction\": \"", trimws(aNNpred), "\", "), file=output_file, append=TRUE, sep="")
 
-write.table(ctab$table, output_file, append=TRUE, sep=" ", dec=".", row.names=TRUE, col.names=TRUE)
-write("\n\n-----\n\n", file=output_file, append=TRUE)
+
+write("\"probabilities\": {", file=output_file, append=TRUE, sep="")
+counter<-0
+for (i in colnames(pred.post)) {
+  counter<-counter+1
+  write(paste("\"", trimws(i), "\": \"", pred.post[1,i], "\"", ifelse(counter!=length(ctab$overall), ",", "")), file=output_file, append=TRUE, sep="")
+}
+write("}, ", file=output_file, append=TRUE, sep="")
+
+
+write("\"matrix\": {", file=output_file, append=TRUE, sep="")
+rcounter<-0
+ccounter<-0
+for(row in rownames(ctab$table)) {
+  write(paste("\"", trimws(row), "\": ["), file=output_file, append=TRUE, sep="")
+  rcounter<-rcounter+1
+  ccounter<-0
+  
+  for (col in colnames(ctab$table)) {
+    ccounter<-ccounter+1
+    write(paste("{\"", trimws(col), "\": \"", trimws(ctab$table[row,col]), "\"}", ifelse(ccounter!=length(colnames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")  
+  }
+  write(paste("]", ifelse(rcounter!=length(rownames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")
+}
+write("}, ", file=output_file, append=TRUE, sep="")
+
+
+write("\"statistics\": {", file=output_file, append=TRUE, sep="")
+counter<-0
+for(key in names(ctab$overall)){
+  value<-ctab$overall[key]
+  counter<-counter+1
+  write(paste("\"", trimws(key), "\": \"", trimws(value), "\"", ifelse(counter!=length(ctab$overall), ",", "")), file=output_file, append=TRUE, sep="")
+}
+write("} ", file=output_file, append=TRUE, sep="")
+
+write("}", file=output_file, append=TRUE, sep="")
+

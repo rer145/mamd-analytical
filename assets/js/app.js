@@ -23,10 +23,21 @@ const requiredPackages = [
 	'e1071'
 ];
 
+const groups = [
+	{"short": "AmericanBlack", "long": "American Black"},
+	{"short": "AmericanWhite", "long": "American White"},
+	{"short": "Amerindian", "long": "American Indian"},
+	{"short": "Asian", "long": "Asian"},
+	{"short": "Guatemalan", "long": "Guatemalan"},
+	{"short": "SWHispanic", "long": "Southwestern Hispanic"},
+	{"short": "Thailand", "long": "Thailand"}
+];
+
 $(document).ready(function() {
 	window.appdb = app_preload();
 	window.is_dirty = false;
 	window.current_file = "";
+	window.current_results = "";
 	
 	//$('[data-toggle="tooltip"]').tooltip();
 	//$('[data-toggle="popover"]').popover();
@@ -167,6 +178,7 @@ function new_case() {
 	window.selections = app_setupselections();
 	window.is_dirty = false;
 	window.current_file = "";
+	window.current_results = "";
 	disable_button("save-button");
 
 	init_case_info();
@@ -213,16 +225,17 @@ function open_case() {
 					});
 
 					// TODO: populate results if applicable
-					// if (json["results"] != undefined) {
-					// 	$("#analysis-results-1").html(json["results"]["ancestry"]);
-					// 	$("#analysis-results-2").html(json["results"]["probabilities"]);
-					// 	$("#analysis-results-3").html(json["results"]["matrix"]);
+					if (json["results"] != undefined) {
+						show_results(json["results"]);
+						// $("#analysis-results-1").html(json["results"]["ancestry"]);
+						// $("#analysis-results-2").html(json["results"]["probabilities"]);
+						// $("#analysis-results-3").html(json["results"]["matrix"]);
 
-					// 	$("#analysis-pending").hide();
-					// 	$("#analysis-loading").hide();
-					// 	$("#analysis-error").hide();
-					// 	$("#analysis-results").show();
-					// }
+						// $("#analysis-pending").hide();
+						// $("#analysis-loading").hide();
+						// $("#analysis-error").hide();
+						// $("#analysis-results").show();
+					}
 
 					// set properties for file checking
 					window.current_file = filePath;
@@ -238,6 +251,11 @@ function save_case() {
 	output += '"properties":{"case_number":"' + $("#case_number_input").val() + '",';
 	output += '"analyst":"' + $("#analyst_input").val() + '",';
 	output += '"observation_date":"' + $("#observation_date_input").val() + '"}';
+
+	if (JSON.stringify(window.current_results).length > 0) {
+		output += ', "results": ' + JSON.stringify(window.current_results);
+	}
+
 	// output += '"results":{"ancenstry":"' + JSON.stringify($("#analysis-results-1").html()) + '",';
 	// output += '"probabilities":"' + JSON.stringify($("#analysis-results-2").html()) + '",';
 	// output += '"matrix":"' + JSON.stringify($("#analysis-results-3").html()) + '"}';
@@ -581,10 +599,14 @@ function run_analysis() {
 					$("#analysis-error").show();
 					return;
 				}
-				console.log('stdout: ' + JSON.stringify(stdout));
-				console.log('stderr: ' + JSON.stringify(stderr));
+				// console.log('stdout: ' + JSON.stringify(stdout));
+				// console.log('stderr: ' + JSON.stringify(stderr));
 				//$("#analysis-results-1").text(stdout);
-				show_results(output_file);
+
+				fs.readFile(output_file, 'utf8', (err, data) => {
+					if (err) console.error(err);
+					show_results(data);
+				});
 			}
 		);
 
@@ -597,27 +619,29 @@ function run_analysis() {
 	//var timeout = setTimeout(show_results, 5000);
 }
 
-function show_results(output_file) {
-	// TODO: read output_file and parse
-	//   populate #analysis-results-1, 2, 3
-	fs.readFile(output_file, 'utf8', (err, data) => {
-		if (err) console.error(err);
+function show_results(data) {
+	var json = data;
+	try {
+		json = JSON.parse(data);
+	} catch { }
+	window.current_results = json;
 
-		var sep = '-----';
-		var sep1 = data.indexOf(sep);
-		var sep2 = data.substring(sep1 + sep.length, data.length-1).indexOf(sep);
-		var sep3 = data.lastIndexOf(sep);
+	$("#analysis-results-1").text(get_group_name(json['prediction']));
 
-		var result1 = data.substring(0, sep1).trim();
-		var result2 = data.substring(sep1 + sep.length, sep2 + sep1 + sep.length).trim();
-		var result3 = data.substring(sep2 + sep1 + (sep.length*2), sep3).trim();
+	// var sep = '-----';
+	// var sep1 = data.indexOf(sep);
+	// var sep2 = data.substring(sep1 + sep.length, data.length-1).indexOf(sep);
+	// var sep3 = data.lastIndexOf(sep);
 
-		$("#analysis-results-1").text(result1);
-		$("#analysis-results-2").text(result2);
-		$("#analysis-results-3").text(result3);
-	});
+	// var result1 = data.substring(0, sep1).trim();
+	// var result2 = data.substring(sep1 + sep.length, sep2 + sep1 + sep.length).trim();
+	// var result3 = data.substring(sep2 + sep1 + (sep.length*2), sep3).trim();
 
+	// $("#analysis-results-1").text(result1);
+	// $("#analysis-results-2").text(result2);
+	// $("#analysis-results-3").text(result3);
 	
+	$("#analysis-pending").hide();
 	$("#analysis-loading").hide();
 	$("#analysis-error").hide();
 	$("#analysis-results").show();
@@ -731,6 +755,15 @@ function verify_package_install(pkg, template) {
 	//console.log("Done verifying " + pkg);
 }
 
+function get_group_name(key) {
+	key = key.trim();
+	for (var i = 0; i < groups.length; i++) {
+		if (groups[i].short === key) {
+			return groups[i].long;
+		}
+	}
+	return key;
+}
 
 
 
