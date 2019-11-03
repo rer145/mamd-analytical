@@ -39,9 +39,9 @@
 				</div>
 
 				<ul class="nav nav-tabs" id="tabs" role="tablist">
-					<li class="nav-item">
+					<!-- <li class="nav-item">
 						<a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
-					</li>
+					</li> -->
 					<li class="nav-item">
 						<a class="nav-link" id="case-tab" data-toggle="tab" href="#case" role="tab" aria-controls="case" aria-selected="false">Case Info</a>
 					</li>
@@ -53,35 +53,6 @@
 					</li>
 				</ul>
 				<div class="tab-content" id="tab-contents">
-					<div class="tab-pane fade show" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-						<div class="card">
-							<div class="card-header">Settings</div>
-							<div class="card-body">
-								<div class="row">
-									<div class="col">
-										<p>Use the button below to select the location of Rscript, or choose from the list below.</p>
-										<p><strong>Current RScript Path: </strong><span id="rscript-current-path"></span></p>
-										<p>
-											<input type="file" id="settings-rscript-button" value="Select Rscript" />
-										</p>
-										<div id="settings-found-rscript"></div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="card">
-							<div class="card-header">Required R Packages</div>
-							<div class="card-body">
-								<div class="row">
-									<div class="col">
-										<p>The following R packages are required for the analysis to run. If you do not have them installed, use the buttons to install them.</p>
-										<div id="settings-r-packages"></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
 					<div class="tab-pane fade show" id="case" role="tabpanel" aria-labelledby="case-tab">
 						<div class="card">
 							<div class="card-header">Case Info</div>
@@ -154,6 +125,51 @@
 				</div>
 			</div>
 		</section>
+
+
+		<div class="modal fade" id="settings-modal" role="dialog" tabindex="-1">
+			<div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Settings / Packages</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="card">
+							<div class="card-header">Settings</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col">
+										<p>Use the button below to select the location of Rscript, or choose from the list below.</p>
+										<p><strong>Current RScript Path: </strong><span id="rscript-current-path"></span></p>
+										<p>
+											<input type="file" id="settings-rscript-button" value="Select Rscript" />
+										</p>
+										<div id="settings-found-rscript"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-header">Required R Packages</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col">
+										<p>The following R packages are required for the analysis to run. If you do not have them installed, use the buttons to install them.</p>
+										<div id="settings-r-packages"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
 
 

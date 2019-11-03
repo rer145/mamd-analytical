@@ -66,15 +66,17 @@ $(document).ready(function() {
 		check_settings();
 	});
 
-	$('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
-		// console.log(e.target.id);
-		// console.log(e.relatedTarget.id);
-		if (e.target.id == "settings-tab") {
-			$("#rscript-current-path").text(store.get("rscript_path"));
-			check_packages();
-		}
-	});
+	// $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+	// 	// console.log(e.target.id);
+	// 	// console.log(e.relatedTarget.id);
+		
+	// });
 
+	$("#settings-modal").on('show.bs.modal', function(e) {
+		$("#rscript-current-path").text(store.get("rscript_path"));
+		check_packages();
+	});
+	
 	$(document).on('click', "input.group-checkbox", function(e) {
 		var group = $(this).val();
 		if ($(this).is(':checked')) {
@@ -750,5 +752,6 @@ ipcRenderer.on('save-case', (event, arg) => {
 });
 
 ipcRenderer.on('settings', (event, arg) => {
-	$('#tabs a[href="#settings"]').tab('show');
+	//$('#tabs a[href="#settings"]').tab('show');
+	$("#settings-modal").modal('show');
 });
