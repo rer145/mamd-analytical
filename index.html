@@ -114,7 +114,44 @@
 							<pre id="analysis-error-message"></pre>
 						</div>
 						<div id="analysis-results">
-							<h5>Predicted Ancestry</h5>
+							<div class="result-area">
+								<div class="row">
+									<div class="col">
+										<h5>Predicted: </h5>
+										<h4 id="results-ancestry"></h4>
+										<br />
+										<p>
+											<strong>Accuracy: </strong><span id="results-accuracy"></span><br />
+											<strong>95% CI: </strong><span id="results-ci"></span>
+										</p>
+										<br />
+										<p>
+											<table id="results-traits" class="table table-bordered table-sm">
+												<thead class="thead-dark">
+													<tr>
+														<th scope="col">Trait</th>
+														<th scope="col">Score</th>
+													</tr>
+												</thead>
+												<tbody></tbody>
+											</table>
+										</p>
+									</div>
+									<div class="col">
+										<canvas id="results-probabilities" width="200" height="200"></canvas>
+									</div>
+								</div>
+								<hr />
+								<div class="row">
+									<div class="col">
+										<table id="results-matrix" class="table table-bordered table-striped table-sm">
+											<thead></thead>
+											<tbody></tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<!-- <h5>Predicted Ancestry</h5>
 							<pre id="analysis-results-1"></pre>
 							<h5>Posterior Probabilities</h5>
 							<pre id="analysis-results-2"></pre>
@@ -142,7 +179,7 @@
 										</tbody>
 									</table>
 								</div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 				</div>

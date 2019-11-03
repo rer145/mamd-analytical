@@ -19,13 +19,28 @@
 {
     padding: 10px;
     margin: 0 0 10.5px;
-    background-color: #f5f5f5;
+	background-color: #f5f5f5;
+	color: #333333;
 }
 
 .result-area th,
 .result-area td {
     color: #333333;
-    background-color: #f5f5f5;
+}
+
+.result-area hr {
+	color: #333333;
+	background-color: #333333;
+}
+
+.numeric {
+	text-align: right;
+}
+
+.thead-dark th {
+	background-color: #2B3E50 !important;
+	color: #EBEBEB !important;
+	font-weight: bold;
 }
 
 pre {

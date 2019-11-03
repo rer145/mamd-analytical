@@ -23,15 +23,15 @@ const requiredPackages = [
 	'e1071'
 ];
 
-const groups = [
-	{"short": "AmericanBlack", "long": "American Black"},
-	{"short": "AmericanWhite", "long": "American White"},
-	{"short": "Amerindian", "long": "American Indian"},
-	{"short": "Asian", "long": "Asian"},
-	{"short": "Guatemalan", "long": "Guatemalan"},
-	{"short": "SWHispanic", "long": "Southwestern Hispanic"},
-	{"short": "Thailand", "long": "Thailand"}
-];
+// const groups = [
+// 	{"short": "AmericanBlack", "long": "American Black"},
+// 	{"short": "AmericanWhite", "long": "American White"},
+// 	{"short": "Amerindian", "long": "American Indian"},
+// 	{"short": "Asian", "long": "Asian"},
+// 	{"short": "Guatemalan", "long": "Guatemalan"},
+// 	{"short": "SWHispanic", "long": "Southwestern Hispanic"},
+// 	{"short": "Thailand", "long": "Thailand"}
+// ];
 
 $(document).ready(function() {
 	window.appdb = app_preload();
@@ -626,20 +626,97 @@ function show_results(data) {
 	} catch { }
 	window.current_results = json;
 
-	$("#analysis-results-1").text(get_group_name(json['prediction']));
+	var pred = json['prediction'];
+	var probs = json['probabilities'];
+	var stats = json['statistics'];
+	var matrix = json['matrix'];
+	var groups = window.appdb["groups"];
+	var traits = window.appdb["traits"];
 
-	// var sep = '-----';
-	// var sep1 = data.indexOf(sep);
-	// var sep2 = data.substring(sep1 + sep.length, data.length-1).indexOf(sep);
-	// var sep3 = data.lastIndexOf(sep);
+	var acc = (parseFloat(stats[' Accuracy ']) * 100).toFixed(2) + "%";
+	var ci = "(" + parseFloat(stats[' AccuracyLower ']).toFixed(4) + ", " + parseFloat(stats[' AccuracyUpper ']).toFixed(4) + ")";
 
-	// var result1 = data.substring(0, sep1).trim();
-	// var result2 = data.substring(sep1 + sep.length, sep2 + sep1 + sep.length).trim();
-	// var result3 = data.substring(sep2 + sep1 + (sep.length*2), sep3).trim();
+	$("#results-ancestry").text(get_group_name(pred));
+	$("#results-accuracy").text(acc);
+	$("#results-ci").text(ci);
 
-	// $("#analysis-results-1").text(result1);
-	// $("#analysis-results-2").text(result2);
-	// $("#analysis-results-3").text(result3);
+	var probs_labels = [];
+	var probs_data = [];
+	for (var k in probs) {
+		probs_labels.push(k);
+		probs_data.push(probs[k]);
+	}
+
+	var Chart = require('chart.js');
+	var ColorSchemes = require('chartjs-plugin-colorschemes');
+	// color schemes: https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+	var probabilities = new Chart(document.getElementById("results-probabilities"), {
+		type: 'pie',
+		data: {
+			labels: probs_labels,
+			datasets: [{
+				data: probs_data
+			}]
+		},
+		options: {
+			responsive: true,
+			legend: {
+				position: 'bottom'
+			},
+			plugins: {
+				colorschemes: {
+					scheme: 'brewer.SetOne7'
+				}
+			}
+		}
+	});
+
+	var trait_table = $("#results-traits").find("tbody");
+	for (var i = 0; i < traits.length; i++) {
+		var trait = get_trait_name(traits[i].abbreviation);
+		var score = window.selections[traits[i].abbreviation];
+		var row = $("<tr></tr>");
+		var col1 = $("<td></td>");
+		var col2 = $("<td></td>");
+		col1.text(trait + " (" + traits[i].abbreviation + ")");
+		col2.addClass("text-right").text(score);
+		row.append(col1).append(col2);
+		trait_table.append(row);
+	}
+
+	var matrix_head = $("#results-matrix").find("thead");
+	var matrix_body = $("#results-matrix").find("tbody");
+
+	var matrix_head_row = $("<tr></tr>");
+	matrix_head_row.append($("<th></th>"));
+	
+	for (var i = 0; i < groups.length; i++) {
+		matrix_head_row.append($("<th></th>").addClass("text-center").text(groups[i].display));
+	}
+	matrix_head.addClass("thead-dark").append(matrix_head_row);
+
+
+	for (var i = 0; i < groups.length; i++) {
+		var row = $("<tr></tr>");
+		row.append($("<td></td>").text(groups[i].display));
+
+		var group_key_i = " " + groups[i].code + " ";
+		for (var j = 0; j < groups.length; j++) {
+			var group_key_j = " " + groups[j].code + " ";
+			var temp = "0";
+
+			for (var k = 0; k < matrix[group_key_i].length; k++) {
+				if (matrix[group_key_i][k].group === group_key_j) {
+					temp = matrix[group_key_i][k].score;
+				}
+			}
+
+			row.append($("<td></td>").addClass("text-right").text(temp));
+		}
+
+		matrix_body.append(row);
+	}
+
 	
 	$("#analysis-pending").hide();
 	$("#analysis-loading").hide();
@@ -756,16 +833,26 @@ function verify_package_install(pkg, template) {
 }
 
 function get_group_name(key) {
+	var groups = window.appdb['groups'];
 	key = key.trim();
 	for (var i = 0; i < groups.length; i++) {
-		if (groups[i].short === key) {
-			return groups[i].long;
+		if (groups[i].code === key) {
+			return groups[i].display;
 		}
 	}
 	return key;
 }
 
-
+function get_trait_name(key) {
+	var traits = window.appdb['traits'];
+	key = key.trim();
+	for (var i = 0; i < traits.length; i++) {
+		if (traits[i].abbreviation === key) {
+			return traits[i].name;
+		}
+	}
+	return key;
+}
 
 
 

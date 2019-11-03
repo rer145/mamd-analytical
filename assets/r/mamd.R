@@ -93,7 +93,7 @@ for(row in rownames(ctab$table)) {
   
   for (col in colnames(ctab$table)) {
     ccounter<-ccounter+1
-    write(paste("{\"", trimws(col), "\": \"", trimws(ctab$table[row,col]), "\"}", ifelse(ccounter!=length(colnames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")  
+    write(paste("{\"group\": \"", trimws(col), "\", \"score\":", trimws(ctab$table[row,col]), "}", ifelse(ccounter!=length(colnames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")  
   }
   write(paste("]", ifelse(rcounter!=length(rownames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")
 }
