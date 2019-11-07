@@ -14,6 +14,10 @@ const lib = require('./assets/js/modules');
 
 var sudo = require('sudo-prompt');
 
+var Chart = require('chart.js');
+var ColorSchemes = require('chartjs-plugin-colorschemes');
+// color schemes: https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+
 const store = new Store();
 const requiredPackages = [
 	'ModelMetrics',
@@ -22,6 +26,8 @@ const requiredPackages = [
 	'caret',
 	'e1071'
 ];
+
+var probs_chart = null;
 
 // const groups = [
 // 	{"short": "AmericanBlack", "long": "American Black"},
@@ -170,6 +176,24 @@ function app_init() {
 	//disable_button("new-button");
 
 	$("#app-version").text(store.get("version"));
+
+
+	probs_chart = new Chart(document.getElementById("results-probabilities"), {
+		type: 'bar',
+		options: {
+			responsive: true,
+			legend: {
+				display: false
+			}
+		},
+		data: {
+			labels: [],
+			datasets: [{
+				labels: 'Accuracy',
+				data: []
+			}]
+		}
+	});
 
 	new_case();
 }
@@ -664,26 +688,16 @@ function show_results(data) {
 
 	$("#results-probability").text(parseFloat(prob).toFixed(4));
 
-	var Chart = require('chart.js');
-	var ColorSchemes = require('chartjs-plugin-colorschemes');
-	// color schemes: https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
-	var probabilities = new Chart(document.getElementById("results-probabilities"), {
-		type: 'bar',
-		data: {
-			labels: probs_labels,
-			datasets: [{
-				data: probs_data
-			}]
-		},
-		options: {
-			responsive: true,
-			legend: {
-				display: false
-			}
-		}
-	});
+	probs_chart.clear();
+	console.log(probs_chart.data.datasets.length);
+
+	probs_chart.data.labels = probs_labels;
+	probs_chart.data.datasets[0].data = probs_data;
+	probs_chart.update();
+
 
 	var trait_table = $("#results-traits").find("tbody");
+	trait_table.empty();
 	for (var i = 0; i < traits.length; i++) {
 		var trait = get_trait_name(traits[i].abbreviation);
 		var score = window.selections[traits[i].abbreviation];
@@ -697,6 +711,7 @@ function show_results(data) {
 	}
 
 	var matrix_head = $("#results-matrix").find("thead");
+	matrix_head.empty();
 	var matrix_body = $("#results-matrix").find("tbody");
 
 	var matrix_head_row = $("<tr></tr>");
@@ -707,7 +722,7 @@ function show_results(data) {
 	}
 	matrix_head.addClass("thead-dark").append(matrix_head_row);
 
-
+	matrix_body.empty();
 	for (var i = 0; i < groups.length; i++) {
 		var row = $("<tr></tr>");
 		row.append($("<td></td>").text(groups[i].display));
