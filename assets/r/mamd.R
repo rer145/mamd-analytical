@@ -68,19 +68,22 @@ aNNpred<-colnames(pred)[apply(pred, 1, which.max)]
 
 
 # populate output file
-write("{", file=output_file, append=TRUE, sep="")
+write("{", file=output_file, append=FALSE, sep="")
 
 
 write(paste("\"prediction\": \"", trimws(aNNpred), "\", "), file=output_file, append=TRUE, sep="")
+write(paste("\"sensitivity\": \"", trimws(gsub(paste("Class: ", trimws(aNNpred), sep=""), "", ctab$byClass[,"Sensitivity"][paste("Class: ", trimws(aNNpred), sep="")])), "\", "), file=output_file, append=TRUE, sep="")
+write(paste("\"specificity\": \"", trimws(gsub(paste("Class: ", trimws(aNNpred), sep=""), "", ctab$byClass[,"Specificity"][paste("Class: ", trimws(aNNpred), sep="")])), "\", "), file=output_file, append=TRUE, sep="")
 
+#gsub("Class: Thailand", "", ctab$byClass[,"Specificity"]["Class: Thailand"])
 
-write("\"probabilities\": {", file=output_file, append=TRUE, sep="")
+write("\"probabilities\": [", file=output_file, append=TRUE, sep="")
 counter<-0
 for (i in colnames(pred.post)) {
   counter<-counter+1
-  write(paste("\"", trimws(i), "\": \"", pred.post[1,i], "\"", ifelse(counter!=length(ctab$overall), ",", "")), file=output_file, append=TRUE, sep="")
+  write(paste("{\"group\": \"", trimws(i), "\", \"probability\": ", pred.post[1,i], "}", ifelse(counter!=length(ctab$overall), ",", "")), file=output_file, append=TRUE, sep="")
 }
-write("}, ", file=output_file, append=TRUE, sep="")
+write("], ", file=output_file, append=TRUE, sep="")
 
 
 write("\"matrix\": {", file=output_file, append=TRUE, sep="")

@@ -627,7 +627,10 @@ function show_results(data) {
 	window.current_results = json;
 
 	var pred = json['prediction'];
+	var sens = json['sensitivity'];
+	var spec = json['specificity'];
 	var probs = json['probabilities'];
+	var prob = 0;
 	var stats = json['statistics'];
 	var matrix = json['matrix'];
 	var groups = window.appdb["groups"];
@@ -635,23 +638,37 @@ function show_results(data) {
 
 	var acc = (parseFloat(stats[' Accuracy ']) * 100).toFixed(2) + "%";
 	var ci = "(" + parseFloat(stats[' AccuracyLower ']).toFixed(4) + ", " + parseFloat(stats[' AccuracyUpper ']).toFixed(4) + ")";
+	var sensitivity = parseFloat(sens).toFixed(4);
+	var specificity = parseFloat(spec).toFixed(4);
 
 	$("#results-ancestry").text(get_group_name(pred));
 	$("#results-accuracy").text(acc);
 	$("#results-ci").text(ci);
+	$("#results-sensitivity").text(sensitivity);
+	$("#results-specificity").text(specificity);
 
+	probs.sort(function(a, b) {
+		return parseFloat(b.probability) - parseFloat(a.probability);
+	});
+	console.log(probs);
 	var probs_labels = [];
 	var probs_data = [];
-	for (var k in probs) {
-		probs_labels.push(k);
-		probs_data.push(probs[k]);
+	for (var i = 0; i < probs.length; i++) {
+		probs_labels.push(probs[i]["group"]);
+		probs_data.push(Number(probs[i]["probability"]));
+
+		if (Number(probs[i]["probability"]) > prob) {
+			prob = Number(probs[i]["probability"]);
+		}
 	}
+
+	$("#results-probability").text(parseFloat(prob).toFixed(4));
 
 	var Chart = require('chart.js');
 	var ColorSchemes = require('chartjs-plugin-colorschemes');
 	// color schemes: https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
 	var probabilities = new Chart(document.getElementById("results-probabilities"), {
-		type: 'pie',
+		type: 'bar',
 		data: {
 			labels: probs_labels,
 			datasets: [{
@@ -661,12 +678,7 @@ function show_results(data) {
 		options: {
 			responsive: true,
 			legend: {
-				position: 'bottom'
-			},
-			plugins: {
-				colorschemes: {
-					scheme: 'brewer.SetOne7'
-				}
+				display: false
 			}
 		}
 	});
