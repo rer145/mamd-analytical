@@ -5,8 +5,7 @@
         {"code": "Amerindian", "display": "American Indian"},
         {"code": "Asian", "display": "Asian"},
         {"code": "Guatemalan", "display": "Guatemalan"},
-        {"code": "SWHispanic", "display": "Southwest Hispanic"},
-        {"code": "Thailand", "display": "Thailand"}
+        {"code": "SWHispanic", "display": "Southwest Hispanic"}
     ],
     "traits": [
     {

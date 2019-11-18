@@ -705,7 +705,7 @@ function show_results(data) {
 		var col1 = $("<td></td>");
 		var col2 = $("<td></td>");
 		col1.text(trait + " (" + traits[i].abbreviation + ")");
-		col2.addClass("text-right").text(score);
+		col2.addClass("text-center").text(score);
 		row.append(col1).append(col2);
 		trait_table.append(row);
 	}
@@ -738,7 +738,7 @@ function show_results(data) {
 				}
 			}
 
-			row.append($("<td></td>").addClass("text-right").text(temp));
+			row.append($("<td></td>").addClass("text-center").text(temp));
 		}
 
 		matrix_body.append(row);

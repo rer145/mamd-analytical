@@ -82,7 +82,7 @@ write("\"probabilities\": [", file=output_file, append=TRUE, sep="")
 counter<-0
 for (i in colnames(pred.post)) {
   counter<-counter+1
-  write(paste("{\"group\": \"", trimws(i), "\", \"probability\": ", pred.post[1,i], "}", ifelse(counter!=length(ctab$overall), ",", "")), file=output_file, append=TRUE, sep="")
+  write(paste("{\"group\": \"", trimws(i), "\", \"probability\": ", pred.post[1,i], "}", ifelse(counter!=length(pred.post), ",", "")), file=output_file, append=TRUE, sep="")
 }
 write("], ", file=output_file, append=TRUE, sep="")
 
