@@ -902,3 +902,7 @@ ipcRenderer.on('settings', (event, arg) => {
 	//$('#tabs a[href="#settings"]').tab('show');
 	$("#settings-modal").modal('show');
 });
+
+ipcRenderer.on('message', (event, arg) => {
+	console.log(arg);
+});
