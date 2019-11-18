@@ -46,6 +46,7 @@ inputs<-read.csv(input_file, sep=',', header=T)
 
 # mamd analysis
 aNN_data = aNN_data[,!sapply(inputs, function(x) mean(is.na(x)))>0.5]
+# apply same sapply to inputs to remove NA columns (or not pass in via original inputs file)
 aNN_data = na.omit(aNN_data)
 aNN_data$Group<-as.factor(aNN_data$Group)
 
