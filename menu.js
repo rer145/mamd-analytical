@@ -14,6 +14,7 @@ const config = require('./config');
 
 //window.$ = window.jQuery = require('jquery');
 const lib = require('./assets/js/modules');
+const updater = require('./assets/js/updater');
 
 const showPreferences = () => {
 	win.getFocusedWindow().webContents.send('settings');
@@ -44,6 +45,13 @@ ${debugInfo()}`;
 				repo: 'mamd-analytical',
 				body
 			});
+		}
+	},
+	{ type: 'separator' },
+	{
+		label: 'Check for Updates',
+		click(menuItem, focusedWindow, event) {
+			updater.checkForUpdates(menuItem, focusedWindow, event);
 		}
 	}
 ];
