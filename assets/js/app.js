@@ -76,6 +76,11 @@ $(document).ready(function() {
 		run_analysis();
 	});
 
+	$("#export-results-pdf").on('click', function(e) {
+		e.preventDefault();
+		export_to_pdf();
+	});
+
 	$("#settings-rscript-button").on('change', function(e) {
 		//console.log(document.getElementById("settings-rscript-button").files[0].path);
 		store.set("rscript_path", document.getElementById("settings-rscript-button").files[0].path);
@@ -857,6 +862,11 @@ function verify_package_install(pkg, template) {
 	// });
 
 	//console.log("Done verifying " + pkg);
+}
+
+function export_to_pdf() {
+	//use window.current_results
+	alert("This function has not yet been implemented.");
 }
 
 function get_group_name(key) {
