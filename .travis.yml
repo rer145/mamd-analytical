@@ -11,8 +11,7 @@ deploy:
     api_key: $GH_TOKEN
     file_glob: true
     file:
-      - "dist/MAMD Analytical Setup *.exe"
-      - "dist/MAMD Analytical Setup *.AppImage"
-      - "dist/MAMD Analytical Setup *.dmg"
+      - "dist/mamd-analytical-*-mac.zip"
+      - "dist/mamd-analytical-setup-*.exe"
     on:
       tags: true

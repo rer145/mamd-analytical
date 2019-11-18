@@ -62,12 +62,14 @@
 	"build": {
 		"appId": "edu.msu.MaMDAnalytical",
 		"win": {
-			"icon": "assets/icons/mamd.png"
+			"icon": "assets/icons/mamd.png",
+			"publish": ["github"]
 		},
 		"mac": {
 			"category": "public.app-category.education",
-			"darkModeSupport": true,
-			"icon": "assets/icons/mamd.png"
+			"darkModeSupport": false,
+			"icon": "assets/icons/mamd.png",
+			"publish": ["github"]
 		},
 		"dmg": {
 			"iconSize": 160,
@@ -82,14 +84,8 @@
 					"type": "link",
 					"path": "/Applications"
 				}
-			]
-		},
-		"linux": {
-			"target": [
-				"AppImage",
-				"deb"
 			],
-			"category": "Network;Chat"
+			"publish": ["github"]
 		}
 	}
 }
