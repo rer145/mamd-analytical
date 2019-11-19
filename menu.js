@@ -116,13 +116,38 @@ const macosTemplate = [
 		role: 'fileMenu',
 		submenu: [
 			{
-				label: 'Custom'
+				label: 'New',
+				click() {
+					win.getFocusedWindow().webContents.send('new-case');
+				}
+			},
+			{
+				label: 'Open',
+				click() {
+					win.getFocusedWindow().webContents.send('open-case');
+				}
+			},
+			{
+				label: 'Save',
+				click() {
+					win.getFocusedWindow().webContents.send('save-case');
+				}
 			},
 			{
 				type: 'separator'
 			},
 			{
-				role: 'close'
+				label: 'Settings',
+				accelerator: 'Control+,',
+				click() {
+					showPreferences();
+				}
+			},
+			{
+				type: 'separator'
+			},
+			{
+				role: 'quit'
 			}
 		]
 	},

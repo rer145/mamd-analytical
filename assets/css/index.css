@@ -74,6 +74,7 @@ body {
 	font-feature-settings: 'liga', 'clig', 'kern';
 }
 
+.alert-template,
 .template {
 	display: none;
 }

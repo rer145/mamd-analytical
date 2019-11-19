@@ -1,73 +1,86 @@
-const { dialog } = require('electron');
+const { dialog, ipcRenderer } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const ProgressBar = require('electron-progressbar');
+//const ProgressBar = require('electron-progressbar');
 
-let progressBar;
+//let progressBar;
+
+const win = require('electron').BrowserWindow;
 
 let updater;
 autoUpdater.autoDownload = false;
 
 autoUpdater.on('error', (error) => {
-	dialog.showErrorBox('Error: ', error == null ? "unknown" : (error.stack || error).toString());
+	// dialog.showErrorBox('Error: ', error == null ? "unknown" : (error.stack || error).toString());
+	win.getFocusedWindow().webContents.send('update-error', error);
 });
 
-autoUpdater.on('update-available', () => {
-	dialog.showMessageBox({
-		type: 'info',
-		title: 'Update Available',
-		message: 'An update to this application was found. Do you want to install it now? The application will be restarted.',
-		buttons: ['Yes, Install the update', 'Cancel']
-	}, (buttonIndex) => {
-		if (buttonIndex === 0) {
-			autoUpdater.downloadUpdate();
+autoUpdater.on('checking-for-update', () => {
+	// dialog.showErrorBox('Error: ', error == null ? "unknown" : (error.stack || error).toString());
+	win.getFocusedWindow().webContents.send('update-checking');
+});
 
-			progressBar = new ProgressBar({
-				indeterminate: false,
-				text: 'Downloading Update...',
-				detail: 'Downloading Update...'
-			});
+autoUpdater.on('update-available', (info) => {
+	// dialog.showMessageBox({
+	// 	type: 'info',
+	// 	title: 'Update Available',
+	// 	message: 'An update to this application was found. Do you want to install it now? The application will be restarted.',
+	// 	buttons: ['Yes, Install the update', 'Cancel']
+	// }, (buttonIndex) => {
+	// 	if (buttonIndex === 0) {
+	// 		autoUpdater.downloadUpdate();
+
+	// 		// progressBar = new ProgressBar({
+	// 		// 	indeterminate: false,
+	// 		// 	text: 'Downloading Update...',
+	// 		// 	detail: 'Downloading Update...'
+	// 		// });
 			
-			progressBar.on('completed', function() {
-				progressBar.detail = 'Download completed. Exiting...';
-			}).on('aborted', function() {
-				console.log('Aborted download');
-			}).on('progress', function(value) {
-				progressBar.detail = `Downloaded ${value}%`;
-			});
+	// 		// progressBar.on('completed', function() {
+	// 		// 	progressBar.detail = 'Download completed. Exiting...';
+	// 		// }).on('aborted', function() {
+	// 		// 	console.log('Aborted download');
+	// 		// }).on('progress', function(value) {
+	// 		// 	progressBar.detail = `Downloaded ${value}%`;
+	// 		// });
 
-		} else {
-			updater.enabled = true;
-			updater = null;
-		}
-	});
+	// 	} else {
+	// 		updater.enabled = true;
+	// 		updater = null;
+	// 	}
+	// });
+	win.getFocusedWindow().webContents.send('update-available', info);
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
-	if (progressBar != undefined) {
-		if (!progressBar.isCompleted()) {
-			progressBar.value = progressObj.percent;
-		}
-	}
+	// if (progressBar != undefined) {
+	// 	if (!progressBar.isCompleted()) {
+	// 		progressBar.value = progressObj.percent;
+	// 	}
+	// }
+	win.getFocusedWindow().webContents.send('update-progress', progressObj);
 });
 
-autoUpdater.on('update-not-available', () => {
-	dialog.showMessageBox({
-		type: 'info',
-		title: 'No Update Available',
-		message: 'The application is currently up-to-date!'
-	});
+autoUpdater.on('update-not-available', (info) => {
+	// dialog.showMessageBox({
+	// 	type: 'info',
+	// 	title: 'No Update Available',
+	// 	message: 'The application is currently up-to-date!'
+	// });
 	updater.enabled = true;
 	updater = null;
+
+	win.getFocusedWindow().webContents.send('update-not-available', info);
 });
 
-autoUpdater.on('update-downloaded', () => {
-	dialog.showMessageBox({
-		type: 'info',
-		title: 'Install Update',
-		message: 'The application update has been downloaded and will now restart to complete the update.'
-	}, () => {
-		setImmediate(() => autoUpdater.quitAndInstall());
-	});
+autoUpdater.on('update-downloaded', (info) => {
+	// dialog.showMessageBox({
+	// 	type: 'info',
+	// 	title: 'Install Update',
+	// 	message: 'The application update has been downloaded and will now restart to complete the update.'
+	// }, () => {
+	// 	setImmediate(() => autoUpdater.quitAndInstall());
+	// });
+	win.getFocusedWindow().webContents.send('update-downloaded', info);
 });
 
 function checkForUpdates(menuItem, focusedWindow, event) {

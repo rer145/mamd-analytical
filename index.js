@@ -135,10 +135,6 @@ app.on('activate', () => {
 	}
 });
 
-// app.on('ready', () => {
-// 	autoUpdater.checkForUpdatesAndNotify();
-// });
-
 (async () => {
 	prep_files_and_settings();
 	
