@@ -26,53 +26,6 @@ app.setAppUserModelId('edu.msu.MaMDAnalytical');
 // Prevent window from being garbage collected
 let mainWindow;
 
-
-/**** AUTO UPDATER *****/
-// autoUpdater.logger = log;
-// autoUpdater.logger.transports.file.level = 'info';
-// log.info('App starting');
-
-
-// if (!is.development) {
-// 	function sendStatusToWindow(text) {
-// 		log.info(text);
-// 		//mainWindow.webContents.send('message', text);
-// 	}
-	
-// 	autoUpdater.on('checking-for-update', () => {
-// 		sendStatusToWindow('Checking for update...');
-// 	});
-// 	autoUpdater.on('update-available', (info) => {
-// 		sendStatusToWindow('Update available.');
-// 	});
-// 	autoUpdater.on('update-not-available', (info) => {
-// 		sendStatusToWindow('Update not available.');
-// 	});
-// 	autoUpdater.on('error', (err) => {
-// 		sendStatusToWindow('Error in auto-updater. ' + err);
-// 	});
-// 	autoUpdater.on('download-progress', (progressObj) => {
-// 		let log_message = "Download speed: " + progressObj.bytesPerSecond;
-// 		log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-// 		log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-// 		sendStatusToWindow(log_message);
-// 	});
-// 	autoUpdater.on('update-downloaded', (info) => {
-// 		sendStatusToWindow('Update downloaded');
-// 	});
-
-// 	// const FOUR_HOURS = 1000 * 60 * 60 * 4;
-// 	// setInterval(() => {
-// 	// 	autoUpdater.checkForUpdates();
-// 	// }, FOUR_HOURS);
-
-// 	// autoUpdater.checkForUpdates();
-// }
-
-
-
-
-
 const createMainWindow = async () => {
 	const win = new BrowserWindow({
 		title: app.getName(),
@@ -81,7 +34,7 @@ const createMainWindow = async () => {
 		backgroundColor: '#4e5d6c',
 		transparent: false,
 		show: false,
-		icon: path.join(__dirname, 'assets/icons/mamd.ico'),
+		icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
 		webPreferences: {
 			nodeIntegration: true,
             defaultEncoding: 'UTF-8'
@@ -141,9 +94,6 @@ app.on('activate', () => {
 	await app.whenReady();
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
-
-	// const favoriteAnimal = config.get('favoriteAnimal');
-	// mainWindow.webContents.executeJavaScript(`document.querySelector('section.main').textContent = 'Your favorite animal is ${favoriteAnimal}'`);
 })();
 
 
