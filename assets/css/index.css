@@ -81,12 +81,18 @@ body {
 
 #offline-alert,
 #settings-alert,
+#update-alert,
 #analysis-pending,
 #analysis-loading,
 #analysis-error,
 #analysis-results,
 .r-package-install-button {
 	display: none;
+}
+
+.alert a {
+	cursor: pointer;
+	text-decoration: none;
 }
 
 /* html,

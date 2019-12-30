@@ -6,11 +6,12 @@ window.Bootstrap = require('bootstrap');
 const fs = require('fs');
 const find = require('find');
 const path = require('path');
-const {ipcRenderer} = require('electron');
+const {ipcMain, ipcRenderer} = require('electron');
 const {dialog} = require('electron').remote;
+//const win = require('electron').BrowserWindow;
 
 const Store = require('electron-store');
-const lib = require('./assets/js/modules');
+//const lib = require('./assets/js/modules');
 
 var sudo = require('sudo-prompt');
 
@@ -145,6 +146,17 @@ $(document).ready(function() {
 		}
 	});
 
+	$(document).on('click', '#install-update-button', function(e) {
+		e.preventDefault();
+		//updater.performUpdate();
+		ipcRenderer.send('update-finish');
+	});
+
+	$(document).on('click', '#dismiss-update-button', function(e) {
+		e.preventDefault();
+		$("#update-alert").hide();
+	});
+
 	// ipcRenderer.on('userdata-path', (event, message) => {
 	// 	//console.log('UserData Path: ' + message);
 	// 	settings.set('config.userdata_path', message);
@@ -179,6 +191,7 @@ function app_init() {
 	show_traits();
 	//check_offline_status();
 	check_settings();
+	check_for_updates();
 	//check_packages();
 
 	//disable_button("save-button");
@@ -365,10 +378,9 @@ function check_offline_status() {
 }
 
 function check_for_updates() {
-	// TODO: show message if updates are available
-	if (!window.is_offline) {
-		//do check
-	}
+	setTimeout(function() {
+		ipcRenderer.send('update-check');
+	}, 3000);
 }
 
 function check_settings() {
@@ -923,39 +935,54 @@ ipcRenderer.on('message', (event, arg) => {
 });
 
 ipcRenderer.on('update-error', (event, arg) => {
-	console.error(arg);
+	$("#update-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-danger")
+		.html(`<p>There was an error while performing an update check.</p><p>${arg}</p>`)
+		.show();
 });
 ipcRenderer.on('update-checking', (event, arg) => {
-	console.log("checking for update");
-	$.toast({
-		heading: 'Checking for update',
-		text: 'Checking remote servers for available updates...',
-		icon: 'info',
-		hideAfter: 3000,
-		position: 'top-center'
-	});
+	$("#update-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-info")
+		.html("Checking remote servers for available updates...")
+		.show();
 });
 ipcRenderer.on('update-available', (event, arg) => {
-	console.log("update available!");
-	console.log(arg);
-	// show toast that does not disappear (hideAfter: false)
-	//  add two buttons in toast, if possible?
+	$("#update-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-warning")
+		.html(`<p>Update Available: Version ${arg.version} is available for download.</p><p><a id="install-update-button" href="#" class="btn btn-warning alert-link">Install Update Now</a> <a id="dismiss-update-button" href="#" class="btn btn-default">Dismiss</a></p>`)
+		.show();
 });
 ipcRenderer.on('update-progress', (event, arg) => {
 	console.log("download progress", arg);
+	$("#update-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-info")
+		.html(`<p>Downloading Update: The application is downloading an update.</p><p><div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="${arg.percent}" aria-valuemin="0" aria-valuemax="100"><span class="sr-only">${arg.percent}% Complete</div></div></p>`)
+		.show();
 });
 ipcRenderer.on('update-not-available', (event, arg) => {
-	console.log("no update available");
-	console.log(arg);
-	$.toast({
-		heading: 'No Update Available',
-		text: `You are currently running version ${arg.version}, which is the most up to date version that is available. <button id="test">Testing</button>`,
-		icon: 'info',
-		hideAfter: 6000,
-		position: 'top-center'
-	});
+	$("#update-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-success")
+		.html(`No Update Available: You are currently running version ${arg.version}, which is the most up to date version that is available.`)
+		.show()
+		.delay(4000)
+		.slideUp(200, function() {
+			$(this).hide();
+		});
 });
 ipcRenderer.on('update-downloaded', (event, arg) => {
-	console.log("update downloaded");
-	console.log(arg);
+	$("#update-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-info")
+		.html(`Install Update: The application update has been downloaded and will restart in 5 seconds to complete the update.`)
+		.show()
+		.delay(5000)
+		.queue(function() {
+			//updater.finishUpdate();
+			ipcRenderer.send('update-finish');
+		});
 });
