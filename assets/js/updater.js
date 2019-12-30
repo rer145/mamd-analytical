@@ -5,8 +5,11 @@ const { ipcMain } = require("electron");
 
 let updater;
 autoUpdater.autoDownload = false;
+autoUpdater.logger = require("electron-log");
+autoUpdater.logger.transports.file.level = "info";
 
 autoUpdater.on('error', (error) => {
+	autoUpdater.logger.info(error);
 	win.getFocusedWindow().webContents.send('update-error', error);
 });
 
