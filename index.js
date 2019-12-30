@@ -1,6 +1,6 @@
 'use strict';
 const path = require('path');
-const {app, BrowserWindow, Menu, ipcMain} = require('electron');
+const {app, BrowserWindow, Menu, ipcMain, dialog, shell} = require('electron');
 // const {autoUpdater} = require('electron-updater');
 // const log = require('electron-log');
 const {is} = require('electron-util');
@@ -163,3 +163,27 @@ function copy_file(src, dest, replace) {
 		});
 	}
 };
+
+
+ipcMain.on('pdf-export', event => {
+	var options = {
+		title: "Save PDF Export",
+		buttonLabel : "Save PDF File",
+		filters :[
+			{name: 'PDF File', extensions: ['pdf']}
+		]
+	};
+	
+	const pdfPath = dialog.showSaveDialog(null, options);
+	const win = BrowserWindow.fromWebContents(event.sender);
+	mainWindow.webContents.printToPDF({}, (error, data) => {
+		if (error) return console.error(error.message);
+
+		fs.writeFile(pdfPath, data, err => {
+			if (err) return console.error(err.message);
+			//shell.openExternal('file://' + pdfPath);
+			event.sender.send('pdf-export-complete', pdfPath);
+		});
+	});
+
+});

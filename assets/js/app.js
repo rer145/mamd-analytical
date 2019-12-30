@@ -7,7 +7,7 @@ const fs = require('fs');
 const find = require('find');
 const path = require('path');
 const {ipcMain, ipcRenderer} = require('electron');
-const {dialog} = require('electron').remote;
+const {dialog, shell} = require('electron').remote;
 //const win = require('electron').BrowserWindow;
 
 const Store = require('electron-store');
@@ -157,6 +157,12 @@ $(document).ready(function() {
 		$("#update-alert").hide();
 	});
 
+	$(document).on('click', '#view-pdf-button', function(e) {
+		e.preventDefault();
+		shell.openExternal('file://' + $(this).attr("data-path"));
+		$("#generic-alert").hide();
+	});
+
 	// ipcRenderer.on('userdata-path', (event, message) => {
 	// 	//console.log('UserData Path: ' + message);
 	// 	settings.set('config.userdata_path', message);
@@ -273,7 +279,7 @@ function open_case() {
 
 					// TODO: populate results if applicable
 					if (json["results"] != undefined) {
-						show_results(json["results"]);
+						show_results(json, json["results"]);
 						// $("#analysis-results-1").html(json["results"]["ancestry"]);
 						// $("#analysis-results-2").html(json["results"]["probabilities"]);
 						// $("#analysis-results-3").html(json["results"]["matrix"]);
@@ -651,7 +657,7 @@ function run_analysis() {
 
 				fs.readFile(output_file, 'utf8', (err, data) => {
 					if (err) console.error(err);
-					show_results(data);
+					show_results(null, data);
 				});
 			}
 		);
@@ -665,7 +671,7 @@ function run_analysis() {
 	//var timeout = setTimeout(show_results, 5000);
 }
 
-function show_results(data) {
+function show_results(fullJson, data) {
 	var json = data;
 	try {
 		json = JSON.parse(data);
@@ -766,7 +772,16 @@ function show_results(data) {
 		matrix_body.append(row);
 	}
 
+
+	// export information
+	$("#results-app-version").html("v" + store.get('version'));
+	if (fullJson != null) {
+		$("#results-case-number").html(fullJson['properties']['case_number']);
+		$("#results-observation-date").html(fullJson['properties']['observation_date']);
+		$("#results-analyst").html(fullJson['properties']['analyst']);
+	}
 	
+	// handle messaging
 	$("#analysis-pending").hide();
 	$("#analysis-loading").hide();
 	$("#analysis-error").hide();
@@ -882,8 +897,20 @@ function verify_package_install(pkg, template) {
 }
 
 function export_to_pdf() {
-	//use window.current_results
-	alert("This function has not yet been implemented.");
+	var today = new Date();
+	var date = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+	var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+	var dateTime = date + ' ' + time;
+	
+	$("#results-export-on").html(dateTime);
+
+	$("#generic-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-info")
+		.html("Please wait while the PDF file is being exported.")
+		.show();
+	
+	ipcRenderer.send('pdf-export');
 }
 
 function get_group_name(key) {
@@ -986,4 +1013,12 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
 			//updater.finishUpdate();
 			ipcRenderer.send('update-finish');
 		});
+});
+
+ipcRenderer.on('pdf-export-complete', (event, arg) => {
+	$("#generic-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-success")
+		.html(`The PDF file has been exported successfully. <a id="view-pdf-button" class="alert-link" data-path="${arg}">Click here</a> to view the file.`)
+		.show();
 });

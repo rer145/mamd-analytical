@@ -10,7 +10,7 @@
 		<script type="text/javascript" src="assets/js/all.min.js"></script>
 	</head>
 	<body>
-		<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top d-print-none">
 			<a class="navbar-brand" href="#">MaMD Analytical (<span id="app-version"></span>)</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -32,15 +32,18 @@
 
 		<section class="main">
 			<div class="container">
-				<div id="settings-alert" class="alert alert-danger" role="alert">
-					The setting for the RScript path is missing. Please check your settings before continuing.
+				<div class="alerts-container d-print-none">
+					<div id="settings-alert" class="alert alert-danger" role="alert">
+						The setting for the RScript path is missing. Please check your settings before continuing.
+					</div>
+					<div id="offline-alert" class="alert alert-warning" role="alert">
+						You are currently working offline. Analysis can continue to be peformed, but no updates to the application can be downloaded and applied until an internet connection has been established.
+					</div>
+					<div id="update-alert" class="alert" role="alert"></div>
+					<div id="generic-alert" class="alert" role="alert"></div>
 				</div>
-				<div id="offline-alert" class="alert alert-warning" role="alert">
-					You are currently working offline. Analysis can continue to be peformed, but no updates to the application can be downloaded and applied until an internet connection has been established.
-				</div>
-				<div id="update-alert" class="alert" role="alert"></div>
 
-				<ul class="nav nav-tabs" id="tabs" role="tablist">
+				<ul class="nav nav-tabs d-print-none" id="tabs" role="tablist">
 					<!-- <li class="nav-item">
 						<a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
 					</li> -->
@@ -117,6 +120,18 @@
 						</div>
 						<div id="analysis-results">
 							<div class="result-area">
+								<div class="row d-none d-print-block">
+									<div class="col">
+										<h2>MaMD Analysis <span id="results-app-version" class="small"></span></h2>
+										<h4>Case Info</h4>
+										<p>
+											<strong>Case #:</strong> <span id="results-case-number"></span><br />
+											<strong>Observation Date:</strong> <span id="results-observation-date"></span><br />
+											<strong>Analyst:</strong> <span id="results-analyst"></span><br />
+											<strong>Exported On:</strong> <span id="results-export-on"></span>
+										</p>
+									</div>
+								</div>
 								<div class="row">
 									<div class="col">
 										<h5>Predicted: <span id="results-ancestry"></span></h5>
@@ -130,7 +145,7 @@
 											<strong>Specificity: </strong><span id="results-specificity"></span>
 										</p>
 										<p>
-											<button id="export-results-pdf" class="btn btn-success">Export to PDF</button>
+											<button id="export-results-pdf" class="btn btn-success d-print-none">Export to PDF</button>
 										</p>
 										<p>
 											<table id="results-traits" class="table table-bordered table-sm">
