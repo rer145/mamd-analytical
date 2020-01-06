@@ -62,7 +62,7 @@ if (!is.macos) {
 			type: 'separator'
 		},
 		aboutMenuItem({
-			icon: path.join(__dirname, 'assets', 'icons', 'mamd.ico'),
+			icon: path.join(__dirname, 'assets', 'icons', 'png', '128x128.png'),
 			text: 'Created by Dr. Joe Hefner and Ron Richardson'
 		})
 	);
