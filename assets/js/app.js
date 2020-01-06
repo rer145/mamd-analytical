@@ -963,7 +963,9 @@ ipcRenderer.on('message', (event, arg) => {
 
 ipcRenderer.on('update-error', (event, arg) => {
 	console.error(arg);
+	console.error(JSON.stringify(arg));
 	console.error(event);
+	console.error(JSON.stringify(errorr));
 	$("#update-alert").removeClass()
 		.addClass("alert")
 		.addClass("alert-danger")
