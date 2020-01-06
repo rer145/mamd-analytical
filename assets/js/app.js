@@ -149,7 +149,7 @@ $(document).ready(function() {
 	$(document).on('click', '#install-update-button', function(e) {
 		e.preventDefault();
 		//updater.performUpdate();
-		ipcRenderer.send('update-finish');
+		ipcRenderer.send('update-start');
 	});
 
 	$(document).on('click', '#dismiss-update-button', function(e) {
@@ -962,14 +962,11 @@ ipcRenderer.on('message', (event, arg) => {
 });
 
 ipcRenderer.on('update-error', (event, arg) => {
-	console.error(arg);
-	console.error(JSON.stringify(arg));
 	console.error(event);
-	console.error(JSON.stringify(event));
 	$("#update-alert").removeClass()
 		.addClass("alert")
 		.addClass("alert-danger")
-		.html(`<p>There was an error while performing an update check.</p><p>${arg}</p>`)
+		.html("<p>There was an error while performing an update check.</p>")
 		.show();
 });
 ipcRenderer.on('update-checking', (event, arg) => {
@@ -980,6 +977,7 @@ ipcRenderer.on('update-checking', (event, arg) => {
 		.show();
 });
 ipcRenderer.on('update-available', (event, arg) => {
+	console.log(arg);
 	$("#update-alert").removeClass()
 		.addClass("alert")
 		.addClass("alert-warning")
