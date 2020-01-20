@@ -77,7 +77,8 @@
 			}
 		],
 		"win": {
-			"icon": "build/icon.ico"
+			"icon": "build/icon.ico",
+			"verifyUpdateCodeSignature": false
 		},
 		"mac": {
 			"category": "public.app-category.education",
