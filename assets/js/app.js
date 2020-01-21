@@ -617,10 +617,10 @@ function run_analysis() {
 	// C:\Users\ronri\AppData\Roaming\MaMD Analytical\1565151398636-input.csv
 	// C:\Users\ronri\AppData\Roaming\MaMD Analytical\1565151398636-output.txt
 
-	$("#analysis-parameters").empty();
-	$.each(parameters, function(i,v) {
-		$("#analysis-parameters").append(v).append("<br />");
-	});
+	// $("#analysis-parameters").empty();
+	// $.each(parameters, function(i,v) {
+	// 	$("#analysis-parameters").append(v).append("<br />");
+	// });
 	
 	if (input_file.length > 0) {
 		// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
