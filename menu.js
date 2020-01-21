@@ -10,11 +10,16 @@ const {
 	openNewGitHubIssue,
 	debugInfo
 } = require('electron-util');
-const config = require('./config');
+//const config = require('./config');
+
+const Store = require('electron-store');
+const store = new Store();
 
 //window.$ = window.jQuery = require('jquery');
-const lib = require('./assets/js/modules');
+//const lib = require('./assets/js/modules');
 const updater = require('./assets/js/updater');
+
+const appName = app.getName();
 
 const showPreferences = () => {
 	win.getFocusedWindow().webContents.send('settings');
@@ -69,27 +74,13 @@ ${debugInfo()}`;
 //}
 
 const debugSubmenu = [
-	{
-		label: 'Show Settings',
-		click() {
-			config.openInEditor();
-		}
-	},
+	{ role: 'reload' },
+	{ role: 'forcereload' },
+	{ type: 'separator' },
 	{
 		label: 'Show App Data',
 		click() {
 			shell.openItem(app.getPath('userData'));
-		}
-	},
-	{
-		type: 'separator'
-	},
-	{
-		label: 'Delete Settings',
-		click() {
-			config.clear();
-			app.relaunch();
-			app.quit();
 		}
 	},
 	{
@@ -99,19 +90,58 @@ const debugSubmenu = [
 			app.relaunch();
 			app.quit();
 		}
+	},
+	{
+		type: 'separator'
+	},
+	// {
+	// 	label: 'Show Settings',
+	// 	click() {
+	// 		config.openInEditor();
+	// 	}
+	// },
+	{
+		label: 'Delete Settings',
+		click() {
+			store.clear();
+			app.relaunch();
+			app.quit();
+		}
 	}
 ];
 
 const macosTemplate = [
-	appMenu([
-		{
-			label: 'Preferences…',
-			accelerator: 'Command+,',
-			click() {
-				showPreferences();
-			}
-		}
-	]),
+	// appMenu([
+	// 	{
+	// 		label: 'Preferences…',
+	// 		accelerator: 'Command+,',
+	// 		click() {
+	// 			showPreferences();
+	// 		}
+	// 	}
+	// ]),
+	{
+		label: appName,
+		submenu: [
+			{ role: 'about' },
+			{ type: 'separator' },
+			{
+				label: 'Preferences...',
+				accelerator: 'Command+,',
+				click() {
+					showPreferences();
+				}
+			},
+			{ type: 'separator' },
+			{ role: 'services', submenu: [] },
+			{ type: 'separator' },
+			{ role: 'hide' },
+			{ role: 'hideothers' },
+			{ role: 'unhide' },
+			{ type: 'separator' },
+			{ role: 'quit' }
+		]
+	},
 	{
 		role: 'fileMenu',
 		submenu: [
