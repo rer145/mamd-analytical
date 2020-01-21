@@ -393,6 +393,7 @@ function check_settings() {
 	// TODO: if no rscript selected, 
 	//   go to settings tab
 	//   disable run analysis button
+	console.log("RPath", store.get("rscript_path"));
 	if (store.get("rscript_path") === undefined) {
 		$("#settings-alert").show();
 		disable_button("analysis-button");

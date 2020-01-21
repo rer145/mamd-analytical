@@ -1,0 +1,3 @@
+[submodule "assets/r-portable"]
+	path = assets/r-portable
+	url = https://github.com/rer145/R-Portable
