@@ -7,6 +7,7 @@ const {is} = require('electron-util');
 const unhandled = require('electron-unhandled');
 const debug = require('electron-debug');
 const contextMenu = require('electron-context-menu');
+const windowStateKeeper = require('electron-window-state');
 const fs = require('fs');
 
 //const config = require('./config');
@@ -27,19 +28,31 @@ app.setAppUserModelId('edu.msu.MaMDAnalytical');
 let mainWindow;
 
 const createMainWindow = async () => {
+	let mainWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768
+	});
+
 	const win = new BrowserWindow({
 		title: app.getName(),
-		width: 1024, 
-		height: 768,
+		// width: 1024, 
+		// height: 768,
+		x: mainWindowState.x,
+		y: mainWindowState.y,
+		width: mainWindowState.width,
+		height: mainWindowState.height,
 		backgroundColor: '#4e5d6c',
 		transparent: false,
 		show: false,
 		icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
 		webPreferences: {
 			nodeIntegration: true,
-            defaultEncoding: 'UTF-8'
+			defaultEncoding: 'UTF-8',
+			disableBlinkFeatures: 'Auxclick'
 		}
 	});
+
+	mainWindowState.manage(win);
 
 	win.on('closed', () => {
 		// Dereference the window
