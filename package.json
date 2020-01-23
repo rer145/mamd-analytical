@@ -78,12 +78,24 @@
 		],
 		"win": {
 			"icon": "build/icon.ico",
-			"verifyUpdateCodeSignature": false
+			"verifyUpdateCodeSignature": false,
+			"extraResources": [
+				  {
+					  "from": "./build/R-Portable/R-Portable-Win",
+					  "to": "R-Portable"
+				  }
+			  ]
 		},
 		"mac": {
 			"category": "public.app-category.education",
 			"darkModeSupport": false,
-			"icon": "build/icon.icns"
+			"icon": "build/icon.icns",
+			"extraResources": [
+				{
+					"from": "./build/R-Portable/R-Portable-Mac",
+					"to": "R-Portable"
+				}
+			]
 		},
 		"dmg": {
 			"iconSize": 160,

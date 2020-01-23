@@ -114,14 +114,26 @@ function prep_files_and_settings() {
 	const appVersion = require(path.join(app.getAppPath(), "package.json")).version;
 	store.set("version", appVersion);
 
-	let RPortablePath = "";
-	if (!is.macos) {
-		RPortablePath = path.join(app.getAppPath(), "assets", "r-portable", "R-Portable-Win", "bin", "RScript.exe");
-		store.set("rscript_path", RPortablePath);
-	} else {
-		RPortablePath = path.join(app.getAppPath(), "assets", "r-portable", "R-Portable-Mac", "bin", "RScript.exe");
-		store.set("rscript_path", RPortablePath);
+	let RPortablePath = path.join(process.resourcesPath, "R-Portable", "bin", "RScript.exe");
+
+	if (is.development) {
+		RPortablePath = path.join(
+			__dirname, 
+			"build", 
+			"R-Portable", 
+			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
+			"bin", 
+			"RScript.exe");
 	}
+
+	// if (!is.macos) {
+	// 	RPortablePath = path.join(RPortablePath, "R-Portable-Win", "bin", "RScript.exe");
+	// 	store.set("rscript_path", RPortablePath);
+	// } else {
+	// 	RPortablePath = path.join(RPortablePath, "R-Portable-Mac", "bin", "RScript.exe");
+	// 	store.set("rscript_path", RPortablePath);
+	// }
+	store.set("rscript_path", RPortablePath);
 
 	
 	store.set("userdata_path", app.getPath("userData"));
