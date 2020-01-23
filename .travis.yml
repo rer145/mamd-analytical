@@ -5,6 +5,13 @@ node_js: '12'
 script:
   - npm run dist
 
+git:
+  submodules: false
+
+before_install:
+  - echo -e "machine github.com\n login $CI_USER_TOKEN" > ~/.netrc
+  - git submodule update --init --recursive
+
 deploy:
     provider: releases
     skip_cleanup: false
