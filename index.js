@@ -126,6 +126,8 @@ function prep_files_and_settings() {
 			"RScript.exe");
 	}
 
+	store.set("rscript_path", RPortablePath);
+
 	// if (!is.macos) {
 	// 	RPortablePath = path.join(RPortablePath, "R-Portable-Win", "bin", "RScript.exe");
 	// 	store.set("rscript_path", RPortablePath);
@@ -133,8 +135,7 @@ function prep_files_and_settings() {
 	// 	RPortablePath = path.join(RPortablePath, "R-Portable-Mac", "bin", "RScript.exe");
 	// 	store.set("rscript_path", RPortablePath);
 	// }
-	store.set("rscript_path", RPortablePath);
-
+	
 	
 	store.set("userdata_path", app.getPath("userData"));
 

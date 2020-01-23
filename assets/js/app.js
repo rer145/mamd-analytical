@@ -102,7 +102,18 @@ $(document).ready(function() {
 
 	$("#settings-modal").on('show.bs.modal', function(e) {
 		$("#rscript-current-path").text(store.get("rscript_path"));
+		
+		if (store.has("auto_check_for_updates")) {
+			$("#settings-auto-update-check").prop("checked", Boolean(store.get("auto_check_for_updates")));
+		} else {
+			$("#settings-auto-update-check").prop("checked", true);
+			store.set("auto_check_for_updates", true);
+		}
 		check_packages();
+	});
+
+	$(document).on('click', "#settings-auto-update-check", function(e) {
+		store.set("auto_check_for_updates", $(this).is(':checked'));
 	});
 	
 	$(document).on('click', "input.group-checkbox", function(e) {
@@ -192,7 +203,7 @@ function app_setupselections() {
 }
 
 function app_init() {
-	show_suggested_rscript_paths();
+	//show_suggested_rscript_paths();
 	//show_groups();
 	show_traits();
 	//check_offline_status();
@@ -384,9 +395,16 @@ function check_offline_status() {
 }
 
 function check_for_updates() {
-	setTimeout(function() {
-		ipcRenderer.send('update-check');
-	}, 3000);
+	let checkForUpdates = true;
+	if (store.has("auto_check_for_updates")) {
+		checkForUpdates = Boolean(store.get("auto_check_for_updates"));
+	}
+
+	if (checkForUpdates) {
+		setTimeout(function() {
+			ipcRenderer.send('update-check');
+		}, 3000);
+	}
 }
 
 function check_settings() {
