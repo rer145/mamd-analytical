@@ -13,7 +13,8 @@ const {dialog, shell} = require('electron').remote;
 const Store = require('electron-store');
 //const lib = require('./assets/js/modules');
 
-var sudo = require('sudo-prompt');
+//var sudo = require('sudo-prompt');
+var exec = require('./assets/js/exec');
 
 var Chart = require('chart.js');
 var ColorSchemes = require('chartjs-plugin-colorschemes');
@@ -621,7 +622,6 @@ function run_analysis() {
 	var output_file = generate_outputfile(input_file);
 	var r_script = path.join(analysis_path, "mamd.R");
 
-	var proc = require('child_process');
 	var parameters = [
 		r_script,
 		packages_path,
@@ -661,25 +661,40 @@ function run_analysis() {
 		});
 		//cmd = cmd.replace("\\", "\\\\g");
 
-		sudo.exec(cmd, options,
+		exec.execFile(store.get("rscript_path"), parameters, 
 			function(error, stdout, stderr) {
-				if (error) {
-					console.error(error);
-					console.log(stderr);
-					$("#analysis-error-message").empty().text(error);
-					$("#analysis-error").show();
-					return;
-				}
-				// console.log('stdout: ' + JSON.stringify(stdout));
-				// console.log('stderr: ' + JSON.stringify(stderr));
-				//$("#analysis-results-1").text(stdout);
-
+				console.error(error);
+				console.log(stderr);
+				$("#analysis-error-message").empty().text(error);
+				$("#analysis-error").show();
+				return;
+			},
+			function(stdout, stderr) {
 				fs.readFile(output_file, 'utf8', (err, data) => {
 					if (err) console.error(err);
 					show_results(null, data);
 				});
-			}
-		);
+			});
+
+		// sudo.exec(cmd, options,
+		// 	function(error, stdout, stderr) {
+		// 		if (error) {
+		// 			console.error(error);
+		// 			console.log(stderr);
+		// 			$("#analysis-error-message").empty().text(error);
+		// 			$("#analysis-error").show();
+		// 			return;
+		// 		}
+		// 		// console.log('stdout: ' + JSON.stringify(stdout));
+		// 		// console.log('stderr: ' + JSON.stringify(stderr));
+		// 		//$("#analysis-results-1").text(stdout);
+
+		// 		fs.readFile(output_file, 'utf8', (err, data) => {
+		// 			if (err) console.error(err);
+		// 			show_results(null, data);
+		// 		});
+		// 	}
+		// );
 
 	} else {
 		$("#analysis-error-message").empty().text("No inut file was generated.");
@@ -833,20 +848,50 @@ function install_package(pkg, template) {
 		cmd = cmd + ' "' + v + '"';
 	});
 
-	sudo.exec(cmd, options, 
+	exec.execFile(store.get("rscript_path"), parameters, 
 		function(error, stdout, stderr) {
-			if (error) {
-				console.error(error);
-				console.log(stderr);
-				toggle_package_status(pkg, template, false); 
-				return false;
-			}
-			console.log('stdout: ' + JSON.stringify(stdout));
-			console.log('stderr: ' + JSON.stringify(stderr));
+			console.error(error);
+			console.log(stderr);
+			toggle_package_status(pkg, template, false);
+			return false;
+		},
+		function(stdout, stderr) {
+			console.log('stdout:', JSON.stringify(stdout));
+			console.log('stderr:', JSON.stringify(stderr));
 			toggle_package_status(pkg, template, true);
 			return true;
-		}
-	);
+		});
+
+	// exec.sudo(
+	// 	cmd, 
+	// 	options, 
+	// 	function(error, stdout, stderr) {
+	// 		console.error(error);
+	// 		console.log(stderr);
+	// 		toggle_package_status(pkg, template, false);
+	// 		return false;
+	// 	},
+	// 	function(stdout, stderr) {
+	// 		console.log('stdout:', JSON.stringify(stdout));
+	// 		console.log('stderr:', JSON.stringify(stderr));
+	// 		toggle_package_status(pkg, template, true);
+	// 		return true;
+	// 	});
+
+	// sudo.exec(cmd, options, 
+	// 	function(error, stdout, stderr) {
+	// 		if (error) {
+	// 			console.error(error);
+	// 			console.log(stderr);
+	// 			toggle_package_status(pkg, template, false); 
+	// 			return false;
+	// 		}
+	// 		console.log('stdout: ' + JSON.stringify(stdout));
+	// 		console.log('stderr: ' + JSON.stringify(stderr));
+	// 		toggle_package_status(pkg, template, true);
+	// 		return true;
+	// 	}
+	// );
 
 	// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
 	// 	if(err){
@@ -878,22 +923,50 @@ function verify_package_install(pkg, template) {
 		cmd = cmd + ' "' + v + '"';
 	});
 
-	sudo.exec(cmd, options, 
+	
+
+	// exec.sudo(cmd, options, 
+	// 	function(error, stdout, stderr) {
+	// 		console.error(error);
+	// 		console.error(stdout);
+	// 		console.error(stderr);
+	// 		return false;
+	// 	},
+	// 	function(stdout, stderr) {
+	// 		var output = JSON.stringify(stdout);
+	// 		console.log("verify stdout:", output);
+	// 		toggle_package_status(pkg, template, output.includes("TRUE"));
+	// 	});
+
+	// sudo.exec(cmd, options, 
+	// 	function(error, stdout, stderr) {
+	// 		if (error) {
+	// 			console.error(error);
+	// 			console.error(stderr);
+	// 			return false;
+	// 		}
+	// 		var output = JSON.stringify(stdout);
+	// 		console.log("verify stdout: " + output);
+	// 		toggle_package_status(pkg, template, output.includes("TRUE"));
+	// 		// if (output.includes("TRUE"))
+	// 		// 	return true;
+	// 		// else
+	// 		// 	return false;
+	// 	}
+	// );
+
+	exec.execFile(store.get("rscript_path"), parameters, 
 		function(error, stdout, stderr) {
-			if (error) {
-				console.error(error);
-				console.error(stderr);
-				return false;
-			}
+			console.error(error);
+			console.error(stdout);
+			console.error(stderr);
+			return false;
+		},
+		function(stdout, stderr) {
 			var output = JSON.stringify(stdout);
-			console.log("verify stdout: " + output);
+			console.log("verify stdout:", output);
 			toggle_package_status(pkg, template, output.includes("TRUE"));
-			// if (output.includes("TRUE"))
-			// 	return true;
-			// else
-			// 	return false;
-		}
-	);
+		});
 
 	// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
 	// 	if(err){
