@@ -16,6 +16,25 @@ function sudo(command, options, error_callback, result_callback) {
 	);
 }
 
+function execBat(file, parameters, error_callback, result_callback) {
+	let cmd = '"' + file + '"';
+	$.each(parameters, function(i,v) {
+		cmd = cmd + ' "' + v + '"';
+	});
+
+	console.warn("Executing", cmd);
+
+	cp.exec(
+		cmd, 
+		function (error, stdout, stderr) {
+			if (error)
+				error_callback(error, stdout, stderr);
+			else
+				result_callback(stdout, stderr);
+		}
+	);
+}
+
 function execFile(file, parameters, error_callback, result_callback) {
 	cp.execFile(
 		file, 
@@ -42,4 +61,4 @@ function spawn(file, parameters, error_callback, result_callback) {
 	// );
 }
 
-module.exports = { sudo, execFile, spawn };
+module.exports = { sudo, execBat, execFile, spawn };

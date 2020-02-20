@@ -8,6 +8,7 @@ const find = require('find');
 const path = require('path');
 const {ipcMain, ipcRenderer} = require('electron');
 const {dialog, shell} = require('electron').remote;
+const {is} = require('electron-util');
 //const win = require('electron').BrowserWindow;
 
 const Store = require('electron-store');
@@ -90,8 +91,8 @@ $(document).ready(function() {
 
 	$("#settings-rscript-button").on('change', function(e) {
 		//console.log(document.getElementById("settings-rscript-button").files[0].path);
-		store.set("rscript_path", document.getElementById("settings-rscript-button").files[0].path);
-		$("#rscript-current-path").text(store.get("rscript_path"));
+		store.set("app.rscript_path", document.getElementById("settings-rscript-button").files[0].path);
+		$("#rscript-current-path").text(store.get("app.rscript_path"));
 		check_settings();
 	});
 
@@ -102,19 +103,19 @@ $(document).ready(function() {
 	// });
 
 	$("#settings-modal").on('show.bs.modal', function(e) {
-		$("#rscript-current-path").text(store.get("rscript_path"));
+		$("#rscript-current-path").text(store.get("app.rscript_path"));
 		
-		if (store.has("auto_check_for_updates")) {
-			$("#settings-auto-update-check").prop("checked", Boolean(store.get("auto_check_for_updates")));
+		if (store.has("settings.auto_check_for_updates")) {
+			$("#settings-auto-update-check").prop("checked", Boolean(store.get("settings.auto_check_for_updates")));
 		} else {
 			$("#settings-auto-update-check").prop("checked", true);
-			store.set("auto_check_for_updates", true);
+			store.set("settings.auto_check_for_updates", true);
 		}
 		check_packages();
 	});
 
 	$(document).on('click', "#settings-auto-update-check", function(e) {
-		store.set("auto_check_for_updates", $(this).is(':checked'));
+		store.set("settings.auto_check_for_updates", $(this).is(':checked'));
 	});
 	
 	$(document).on('click', "input.group-checkbox", function(e) {
@@ -208,8 +209,11 @@ function app_init() {
 	//show_groups();
 	show_traits();
 	//check_offline_status();
-	check_settings();
-	check_for_updates();
+	
+	check_installation();
+	//check_settings();
+	//check_for_updates();
+	
 	//check_packages();
 
 	//disable_button("save-button");
@@ -362,7 +366,7 @@ function search_for_rscript(path) {
 						.text(files[i])
 						.on("click", function(e) {
 							e.preventDefault();
-							store.set("rscript_path", $(this).text());
+							store.set("app.rscript_path", $(this).text());
 							check_settings();
 						})
 				).append($("<br></br>"));
@@ -395,10 +399,85 @@ function check_offline_status() {
 		$("#offline-alert").hide();
 }
 
+function check_installation() {
+	let runInstallation = false;
+	if (store.get("settings.first_run")) {
+		runInstallation = true;
+	}
+
+	if (is.windows) {
+		if (runInstallation) {
+			setTimeout(function() {
+				new Promise(function(resolve, reject) {
+					disable_button("analysis-button");
+					resolve();
+				}).then(function(result) {
+					return new Promise(function(resolve, reject) {
+						$("#generic-alert").removeClass()
+							.addClass("alert")
+							.addClass("alert-warning")
+							.html("Since this is the first time running the application, a few extra items need to be downloaded and installed. This will take a few minutes and will occur in the background, but until it is finished, the analysis won't be able to be run. Another notification will appear once the installation is complete.")
+							.show();
+						resolve();
+					});
+				}).then(function(result) {
+					return new Promise(function(resolve, reject) {
+						let cmd = path.join(store.get("app.resources_path"), "install.bat");
+						var params = [
+							// location of RScript.exe
+							store.get("app.rscript_path"),
+							// ignored
+							"",				
+							// location of R package source files
+							store.get("app.r_package_source_path"),				
+							// location to install R packages
+							store.get("user.packages_path"),				
+							// location of R install/verify scripts
+							store.get("user.analysis_path")
+						];
+
+						exec.execBat(
+							cmd,
+							params, 
+							function(error, stdout, stderr) {
+								console.error(error);
+								console.error(stderr);
+								$("#generic-alert").removeClass()
+									.addClass("alert")
+									.addClass("alert-danger")
+									.html("<p>There was an error while attempting to install the supplemental items. The error received was:</p><p>" + error + "</p><p>" + stderr + "</p>")
+									.show();
+								reject();
+							},
+							function(stdout, stderr) {
+								$("#generic-alert").removeClass()
+									.addClass("alert")
+									.addClass("alert-success")
+									.html("The installation has completed successfully! You may now run an analysis. This notification will disappear in 5 seconds...")
+									.show()
+									.delay(5000)
+									.slideUp(200, function() {
+										$(this).hide();
+									});
+								resolve();
+							}
+						);
+					});
+				}).then(function(result) {
+					return new Promise(function(resolve, reject) {
+						enable_button("analysis-button");
+						resolve();
+					});
+				});
+			}, 1000);
+		}
+	}
+}
+
 function check_for_updates() {
 	let checkForUpdates = true;
-	if (store.has("auto_check_for_updates")) {
-		checkForUpdates = Boolean(store.get("auto_check_for_updates"));
+	if (store.has("settings.auto_check_for_updates")) {
+		checkForUpdates = Boolean(store.get("settings.auto_check_for_updates"));
 	}
 
 	if (checkForUpdates) {
@@ -412,8 +491,9 @@ function check_settings() {
 	// TODO: if no rscript selected, 
 	//   go to settings tab
 	//   disable run analysis button
-	console.log("RPath", store.get("rscript_path"));
-	if (store.get("rscript_path") === undefined) {
+	console.log("RPath", store.get("app.rscript_path"));
+	console.log("RPackageSource", store.get("r_package_source_path"));
+	if (store.get("app.rscript_path") === undefined) {
 		$("#settings-alert").show();
 		disable_button("analysis-button");
 		$('#tabs a[href="#settings"]').tab('show');
@@ -460,12 +540,14 @@ function show_suggested_rscript_paths() {
 	var span = $("#settings-found-rscript");
 	span.empty().html('<p class="loading">Loading suggested paths...</p>');
 
-	if (process.platform === "win32" || process.platform === "win64") {
+	//if (process.platform === "win32" || process.platform === "win64") {
+	if (is.windows) {
 		search_for_rscript('C:\\Program Files\\R');
 		search_for_rscript('C:\\Program Files\\Microsoft\\R Open');
 	}
 
-	if (process.platform === "darwin") {
+	//if (process.platform === "darwin") {
+	if (is.macos) {
         search_for_rscript('/Library/Frameworks/R.framework/Resources/bin');
 		search_for_rscript('/usr/bin/Rscript');
         search_for_rscript("/Library/Frameworks/R.framework/Versions/3.5.1-MRO/Resources/bin/");
@@ -615,6 +697,7 @@ function run_analysis() {
 	$("#analysis-error").hide();
 	$("#analysis-loading").show();
 	
+	var source_path = store.get("r_package_source_path");
 	var packages_path = store.get("packages_path");
 	//var data_path = store.get("userdata_path");
 	var analysis_path = store.get("analysis_path");
@@ -624,7 +707,9 @@ function run_analysis() {
 
 	var parameters = [
 		r_script,
+		source_path,
 		packages_path,
+		is.macos ? "mac.binary" : "win.binary",
 		analysis_path,
 		input_file,
 		output_file
@@ -641,7 +726,7 @@ function run_analysis() {
 	// });
 	
 	if (input_file.length > 0) {
-		// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+		// proc.execFile(store.get("app.rscript_path"), parameters, function(err, data) {
 		// 	if(err){
 		// 		$("#analysis-error-message").empty().text(err);
 		// 		$("#analysis-error").show();
@@ -655,13 +740,13 @@ function run_analysis() {
 		var options = {
 			name: 'MaMD Analysis Subprocess'
 		};
-		var cmd = '"' + store.get("rscript_path") + '"';
+		var cmd = '"' + store.get("app.rscript_path") + '"';
 		$.each(parameters, function(i,v) {
 			cmd = cmd + ' "' + v + '"';
 		});
 		//cmd = cmd.replace("\\", "\\\\g");
 
-		exec.execFile(store.get("rscript_path"), parameters, 
+		exec.execFile(store.get("app.rscript_path"), parameters, 
 			function(error, stdout, stderr) {
 				console.error(error);
 				console.log(stderr);
@@ -843,12 +928,12 @@ function install_package(pkg, template) {
 	var options = {
 		name: 'MaMD Analysis Subprocess'
 	};
-	var cmd = '"' + store.get("rscript_path") + '"';
+	var cmd = '"' + store.get("app.rscript_path") + '"';
 	$.each(parameters, function(i,v) {
 		cmd = cmd + ' "' + v + '"';
 	});
 
-	exec.execFile(store.get("rscript_path"), parameters, 
+	exec.execFile(store.get("app.rscript_path"), parameters, 
 		function(error, stdout, stderr) {
 			console.error(error);
 			console.log(stderr);
@@ -893,7 +978,7 @@ function install_package(pkg, template) {
 	// 	}
 	// );
 
-	// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+	// proc.execFile(store.get("app.rscript_path"), parameters, function(err, data) {
 	// 	if(err){
 	// 		console.error(err);
 	// 		return false;
@@ -918,7 +1003,7 @@ function verify_package_install(pkg, template) {
 	var options = {
 		name: 'MaMD Analysis Subprocess'
 	};
-	var cmd = '"' + store.get("rscript_path") + '"';
+	var cmd = '"' + store.get("app.rscript_path") + '"';
 	$.each(parameters, function(i,v) {
 		cmd = cmd + ' "' + v + '"';
 	});
@@ -955,7 +1040,7 @@ function verify_package_install(pkg, template) {
 	// 	}
 	// );
 
-	exec.execFile(store.get("rscript_path"), parameters, 
+	exec.execFile(store.get("app.rscript_path"), parameters, 
 		function(error, stdout, stderr) {
 			console.error(error);
 			console.error(stdout);
@@ -968,7 +1053,7 @@ function verify_package_install(pkg, template) {
 			toggle_package_status(pkg, template, output.includes("TRUE"));
 		});
 
-	// proc.execFile(store.get("rscript_path"), parameters, function(err, data) {
+	// proc.execFile(store.get("app.rscript_path"), parameters, function(err, data) {
 	// 	if(err){
 	// 		console.error(err);
 	// 		return false;

@@ -80,10 +80,26 @@
 			"icon": "build/icon.ico",
 			"verifyUpdateCodeSignature": false,
 			"extraResources": [
-				  {
-					  "from": "./build/R-Portable/R-Portable-Win",
-					  "to": "R-Portable"
-				  }
+				{
+					"from": "./build/R-Portable/R-Portable-Win",
+					"to": "R-Portable"
+				},
+				{
+					"from": "./build/R-Portable/Rtools*.exe",
+					"to": "Rtools.exe"
+				},
+				{
+					"from": "./build/packages",
+					"to": "packages"
+				},
+				{
+					"from": "./build/scripts",
+					"to": "scripts"
+				},
+				{
+					"from": "./build/install.bat",
+					"to": "install.bat"
+				}
 			  ]
 		},
 		"mac": {
@@ -94,6 +110,22 @@
 				{
 					"from": "./build/R-Portable/R-Portable-Mac",
 					"to": "R-Portable"
+				},
+				{
+					"from": "./build/R-Portable/Rtools*.exe",
+					"to": "Rtools.exe"
+				},
+				{
+				  "from": "./build/packages",
+				  "to": "packages"
+			    },
+				{
+					"from": "./build/scripts",
+					"to": "scripts"
+				},
+				{
+					"from": "./build/install.bat",
+					"to": "install.bat"
 				}
 			]
 		},

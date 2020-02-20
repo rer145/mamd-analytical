@@ -114,60 +114,88 @@ function prep_files_and_settings() {
 	const appVersion = require(path.join(app.getAppPath(), "package.json")).version;
 	store.set("version", appVersion);
 
-	let RPortablePath = path.join(process.resourcesPath, "R-Portable", "bin", "RScript.exe");
+	if (!store.has("settings.auto_check_for_updates")) {
+		store.set("settings.auto_check_for_updates", true);
+	}
 
+	if (!store.has("settings.first_run")) {
+		store.set("settings.first_run", true);
+	} else {
+		store.set("settings.first_run", false);
+	}
+
+	let resourcesPath = process.resourcesPath;
+
+	let RPortablePath = path.join(resourcesPath, "R-Portable", "bin", "RScript.exe");
+	//let RToolsPath = path.join(resourcesPath, "R-Portable", "Rtools.exe");
+	let RPackageSourcePath = path.join(resourcesPath, "packages");
+	let RAnalysisPath = path.join(resourcesPath, "scripts");
+	
 	if (is.development) {
+		resourcesPath = path.join(__dirname, "build");
+
 		RPortablePath = path.join(
-			__dirname, 
-			"build", 
+			resourcesPath, 
 			"R-Portable", 
 			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
 			"bin", 
 			"RScript.exe");
+
+		// RToolsPath = path.join(
+		// 	resourcesPath, 
+		// 	is.macos ? "R-Portable-Mac" : "R-Portable-Win",
+		// 	"Rtools.exe");
+
+		RPackageSourcePath = path.join(
+			resourcesPath,
+			"packages"
+		);
+
+		RAnalysisPath = path.join(
+			resourcesPath,
+			"scripts"
+		);
 	}
 
-	store.set("rscript_path", RPortablePath);
+	store.set("app.resources_path", resourcesPath);
+	store.set("app.rscript_path", RPortablePath);
+	//store.set("app.rtools_path", RToolsPath);
+	store.set("app.r_package_source_path", RPackageSourcePath);
+	store.set("app.r_analysis_path", RAnalysisPath);
 
-	// if (!is.macos) {
-	// 	RPortablePath = path.join(RPortablePath, "R-Portable-Win", "bin", "RScript.exe");
-	// 	store.set("rscript_path", RPortablePath);
-	// } else {
-	// 	RPortablePath = path.join(RPortablePath, "R-Portable-Mac", "bin", "RScript.exe");
-	// 	store.set("rscript_path", RPortablePath);
-	// }
+
+	let userDataPath = app.getPath("userData");
+	let userPackagesPath = path.join(userDataPath, "packages");
+	let userAnalysisPath = path.join(userDataPath, "analysis");
 	
-	
-	store.set("userdata_path", app.getPath("userData"));
+	store.set("user.userdata_path", userDataPath);
+	store.set("user.packages_path", userPackagesPath);
+	store.set("user.analysis_path", userAnalysisPath);
 
-	var packages_path = path.join(app.getPath("userData"), "packages");
-	make_directory(packages_path);
-	store.set("packages_path", packages_path);
+	make_directory(userPackagesPath);
+	make_directory(userAnalysisPath);
 
-	var analysis_path = path.join(app.getPath("userData"), "analysis");
-	make_directory(analysis_path);
-	store.set("analysis_path", analysis_path);
-
-	var r_path = path.join(__dirname, "assets/r");
-	copy_file(
-        path.join(r_path, "mamd.csv"), 
-        path.join(analysis_path, "mamd.csv"), 
-		true);
-	copy_file(
-		path.join(r_path, "Geo.Origin.csv"), 
-		path.join(analysis_path, "Geo.Origin.csv"), 
-		true);
-	copy_file(
-		path.join(r_path, "mamd.R"), 
-		path.join(analysis_path, "mamd.R"), 
-		true);
-	copy_file(
-		path.join(r_path, "install_package.R"), 
-		path.join(analysis_path, "install_package.R"), 
-		true);
-	copy_file(
-		path.join(r_path, "verify_package.R"), 
-		path.join(analysis_path, "verify_package.R"), 
-		true);
+	// var r_path = path.join(__dirname, "assets/r");
+	// copy_file(
+    //     path.join(r_path, "mamd.csv"), 
+    //     path.join(analysis_path, "mamd.csv"), 
+	// 	true);
+	// copy_file(
+	// 	path.join(r_path, "Geo.Origin.csv"), 
+	// 	path.join(analysis_path, "Geo.Origin.csv"), 
+	// 	true);
+	// copy_file(
+	// 	path.join(r_path, "mamd.R"), 
+	// 	path.join(analysis_path, "mamd.R"), 
+	// 	true);
+	// copy_file(
+	// 	path.join(r_path, "install_package.R"), 
+	// 	path.join(analysis_path, "install_package.R"), 
+	// 	true);
+	// copy_file(
+	// 	path.join(r_path, "verify_package.R"), 
+	// 	path.join(analysis_path, "verify_package.R"), 
+	// 	true);
 };
 
 
