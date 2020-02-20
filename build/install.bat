@@ -44,19 +44,26 @@ SET i=0
 FOR %%a IN (%*) DO (
 	SET /a i+=1
 	echo   Arg !i! is %%a
+	rem echo   Parsed Arg !i! is %%a=:+! !%
 )
 echo.
-
-
 
 SET RTOOLS_DEFAULT_PATH=C:\Rtools
 SET RTOOLS_EXE_PATH=C:\Rtools\bin
 
-IF [%1]==[] (
+SET RSCRIPT_PATH=%~1
+
+REM echo checking exist
+REM IF EXIST %RSCRIPT_PATH% (echo i haz it) ELSE (echo nopez)
+REM echo done
+
+set ARG_PARSE=%1
+set ARG_PARSE=%ARG_PARSE:+= %
+IF [%ARG_PARSE%]==[] (
 	GOTO err_arg_rscript_path
 ) ELSE (
-	IF EXIST %1 (
-		SET RSCRIPT_PATH=%1
+	IF EXIST %ARG_PARSE% (
+		SET RSCRIPT_PATH=%ARG_PARSE%
 	) ELSE (
 		GOTO err_rscript_notfound
 	)
@@ -72,29 +79,38 @@ rem 	)
 rem )
 SET RTOOLS_PATH=%USERPROFILE%\Downloads\Rtools35.exe
 
-IF [%3]==[] (
+set ARG_PARSE=%3
+set ARG_PARSE=%ARG_PARSE:+= %
+IF [%ARG_PARSE%]==[] (
 	GOTO err_arg_package_path
 ) ELSE (
-	IF EXIST %3 (
-		SET PKG_SOURCE_PATH=%3
+	IF EXIST %ARG_PARSE% (
+		SET PKG_SOURCE_PATH=%ARG_PARSE%
 	) ELSE (
 		GOTO err_pkg_src_notfound
 	)
 )
-IF [%4]==[] (
+
+set ARG_PARSE=%4
+set ARG_PARSE=%ARG_PARSE:+= %
+IF [%ARG_PARSE%]==[] (
 	GOTO err_arg_install_path
 ) ELSE (
-	IF EXIST %4 (
-		SET PKG_INSTALL_PATH=%4
+	echo haz value
+	IF EXIST %ARG_PARSE% (
+		SET PKG_INSTALL_PATH=%ARG_PARSE%
 	) ELSE (
 		GOTO err_pkg_dest_notfound
 	)
 )
-IF [%5]==[] (
+
+set ARG_PARSE=%5
+set ARG_PARSE=%ARG_PARSE:+= %
+IF [%ARG_PARSE%]==[] (
 	GOTO err_arg_scripts_path
 ) ELSE (
-	IF EXIST %5 (
-		SET SCRIPTS_PATH=%5
+	IF EXIST %ARG_PARSE% (
+		SET SCRIPTS_PATH=%ARG_PARSE%
 		SET SCRIPTS_INSTALL_PATH=!SCRIPTS_PATH:"=!\install.R
 		SET SCRIPTS_VERIFY_PATH=!SCRIPTS_PATH:"=!\verify.R
 		
@@ -187,7 +203,7 @@ echo.
 echo Verifying R packages installation
 echo ---------------------------------------------------------------
 echo.
-%RSCRIPT_PATH% %SCRIPTS_VERIFY_PATH% %PKG_INSTALL_PATH%
+%RSCRIPT_PATH% %SCRIPTS_VERIFY_PATH% %PKG_SOURCE_PATH% %PKG_INSTALL_PATH%
 rem Check for errors and report?
 echo.
 

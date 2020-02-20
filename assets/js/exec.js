@@ -19,10 +19,10 @@ function sudo(command, options, error_callback, result_callback) {
 function execBat(file, parameters, error_callback, result_callback) {
 	let cmd = '"' + file + '"';
 	$.each(parameters, function(i,v) {
-		cmd = cmd + ' "' + v + '"';
+		cmd = cmd + ' "' + v.replace(/\s/g, "+") + '"';
 	});
 
-	console.warn("Executing", cmd);
+	console.warn("Executing [" + cmd + "]");
 
 	cp.exec(
 		cmd, 

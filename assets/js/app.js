@@ -433,7 +433,7 @@ function check_installation() {
 							// location to install R packages
 							store.get("user.packages_path"),				
 							// location of R install/verify scripts
-							store.get("user.analysis_path")
+							store.get("app.r_analysis_path")
 						];
 
 						exec.execBat(
@@ -441,19 +441,19 @@ function check_installation() {
 							params, 
 							function(error, stdout, stderr) {
 								console.error(error);
-								console.error(stderr);
 								$("#generic-alert").removeClass()
 									.addClass("alert")
 									.addClass("alert-danger")
-									.html("<p>There was an error while attempting to install the supplemental items. The error received was:</p><p>" + error + "</p><p>" + stderr + "</p>")
+									.html("<p>There was an error while attempting to install the supplemental items. The error received was:</p><p><pre>" + error + "</pre></p><p><pre>" + stdout + "</pre>")
 									.show();
 								reject();
 							},
 							function(stdout, stderr) {
+								console.log(stdout);
 								$("#generic-alert").removeClass()
 									.addClass("alert")
 									.addClass("alert-success")
-									.html("The installation has completed successfully! You may now run an analysis. This notification will disappear in 5 seconds...")
+									.html("<p>The installation has completed successfully! You may now run an analysis. This notification will disappear in 5 seconds...</p><p><pre>" + stdout + "</pre></p>")
 									.show()
 									.delay(5000)
 									.slideUp(200, function() {
