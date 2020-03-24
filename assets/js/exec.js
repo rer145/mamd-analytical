@@ -16,6 +16,15 @@ function sudo(command, options, error_callback, result_callback) {
 	);
 }
 
+function batch(file, parameters) {
+	let params = ['/c', file];
+	$.each(parameters, function(k,v) {
+		params.push(v.replace(/\s/g, "+"));
+	});
+
+	return cp.spawn('cmd.exe', params);
+}
+
 function execBat(file, parameters, error_callback, result_callback) {
 	let cmd = '"' + file + '"';
 	$.each(parameters, function(i,v) {
@@ -24,8 +33,9 @@ function execBat(file, parameters, error_callback, result_callback) {
 
 	console.warn("Executing [" + cmd + "]");
 
-	cp.exec(
-		cmd, 
+	cp.execFile(
+		cmd,
+		parameters,
 		function (error, stdout, stderr) {
 			if (error)
 				error_callback(error, stdout, stderr);
@@ -61,4 +71,4 @@ function spawn(file, parameters, error_callback, result_callback) {
 	// );
 }
 
-module.exports = { sudo, execBat, execFile, spawn };
+module.exports = { sudo, batch, execBat, execFile, spawn };

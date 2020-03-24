@@ -16,6 +16,7 @@ const Store = require('electron-store');
 
 //var sudo = require('sudo-prompt');
 var exec = require('./assets/js/exec');
+const setup = require('./assets/js/setup');
 
 var Chart = require('chart.js');
 var ColorSchemes = require('chartjs-plugin-colorschemes');
@@ -42,17 +43,65 @@ var probs_chart = null;
 // 	{"short": "Thailand", "long": "Thailand"}
 // ];
 
+function show_setup() {
+	$("#section-setup").show();
+	$("#section-main").hide();
+}
+
+function show_app() {
+	$("#section-setup").hide();
+	$("#section-main").show();
+}
+
 $(document).ready(function() {
 	window.appdb = app_preload();
 	window.is_dirty = false;
 	window.current_file = "";
 	window.current_results = "";
+	$("#app-version").text(store.get("version"));
 	
-	//$('[data-toggle="tooltip"]').tooltip();
-	//$('[data-toggle="popover"]').popover();
+	let is_installed = setup.check_installation(false);
+	if (is_installed) {
+		app_init();
+	} else {
+		app_install();
+	}
+});
 
-	app_init();
+function app_install() {
+	disable_button("save-button");
+	disable_button("open-button");
+	disable_button("new-button");
 
+	show_setup();
+	wire_setup_events();
+}
+
+function wire_setup_events() {
+	$("#setup-start").on('click', function(e) {
+		e.preventDefault();
+		
+		setup.start().then(function(response) {
+			store.set("settings.first_run", false);
+
+			app_init();
+			wire_events();
+
+			$("#generic-alert").removeClass()
+				.addClass("alert")
+				.addClass("alert-success")
+				.html("MaMD Analytical is now ready to use!")
+				.show()
+				.delay(3000)
+				.slideUp();
+		}, function(error) {
+			store.set("settings.first_run", true);	// set to force install on next run
+			console.error(error);
+		});
+	});
+}
+
+function wire_events() {
 	$(document).on('click', "#test", function(e) {
 		e.preventDefault();
 		alert("test");
@@ -180,8 +229,7 @@ $(document).ready(function() {
 	// 	//console.log('UserData Path: ' + message);
 	// 	settings.set('config.userdata_path', message);
 	// });
-});
-
+}
 
 function app_preload() {
 	var db = JSON.parse(fs.readFileSync(path.join(__dirname, "/assets/db/db.json")).toString());
@@ -205,23 +253,21 @@ function app_setupselections() {
 }
 
 function app_init() {
+	wire_events();
 	//show_suggested_rscript_paths();
 	//show_groups();
 	show_traits();
 	//check_offline_status();
 	
-	check_installation();
+	//check_installation();
 	//check_settings();
 	//check_for_updates();
 	
 	//check_packages();
 
-	//disable_button("save-button");
-	//disable_button("open-button");
-	//disable_button("new-button");
-
-	$("#app-version").text(store.get("version"));
-
+	enable_button("save-button");
+	enable_button("open-button");
+	enable_button("new-button");
 
 	probs_chart = new Chart(document.getElementById("results-probabilities"), {
 		type: 'bar',
@@ -241,6 +287,7 @@ function app_init() {
 	});
 
 	new_case();
+	show_app();
 }
 
 function new_case() {
@@ -399,80 +446,7 @@ function check_offline_status() {
 		$("#offline-alert").hide();
 }
 
-function check_installation() {
-	let runInstallation = false;
-	if (store.get("settings.first_run")) {
-		runInstallation = true;
-	}
 
-	if (is.windows) {
-		if (runInstallation) {
-			setTimeout(function() {
-				new Promise(function(resolve, reject) {
-					disable_button("analysis-button");
-					resolve();
-				}).then(function(result) {
-					return new Promise(function(resolve, reject) {
-						$("#generic-alert").removeClass()
-							.addClass("alert")
-							.addClass("alert-warning")
-							.html("Since this is the first time running the application, a few extra items need to be downloaded and installed. This will take a few minutes and will occur in the background, but until it is finished, the analysis won't be able to be run. Another notification will appear once the installation is complete.")
-							.show();
-						resolve();
-					});
-				}).then(function(result) {
-					return new Promise(function(resolve, reject) {
-						let cmd = path.join(store.get("app.resources_path"), "install.bat");
-						var params = [
-							// location of RScript.exe
-							store.get("app.rscript_path"),
-							// ignored
-							"",				
-							// location of R package source files
-							store.get("app.r_package_source_path"),				
-							// location to install R packages
-							store.get("user.packages_path"),				
-							// location of R install/verify scripts
-							store.get("app.r_analysis_path")
-						];
-
-						exec.execBat(
-							cmd,
-							params, 
-							function(error, stdout, stderr) {
-								console.error(error);
-								$("#generic-alert").removeClass()
-									.addClass("alert")
-									.addClass("alert-danger")
-									.html("<p>There was an error while attempting to install the supplemental items. The error received was:</p><p><pre>" + error + "</pre></p><p><pre>" + stdout + "</pre>")
-									.show();
-								reject();
-							},
-							function(stdout, stderr) {
-								console.log(stdout);
-								$("#generic-alert").removeClass()
-									.addClass("alert")
-									.addClass("alert-success")
-									.html("<p>The installation has completed successfully! You may now run an analysis. This notification will disappear in 5 seconds...</p><p><pre>" + stdout + "</pre></p>")
-									.show()
-									.delay(5000)
-									.slideUp(200, function() {
-										$(this).hide();
-									});
-								resolve();
-							}
-						);
-					});
-				}).then(function(result) {
-					return new Promise(function(resolve, reject) {
-						enable_button("analysis-button");
-						resolve();
-					});
-				});
-			}, 1000);
-		}
-	}
-}
 
 function check_for_updates() {
 	let checkForUpdates = true;
@@ -492,7 +466,7 @@ function check_settings() {
 	//   go to settings tab
 	//   disable run analysis button
 	console.log("RPath", store.get("app.rscript_path"));
-	console.log("RPackageSource", store.get("r_package_source_path"));
+	console.log("RPackageSource", store.get("app.r_package_source_path"));
 	if (store.get("app.rscript_path") === undefined) {
 		$("#settings-alert").show();
 		disable_button("analysis-button");
@@ -676,7 +650,7 @@ function generate_inputfile() {
 	var inputs = values.join(",");
 
 	try {
-		var filepath = path.join(store.get("analysis_path"), new Date().valueOf().toString() + "-input.csv");
+		var filepath = path.join(store.get("app.r_analysis_path"), new Date().valueOf().toString() + "-input.csv");
 		fs.writeFileSync(filepath, header + '\n' + inputs + '\n');
 		return filepath;
 	} catch(err) { 
@@ -686,8 +660,8 @@ function generate_inputfile() {
 }
 
 function generate_outputfile(input_file) {
-	var ts = input_file.replace("-input.csv", "").replace(store.get("analysis_path"), "");
-	var filepath = path.join(store.get("analysis_path"), ts + "-output.txt");
+	var ts = input_file.replace("-input.csv", "").replace(store.get("app.r_analysis_path"), "");
+	var filepath = path.join(store.get("app.r_analysis_path"), ts + "-output.txt");
 	return filepath;
 }
 
@@ -697,34 +671,21 @@ function run_analysis() {
 	$("#analysis-error").hide();
 	$("#analysis-loading").show();
 	
-	var source_path = store.get("r_package_source_path");
-	var packages_path = store.get("packages_path");
+	var packages_path = store.get("user.packages_path");
 	//var data_path = store.get("userdata_path");
-	var analysis_path = store.get("analysis_path");
+	var analysis_path = store.get("app.r_analysis_path");
 	var input_file = generate_inputfile();
 	var output_file = generate_outputfile(input_file);
 	var r_script = path.join(analysis_path, "mamd.R");
 
 	var parameters = [
 		r_script,
-		source_path,
 		packages_path,
-		is.macos ? "mac.binary" : "win.binary",
 		analysis_path,
 		input_file,
 		output_file
 	];
 
-	// D:\work\hefner\hefner-electron-boilerplate\assets\r\mamd.r
-	// C:\Users\ronri\AppData\Roaming\MaMD Analytical
-	// C:\Users\ronri\AppData\Roaming\MaMD Analytical\1565151398636-input.csv
-	// C:\Users\ronri\AppData\Roaming\MaMD Analytical\1565151398636-output.txt
-
-	// $("#analysis-parameters").empty();
-	// $.each(parameters, function(i,v) {
-	// 	$("#analysis-parameters").append(v).append("<br />");
-	// });
-	
 	if (input_file.length > 0) {
 		// proc.execFile(store.get("app.rscript_path"), parameters, function(err, data) {
 		// 	if(err){
@@ -918,7 +879,7 @@ function disable_button(id) {
 
 function install_package(pkg, template) {
 	console.log('installing : ' + pkg);
-	var analysis_path = store.get("analysis_path");
+	var analysis_path = store.get("app.r_analysis_path");
 	var r_script = path.join(analysis_path, "install_package.R");
 	var parameters = [
 		r_script,
@@ -993,7 +954,7 @@ function verify_package_install(pkg, template) {
 
 	var proc = require('child_process');
 
-	var analysis_path = store.get("analysis_path");
+	var analysis_path = store.get("app.r_analysis_path");
 	var r_script = path.join(analysis_path, "verify_package.R");
 	var parameters = [
 		r_script,
@@ -1199,4 +1160,20 @@ ipcRenderer.on('pdf-export-complete', (event, arg) => {
 		.addClass("alert-success")
 		.html(`The PDF file has been exported successfully. <a id="view-pdf-button" class="alert-link" data-path="${arg}">Click here</a> to view the file.`)
 		.show();
+});
+
+ipcRenderer.on('check-installation', (event, arg) => {
+	let is_installed = setup.check_installation(true);
+	if (is_installed) {
+		app_init();
+	} else {
+		app_install();
+	}
+});
+
+
+ipcRenderer.on('setup-rtools-exit', (event, args) => {
+	console.log("RTOOLS EXIT");
+	console.log(event);
+	console.log(args);
 });

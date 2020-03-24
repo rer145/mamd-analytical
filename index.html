@@ -30,7 +30,112 @@
 			</div>
 		</nav>
 
-		<section class="main">
+		<section id="section-setup" class="setup" style="display:none;">
+			<div class="container">
+				<div class="row">
+					<div class="col text-center">
+						<h1>Welcome to MaMD Analytical</h1>
+						<p class="small">Before you can begin using this analysis tool, we need to configure a few things first.</p>
+						<p class="small"><strong>Note: </strong> This may take several minutes to complete.</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<div class="card card-default">
+							<div class="card-body">
+
+								<div id="setup-rtools" class="setup-item">
+									<div class="row">
+										<div class="col text-left">
+											<span class="setup-item-name">1) RTools</span>
+										</div>
+										<div class="col-2 text-right">
+											<span class="setup-item-status"></span>
+										</div>
+									</div>
+									<div class="pb row">
+										<div class="col">
+											<div class="progress">
+												<div class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+													<span class="sr-only">0% Complete</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="err row" style="display:none;">
+										<div class="col">
+											<pre></pre>
+										</div>
+									</div>
+								</div>
+
+								<div id="setup-r" class="setup-item">
+									<div class="row">
+										<div class="col text-left">
+											<span class="setup-item-name">2) R (v3.6.2)</span>
+										</div>
+										<div class="col-2 text-right">
+											<span class="setup-item-status"></span>
+										</div>
+									</div>
+									<div class="pb row">
+										<div class="col">
+											<div class="progress">
+												<div class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+													<span class="sr-only">0% Complete</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="err row" style="display:none;">
+										<div class="col">
+											<pre></pre>
+										</div>
+									</div>
+								</div>
+
+								<div id="setup-packages" class="setup-item">
+									<div class="row">
+										<div class="col text-left">
+											<span class="setup-item-name">3) Required R packages <span class="setup-item-package"></span>
+										</div>
+										<div class="col-2 text-right">
+											<span class="setup-item-status">0 of 5</span>
+										</div>
+									</div>
+									<div class="pb row">
+										<div class="col">
+											<div class="progress">
+												<div class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+													<span class="sr-only">0% Complete</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="err row" style="display:none;">
+										<div class="col">
+											<pre></pre>
+										</div>
+									</div>
+								</div>
+
+								<p class="text-center">
+									<strong>Note: </strong> You may be asked to approve changes a few times during this process.<br />
+									This is required to configure MaMD Analytical.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col text-center">
+						<button id="setup-start" class="btn btn-lg btn-success">Get Started</button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id="section-main" class="main" style="display:none;">
 			<div class="container">
 				<div class="alerts-container d-print-none">
 					<div id="settings-alert" class="alert alert-danger" role="alert">

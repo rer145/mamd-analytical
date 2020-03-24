@@ -1,5 +1,9 @@
-.main {
+section {
 	margin-top: 70px;
+}
+
+.setup-item {
+	margin-bottom: 20px;
 }
 
 .nav-tabs .nav-link.active {

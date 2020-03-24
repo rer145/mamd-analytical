@@ -38,6 +38,7 @@
 		"fs": "0.0.1-security",
 		"jquery": "^3.4.1",
 		"popper.js": "^1.15.0",
+		"q": "^1.5.1",
 		"sudo-prompt": "^9.0.0",
 		"tether": "^1.4.6"
 	},
@@ -97,10 +98,10 @@
 					"to": "scripts"
 				},
 				{
-					"from": "./build/install.bat",
-					"to": "install.bat"
+					"from": "./build/setup",
+					"to": "setup"
 				}
-			  ]
+			]
 		},
 		"mac": {
 			"category": "public.app-category.education",
@@ -116,16 +117,12 @@
 					"to": "Rtools.exe"
 				},
 				{
-				  "from": "./build/packages",
-				  "to": "packages"
-			    },
+					"from": "./build/packages",
+					"to": "packages"
+				},
 				{
 					"from": "./build/scripts",
 					"to": "scripts"
-				},
-				{
-					"from": "./build/install.bat",
-					"to": "install.bat"
 				}
 			]
 		},

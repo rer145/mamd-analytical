@@ -18,9 +18,12 @@ setlocal ENABLEDELAYEDEXPANSION
 ::   %5 Path to package installation and verification scripts
 ::     (DEV=./build/scripts)
 ::     (PROD=process.resourcesPath/scripts)
+::   %6 Path to R.exe
+::     (DEV=./build/R-Portable/R-Portable-Win/bin/R.exe)
+::     (PROD=process.resourcesPath/R-Portable/bin/R.exe)
 
 :: Example
-:: install.bat "D:\work\hefner\mamd-analytical\build\R-Portable\R-Portable-Win\bin\Rscript.exe" "D:\work\hefner\mamd-analytical\build\R-Portable\Rtools35.exe" "D:\work\hefner\mamd-analytical\build\packages" "C:\Users\ronri\AppData\Roaming\MaMD Analytical\packages" "D:\work\hefner\mamd-analytical\build\scripts"
+:: install.bat "D:\work\hefner\mamd-analytical\build\R-Portable\R-Portable-Win\bin\Rscript.exe" "D:\work\hefner\mamd-analytical\build\R-Portable\Rtools35.exe" "D:\work\hefner\mamd-analytical\build\packages" "C:\Users\ronri\AppData\Roaming\MaMD Analytical\packages" "D:\work\hefner\mamd-analytical\build\scripts" "D:\work\hefner\mamd-analytical\build\R-Portable\R-Portable-Win\bin\R.exe" 
 
 
 :: Other Requirements
@@ -128,12 +131,25 @@ IF [%ARG_PARSE%]==[] (
 	)
 )
 
+set ARG_PARSE=%6
+set ARG_PARSE=%ARG_PARSE:+= %
+IF [%ARG_PARSE%]==[] (
+	GOTO err_r_path
+) ELSE (
+	IF EXIST %ARG_PARSE% (
+		SET R_PATH=%ARG_PARSE%
+	) ELSE (
+		GOTO err_r_path_notfound
+	)
+)
+
 
 
 echo.
 echo Current Installation and Setup Variables
 echo ----------------------------------------------------------------
 echo   Rscript Path: %RSCRIPT_PATH%
+echo   R Path: %R_PATH%
 echo   Rtools Path: %RTOOLS_PATH%
 echo   Package Src Path: %PKG_SOURCE_PATH%
 echo   Package Install Path: %PKG_INSTALL_PATH%
@@ -177,6 +193,7 @@ echo Checking/Setting temporary PATH variables
 echo ---------------------------------------------------------------
 echo   Backing up PATH variables to: %USERPROFILE%\PATH-backup.txt
 echo %PATH% > %USERPROFILE%\PATH-backup.txt
+
 echo   Checking if Rtools path is set
 echo.%PATH% | findstr /C:"%RTOOLS_EXE_PATH%" 1>nul
 IF ERRORLEVEL 1 (
@@ -185,7 +202,16 @@ IF ERRORLEVEL 1 (
 ) ELSE (
 	echo     Rtools path already in PATH
 )
-:: echo %PATH%
+echo.
+
+
+
+echo.
+echo Setting .libPath()
+echo ---------------------------------------------------------------
+echo.
+rem %R_PATH% %SCRIPTS_INSTALL_PATH% %PKG_SOURCE_PATH% %PKG_INSTALL_PATH%
+rem Check for errors and report?
 echo.
 
 
@@ -254,6 +280,14 @@ GOTO eof
 
 :err_scripts_path_notfound
 echo ERROR: Path for R scripts directory does not exist on file system (%5)
+GOTO eof
+
+:err_r_path
+echo ERROR: Argument 6 is missing -- Full path to R.exe
+GOTO eof
+
+:err_r_path_notfound
+echo ERROR: Path for Rscript.exe does not exist on file system (%6)
 GOTO eof
 
 :err_scripts_install_notfound

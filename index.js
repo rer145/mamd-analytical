@@ -127,6 +127,7 @@ function prep_files_and_settings() {
 	let resourcesPath = process.resourcesPath;
 
 	let RPortablePath = path.join(resourcesPath, "R-Portable", "bin", "RScript.exe");
+	let RPath = path.join(resourcesPath, "R-Portable", "bin", "R.exe");
 	//let RToolsPath = path.join(resourcesPath, "R-Portable", "Rtools.exe");
 	let RPackageSourcePath = path.join(resourcesPath, "packages");
 	let RAnalysisPath = path.join(resourcesPath, "scripts");
@@ -140,6 +141,13 @@ function prep_files_and_settings() {
 			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
 			"bin", 
 			"RScript.exe");
+
+		RPath = path.join(
+			resourcesPath, 
+			"R-Portable", 
+			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
+			"bin", 
+			"R.exe");
 
 		// RToolsPath = path.join(
 		// 	resourcesPath, 
@@ -159,12 +167,16 @@ function prep_files_and_settings() {
 
 	store.set("app.resources_path", resourcesPath);
 	store.set("app.rscript_path", RPortablePath);
+	store.set("app.r_path", RPath);
 	//store.set("app.rtools_path", RToolsPath);
 	store.set("app.r_package_source_path", RPackageSourcePath);
 	store.set("app.r_analysis_path", RAnalysisPath);
 
 
-	let userDataPath = app.getPath("userData");
+	//let userDataPath = path.join(app.getPath("userData");
+	let userDataPath = path.join(app.getPath("home"), "MaMD");
+	make_directory(userDataPath);
+
 	let userPackagesPath = path.join(userDataPath, "packages");
 	let userAnalysisPath = path.join(userDataPath, "analysis");
 	

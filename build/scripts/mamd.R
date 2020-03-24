@@ -2,101 +2,19 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
 # command arguments
 args = commandArgs(trailingOnly=TRUE)
-src_path<-trim(args[1])       # path to package source files
-packages_path<-trim(args[2])	# path to package install 
-package_type<-trim(args[3])   # package type
-analysis_path<-trim(args[4])	# path to analysis files
-input_file<-trim(args[5])	# file where user inputs will be saved
-output_file<-trim(args[6])	# file where analysis output will be saved
+packages_path<-trim(args[1])	# path to package install 
+analysis_path<-trim(args[2])	# path to analysis files
+input_file<-trim(args[3])	# file where user inputs will be saved
+output_file<-trim(args[4])	# file where analysis output will be saved
 
+.libPaths(c(packages_path, .libPaths()))
 
-
-# packages to install from source
-
-# dependencies
-pkg_rcpp<-"Rcpp_1.0.3"
-pkg_rlang<-"rlang_0.4.4"
-pkg_ggplot<-"ggplot2_3.2.1"
-
-# required 
-pkg_mm<-"ModelMetrics_1.2.2.1"
-pkg_nnet<-"nnet_7.3-12"
-pkg_dplyr<-"dplyr_0.8.4"
-pkg_caret<-"caret_6.0-85"
-pkg_e1071<-"e1071_1.7-3"
-
-
-pkg_ext<-".zip"
-if (grepl("mac", package_type)) {
-  pkg_ext<=".tgz"
-}
-
-
-
-# install package dependencies
-if (!require("Rcpp", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_rcpp, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-if (!require("rlang", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_rlang, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-if (!require("ggplot2", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_ggplot, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-
-
-# install packages
-if (!require("ModelMetrics", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_mm, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-if (!require("nnet", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_nnet, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-if (!require("dplyr", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_dplyr, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-if (!require("caret", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_caret, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-if (!require("e1071", lib.loc=packages_path)) {
-	install.packages(paste(src_path, "\\", pkg_e1071, pkg_ext, sep=""), repos=NULL, type=package_type, lib=packages_path)
-}
-
-
-# load dependencies
-library("Rcpp", lib.loc=packages_path)
-library("rlang", lib.loc=packages_path)
-library("ggplot2", lib.loc=packages_path)
-
-# load packages
+# load packages after installation
 library("ModelMetrics", lib.loc=packages_path)
 library("nnet", lib.loc=packages_path)
 library("dplyr", lib.loc=packages_path)
 library("caret", lib.loc=packages_path)
 library("e1071", lib.loc=packages_path)
-
-# # package requirements
-# if (!require("ModelMetrics")) { 
-# 	install.packages("ModelMetrics", repos = "http://cran.us.r-project.org")
-# }
-# if (!require("nnet")) { 
-# 	install.packages("nnet", repos = "http://cran.us.r-project.org")
-# }
-# if (!require("dplyr")) { 
-# 	install.packages("dplyr", repos = "http://cran.us.r-project.org")
-# }
-# if (!require("caret")) { 
-# 	install.packages("caret", repos = "http://cran.us.r-project.org")
-# }
-# if (!require("e1071")) { 
-# 	install.packages("e1071", repos = "http://cran.us.r-project.org")
-# }
-
-# library(ModelMetrics)
-# library(nnet)
-# library(dplyr)
-# library(caret)
-# library(e1071)
 
 
 # global options

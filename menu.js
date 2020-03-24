@@ -107,6 +107,12 @@ const debugSubmenu = [
 			app.relaunch();
 			app.quit();
 		}
+	},
+	{
+		label: 'Run Installer',
+		click() {
+			win.getFocusedWindow().webContents.send('check-installation');
+		}
 	}
 ];
 
