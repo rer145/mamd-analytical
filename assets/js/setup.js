@@ -237,7 +237,6 @@ function install_packages() {
 		
 		var params = [
 			store.get("app.rscript_path"),
-			store.get("app.r_package_source_path"),
 			store.get("user.packages_path"),
 			store.get("app.r_analysis_path")
 		];
@@ -264,24 +263,18 @@ function install_packages() {
 					msg = "Path for Rscript.exe does not exist on file system.";
 					break;
 				case 21:
-					msg = "Argument 2 is missing -- Full path to package source files";
+					msg = "Argument 2 is missing -- Full path to package installation";
 					break;
 				case 22:
-					msg = "Path for package source files does not exist on file system.";
-					break;
-				case 31:
-					msg = "Argument 3 is missing -- Full path to package installation";
-					break;
-				case 32:
 					msg = "Path for package installation does not exist on file system.";
 					break;
-				case 41:
-					msg = "Argument 1 is missing -- Full path to install/verify scripts";
+				case 31:
+					msg = "Argument 3 is missing -- Full path to install/verify scripts";
 					break;
-				case 42:
+				case 32:
 					msg = "Path for install script does not exist on file system.";
 					break;
-				case 43:
+				case 33:
 					msg = "Path for verify script does not exist on file system.";
 					break;
 				case 44:
@@ -291,7 +284,7 @@ function install_packages() {
 					msg = `There was an error installing the R packages (${code}).`;
 					break;
 			}
-			
+			console.log("Batch Execution Done:", code, msg);
 			if (code === 0)
 				resolve();
 			else

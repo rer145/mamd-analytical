@@ -7,9 +7,6 @@ setlocal ENABLEDELAYEDEXPANSION
 ::   %1 Path to Rscript.exe
 ::     (DEV=./build/R-Portable/R-Portable-Win/bin/Rscript.exe)
 ::     (PROD=process.resourcesPath/R-Portable/bin/Rscript.exe)
-::   %2 Path to package source files
-::     (DEV=./build/packages)
-::     (PROD=process.resourcesPath/packages)
 ::   %3 Path to package installation folder
 ::     (app.getPath("userData")/packages | store.get("packages_path")
 ::   %4 Path to package installation and verification scripts
@@ -64,31 +61,18 @@ IF [%ARG_PARSE%]==[] (
 	EXIT /B 21
 ) ELSE (
 	IF EXIST %ARG_PARSE% (
-		SET PKG_SOURCE_PATH=%ARG_PARSE%
+		SET PKG_INSTALL_PATH=%ARG_PARSE%
 	) ELSE (
 		EXIT /B 22
 	)
 )
 
 
+
 set ARG_PARSE=%3
 set ARG_PARSE=%ARG_PARSE:+= %
 IF [%ARG_PARSE%]==[] (
 	EXIT /B 31
-) ELSE (
-	IF EXIST %ARG_PARSE% (
-		SET PKG_INSTALL_PATH=%ARG_PARSE%
-	) ELSE (
-		EXIT /B 32
-	)
-)
-
-
-
-set ARG_PARSE=%4
-set ARG_PARSE=%ARG_PARSE:+= %
-IF [%ARG_PARSE%]==[] (
-	EXIT /B 41
 ) ELSE (
 	IF EXIST %ARG_PARSE% (
 		SET SCRIPTS_PATH=%ARG_PARSE%
@@ -99,13 +83,13 @@ IF [%ARG_PARSE%]==[] (
 		echo verify : !SCRIPTS_VERIFY_PATH!
 		
 		IF NOT EXIST !SCRIPTS_INSTALL_PATH! (
-			EXIT /B 42
+			EXIT /B 32
 		)
 		IF NOT EXIST !SCRIPTS_VERIFY_PATH! (
-			EXIT /B 43
+			EXIT /B 33
 		)
 	) ELSE (
-		EXIT /B 44
+		EXIT /B 34
 	)
 )
 
@@ -113,7 +97,7 @@ IF [%ARG_PARSE%]==[] (
 
 
 REM Install packages locally
-%RSCRIPT_PATH% %SCRIPTS_INSTALL_PATH% %PKG_SOURCE_PATH% %PKG_INSTALL_PATH%
+%RSCRIPT_PATH% %SCRIPTS_INSTALL_PATH% %PKG_INSTALL_PATH%
 IF %ERRORLEVEL% NEQ 0 (
 	EXIT %ERRORLEVEL%
 )

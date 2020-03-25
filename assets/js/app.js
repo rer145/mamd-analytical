@@ -622,7 +622,7 @@ function toggleSelection(code, value, isExplicit) {
 			window.selections[code] = value;
 	}
 	
-	console.log(window.selections);
+	//console.log(window.selections);
 }
 
 // function toggleIsDirty() {
@@ -709,8 +709,8 @@ function run_analysis() {
 
 		exec.execFile(store.get("app.rscript_path"), parameters, 
 			function(error, stdout, stderr) {
-				console.error(error);
-				console.log(stderr);
+				// console.error(error);
+				// console.log(stderr);
 				$("#analysis-error-message").empty().text(error);
 				$("#analysis-error").show();
 				return;

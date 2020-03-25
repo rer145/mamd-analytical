@@ -27,21 +27,23 @@ do.package.install<-function(pkg_name, build_date) {
   }
 }
 
-src_path<-trim(args[1])
-dest_path<-trim(args[2])
-pkg_to_install<-trim(args[3])
+dest_path<-trim(args[1])
+#pkg_to_install<-trim(args[3])
 
-if (is.na(src_path)) {
-  print("  ERROR: Cannot install - no source path defined")
-}
+# if (is.na(src_path)) {
+#   print("  ERROR: Cannot install - no source path defined")
+# }
 
 if (is.na(dest_path)) {
   print("  ERROR: Cannot install - no destination path defined")
 }
 
 
-if (!is.na(src_path) && !is.na(dest_path)) {
-  print(paste("Installing FROM", src_path))
+if (
+#  !is.na(src_path) && 
+  !is.na(dest_path)
+) {
+  #print(paste("Installing FROM", src_path))
   print(paste("Installing TO", dest_path))
   print(paste("libPaths()", .libPaths()))
 

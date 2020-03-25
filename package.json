@@ -1,7 +1,7 @@
 {
 	"name": "mamd-analytical",
 	"productName": "MaMD Analytical",
-	"version": "0.3.15",
+	"version": "0.4.0",
 	"description": "MaMDAnalytical uses an artificial neural network (aNN) to classify an unknown cranium into a reference group.",
 	"license": "",
 	"repository": "rer145/mamd-analytical",
@@ -86,14 +86,6 @@
 					"to": "R-Portable"
 				},
 				{
-					"from": "./build/R-Portable/Rtools*.exe",
-					"to": "Rtools.exe"
-				},
-				{
-					"from": "./build/packages",
-					"to": "packages"
-				},
-				{
 					"from": "./build/scripts",
 					"to": "scripts"
 				},
@@ -111,14 +103,6 @@
 				{
 					"from": "./build/R-Portable/R-Portable-Mac",
 					"to": "R-Portable"
-				},
-				{
-					"from": "./build/R-Portable/Rtools*.exe",
-					"to": "Rtools.exe"
-				},
-				{
-					"from": "./build/packages",
-					"to": "packages"
 				},
 				{
 					"from": "./build/scripts",
