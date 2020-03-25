@@ -80,6 +80,7 @@ function app_install() {
 function wire_setup_events() {
 	$("#setup-start").on('click', function(e) {
 		e.preventDefault();
+		disable_button("setup-start");
 		
 		setup.start().then(function(response) {
 			store.set("settings.first_run", false);
@@ -97,6 +98,7 @@ function wire_setup_events() {
 		}, function(error) {
 			store.set("settings.first_run", true);	// set to force install on next run
 			console.error(error);
+			enable_button("setup-start");
 		});
 	});
 }
