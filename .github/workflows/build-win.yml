@@ -14,11 +14,11 @@ jobs:
 
     if: github.actor == github.event.repository.owner.login
 
-	steps:
+    steps:
       - name: Checkout repository
-		uses: actions/checkout@v2
-		
-	  - name: Checkout submodules
+        uses: actions/checkout@v2
+
+      - name: Checkout submodules
         uses: textbook/git-checkout-submodule-action@2.1.1
 
       - name: Setup NodeJS 12.x
