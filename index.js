@@ -187,6 +187,16 @@ function prep_files_and_settings() {
 	make_directory(userPackagesPath);
 	make_directory(userAnalysisPath);
 
+	// // check if packages path is empty, if so, consider it the first run
+	// fs.readdirSync(userPackagesPath, function(err, files) {
+	// 	console.log("checking for packages", err, files);
+	// 	if (!err) {
+	// 		if (!files.length) {
+	// 			store.set("settings.first_run", true);
+	// 		}
+	// 	}
+	// });
+	
 	// var r_path = path.join(__dirname, "assets/r");
 	// copy_file(
     //     path.join(r_path, "mamd.csv"), 

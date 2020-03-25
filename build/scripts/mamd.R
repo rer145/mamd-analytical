@@ -9,6 +9,33 @@ output_file<-trim(args[4])	# file where analysis output will be saved
 
 .libPaths(c(packages_path, .libPaths()))
 
+
+# attempt reinstallation of missing packages?
+# if (!require("ModelMetrics", lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
+#   install.packages("ModelMetrics", repos="https://mran.microsoft.com/snapshot/2020-01-31", lib=dest_path, verbose=FALSE, quiet=TRUE)
+# }
+# if (!require("nnet", lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
+#   install.packages("nnet", repos="https://mran.microsoft.com/snapshot/2020-01-31", lib=dest_path, verbose=FALSE, quiet=TRUE)
+# }
+
+# if (!require("rlang", lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
+#   install.packages("rlang", repos="https://mran.microsoft.com/snapshot/2020-01-29", lib=dest_path, verbose=FALSE, quiet=TRUE)
+# }
+# if (!require("tidyselect", lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
+#   install.packages("tidyselect", repos="https://mran.microsoft.com/snapshot/2020-01-28", lib=dest_path, verbose=FALSE, quiet=TRUE)
+# }
+# if (!require("dplyr", lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
+#   install.packages("dplyr", repos="https://mran.microsoft.com/snapshot/2020-02-01", lib=dest_path, verbose=FALSE, quiet=TRUE)
+# }
+
+# if (!require("caret", lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
+#   install.packages("caret", repos="https://mran.microsoft.com/snapshot/2020-01-11", lib=dest_path, verbose=FALSE, quiet=TRUE)
+# }
+# if (!require("e1071", lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
+#   install.packages("e1071", repos="https://mran.microsoft.com/snapshot/2020-01-31", lib=dest_path, verbose=FALSE, quiet=TRUE)
+# }
+
+
 # load packages after installation
 library("ModelMetrics", lib.loc=packages_path)
 library("nnet", lib.loc=packages_path)

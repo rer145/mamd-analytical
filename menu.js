@@ -172,16 +172,16 @@ const macosTemplate = [
 				},
 				accelerator: 'CmdOrCtrl+S'
 			},
-			{
-				type: 'separator'
-			},
-			{
-				label: 'Settings',
-				accelerator: 'Control+,',
-				click() {
-					showPreferences();
-				}
-			},
+			// {
+			// 	type: 'separator'
+			// },
+			// {
+			// 	label: 'Settings',
+			// 	accelerator: 'Control+,',
+			// 	click() {
+			// 		showPreferences();
+			// 	}
+			// },
 			{
 				type: 'separator'
 			},
@@ -231,16 +231,16 @@ const otherTemplate = [
 				},
 				accelerator: 'CmdOrCtrl+S'
 			},
-			{
-				type: 'separator'
-			},
-			{
-				label: 'Settings',
-				accelerator: 'Control+,',
-				click() {
-					showPreferences();
-				}
-			},
+			// {
+			// 	type: 'separator'
+			// },
+			// {
+			// 	label: 'Settings',
+			// 	accelerator: 'Control+,',
+			// 	click() {
+			// 		showPreferences();
+			// 	}
+			// },
 			{
 				type: 'separator'
 			},

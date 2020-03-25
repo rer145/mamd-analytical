@@ -74,42 +74,46 @@ function start() {
 
 function install_rtools() {
 	return new Promise(function(resolve, reject) {
-		let batch_file = path.join(scripts_path, "install_rtools.bat");
-		console.log("Installing RTools:", batch_file);
-	
-		start_progress("setup-rtools");
-	
-		const bat = exec.batch(batch_file, []);
-		// bat.stdout.on('data', (data) => {
-		// 	let str = String.fromCharCode.apply(null, data);
-		// 	console.info(str);
-		// });
-		// bat.stderr.on('data', (data) => {
-		// 	let str = String.fromCharCode.apply(null, data);
-		// 	console.error(str);
-		// });
-	
-		bat.on('exit', (code) => {
-			let msg = "";
-			switch (code) {
-				case 0:
-					msg = "RTools installation was successful.";
-					break;
-				case 1:
-					msg = "There was an error downloading RTools. Please check that you have an internet connection.";
-					break;
-				default:
-					msg = `There was an error installing RTools (${code}).`;
-					break;
-			}
-			end_progress("setup-rtools", code, msg);
-
-			if (code === 0)
-				resolve();
-			else
-				reject(code);
-		});
+		resolve();
 	});
+
+	// return new Promise(function(resolve, reject) {
+	// 	let batch_file = path.join(scripts_path, "install_rtools.bat");
+	// 	console.log("Installing RTools:", batch_file);
+	
+	// 	start_progress("setup-rtools");
+	
+	// 	const bat = exec.batch(batch_file, []);
+	// 	// bat.stdout.on('data', (data) => {
+	// 	// 	let str = String.fromCharCode.apply(null, data);
+	// 	// 	console.info(str);
+	// 	// });
+	// 	// bat.stderr.on('data', (data) => {
+	// 	// 	let str = String.fromCharCode.apply(null, data);
+	// 	// 	console.error(str);
+	// 	// });
+	
+	// 	bat.on('exit', (code) => {
+	// 		let msg = "";
+	// 		switch (code) {
+	// 			case 0:
+	// 				msg = "RTools installation was successful.";
+	// 				break;
+	// 			case 1:
+	// 				msg = "There was an error downloading RTools. Please check that you have an internet connection.";
+	// 				break;
+	// 			default:
+	// 				msg = `There was an error installing RTools (${code}).`;
+	// 				break;
+	// 		}
+	// 		end_progress("setup-rtools", code, msg);
+
+	// 		if (code === 0)
+	// 			resolve();
+	// 		else
+	// 			reject(code);
+	// 	});
+	// });
 }
 
 function install_rportable() {

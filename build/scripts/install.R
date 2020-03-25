@@ -3,7 +3,7 @@ print("Starting Install of R Packages")
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 args<-commandArgs(trailingOnly=TRUE)
 
-do.package.install<-function(pkg_name, pkg_file) {
+do.package.install<-function(pkg_name, build_date) {
   print(paste("  Installing package:", pkg_name))
   # if (!require(pkg_name, lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
   if (!require(pkg_name, lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
@@ -11,17 +11,10 @@ do.package.install<-function(pkg_name, pkg_file) {
       {
         install.packages(
           pkg_name, 
-          repos="https://mran.microsoft.com/snapshot/2020-01-31/",
+          repos=paste("https://mran.microsoft.com/snapshot/", build_date, sep=""),
           lib=dest_path,
           verbose=FALSE,
           quiet=TRUE)
-        #install.packages(
-        #  paste(src_path, "\\", pkg_file, sep=""),
-        #  repos=NULL,
-        #  type="source",
-        #  lib=dest_path, 
-        #  verbose=FALSE,
-        #  quiet=TRUE)
         print("    Package installed successfully!")
       },
       error=function(cond) {
@@ -55,16 +48,16 @@ if (!is.na(src_path) && !is.na(dest_path)) {
   .libPaths(c(dest_path, .libPaths()))
   print(paste(".libPaths()", .libPaths()))
   
-  if (is.na(pkg_to_install)) {
-    do.package.install("ModelMetrics", "ModelMetrics_1.2.2.1.tar.gz")
-    do.package.install("nnet", "nnet_7.3-12.tar.gz")
-    do.package.install("dplyr", "dplyr_0.8.4.tar.gz")
-    do.package.install("caret", "caret_6.0-85.tar.gz")
-    do.package.install("e1071", "e1071_1.7-3.tar.gz")
-  } else {
-    print(paste("Installing Package", pkg_to_install))
-    do.package.install(pkg_to_install, "")
-  }
+  # if (is.na(pkg_to_install)) {
+    do.package.install("ModelMetrics", "2020-02-20")
+    do.package.install("nnet", "2020-02-20")
+    do.package.install("dplyr", "2020-02-20")
+    do.package.install("caret", "2020-02-20")
+    do.package.install("e1071", "2020-02-20")
+  # } else {
+  #   print(paste("Installing Package", pkg_to_install))
+  #   do.package.install(pkg_to_install, "")
+  # }
 }
 
 print("Finished Install of R Packages")

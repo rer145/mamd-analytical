@@ -650,7 +650,7 @@ function generate_inputfile() {
 	var inputs = values.join(",");
 
 	try {
-		var filepath = path.join(store.get("app.r_analysis_path"), new Date().valueOf().toString() + "-input.csv");
+		var filepath = path.join(store.get("user.analysis_path"), new Date().valueOf().toString() + "-input.csv");
 		fs.writeFileSync(filepath, header + '\n' + inputs + '\n');
 		return filepath;
 	} catch(err) { 
@@ -660,8 +660,8 @@ function generate_inputfile() {
 }
 
 function generate_outputfile(input_file) {
-	var ts = input_file.replace("-input.csv", "").replace(store.get("app.r_analysis_path"), "");
-	var filepath = path.join(store.get("app.r_analysis_path"), ts + "-output.txt");
+	var ts = input_file.replace("-input.csv", "").replace(store.get("user.analysis_path"), "");
+	var filepath = path.join(store.get("user.analysis_path"), ts + "-output.txt");
 	return filepath;
 }
 
@@ -855,11 +855,20 @@ function show_results(fullJson, data) {
 
 	// export information
 	$("#results-app-version").html("v" + store.get('version'));
-	if (fullJson != null) {
-		$("#results-case-number").html(fullJson['properties']['case_number']);
-		$("#results-observation-date").html(fullJson['properties']['observation_date']);
-		$("#results-analyst").html(fullJson['properties']['analyst']);
+
+	// fill in properties from Case Info if not loaded from file
+	if (!json.hasOwnProperty('properties')) {
+		json['properties'] = {};
+		json['properties']['case_number'] = $("#case_number_input").val();
+		json['properties']['observation_date'] = $("#observation_date_input").val();
+		json['properties']['analyst'] = $("#analyst_input").val();
 	}
+
+	//if (fullJson != null) {
+		$("#results-case-number").html(json['properties']['case_number']);
+		$("#results-observation-date").html(json['properties']['observation_date']);
+		$("#results-analyst").html(json['properties']['analyst']);
+	//}
 	
 	// handle messaging
 	$("#analysis-pending").hide();
