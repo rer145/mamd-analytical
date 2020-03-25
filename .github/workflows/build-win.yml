@@ -1,0 +1,98 @@
+name: Build Windows
+
+on:
+  watch
+	types: [started]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+	runs-on: ${{matrix.os}}
+	
+	if: github.actor == github.event.repository.owner.login
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup NodeJS 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Install NodeJS components
+        run: |
+          npm install
+
+      - name: Emit pkgver
+        id: pkg
+        run: |
+          pkgver=$(node ./build/dist/get-pkg-version.js)
+          echo ::set-output name=version::$pkgver
+        shell: bash
+      
+      - name: Build Windows NSIS installer
+        if: matrix.os == 'windows-latest'
+        run: npm run dist-win
+      - name: Cache Windows release
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v1
+        with:
+          name: mamd-${{steps.pkg.outputs.version}}.exe
+          path: ./dist/mamd-${{steps.pkg.outputs.version}}.exe
+
+  prepare_release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Steup NodeJS 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Retrieve current package version
+        id: pkg
+        run: |
+          pkgver=$(node ./build/dist/get-pkg-version.js)
+          echo ::set-output name=version::$pkgver
+      - name: Download Windows asset
+        uses: actions/download-artifact@v1
+        with:
+          name: mamd-${{steps.pkg.outputs.version}}.exe
+          path: .
+      - name: Generate SHA256 checksums
+        run: |
+          sha256sum "mamd-${{steps.pkg.outputs.version}}.exe" > "SHA256SUMS.txt"
+      - name: Verify checksums
+        run: sha256sum -c SHA256SUMS.txt
+      - name: Create new release draft
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: v${{steps.pkg.outputs.version}}
+          release_name: Release v${{steps.pkg.outputs.version}}
+          body: Looks like we forgot to fill in the changelog....
+          draft: true
+
+      - name: Upload Windows asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with: 
+          upload_url: ${{steps.create_release.outputs.upload_url}}
+          asset_path: ./mamd-${{steps.pkg.outputs.version}}.exe
+          asset_name: mamd-${{steps.pkg.outputs.version}}.exe
+          asset_content_type: application/x-msdownload
+
+      - name: Upload checksums
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}}
+          asset_path: ./SHA256SUMS.txt
+          asset_name: SHA256SUMS.txt
+          asset_content_type: text/plain
