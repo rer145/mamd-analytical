@@ -1,7 +1,7 @@
 name: Build Windows
 
 on:
-  watch
+  watch:
     types: [started]
 
 jobs:
