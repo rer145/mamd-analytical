@@ -16,10 +16,10 @@ jobs:
 
     steps:
 	  - name: Checkout repo and submodules
-		  uses: actions/checkout@v2
-		  with:
-			submodules: true
-			
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Setup NodeJS 12.x
         uses: actions/setup-node@v1
         with:
