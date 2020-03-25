@@ -15,8 +15,7 @@ jobs:
     if: github.actor == github.event.repository.owner.login
 
     steps:
-	  - name: Checkout repo and submodules
-        uses: actions/checkout@v2
+	  - uses: actions/checkout@v2
         with:
           submodules: true
 
