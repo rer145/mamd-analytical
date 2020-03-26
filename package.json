@@ -14,7 +14,13 @@
 		"start": "electron .",
 		"pack": "node build/dist/build-app.js --dir",
 		"dist-win": "node build/dist/build-app.js --win",
-		"dist-mac": "node build/dist/build-app.js --mac"
+		"dist-mac": "node build/dist/build-app.js --mac",
+
+		"travis-pack": "electron-builder --dir",
+		"travis-dist": "electron-builder --macos --windows -p always",
+		"travis-dist-win": "electron-builder --windows",
+		"travis-dist-mac": "electron-builder --macos"
+
 	},
 	"dependencies": {
 		"bootstrap": "^4.3.1",
