@@ -86,7 +86,7 @@ function wire_setup_events() {
 			store.set("settings.first_run", false);
 
 			app_init();
-			wire_events();
+			//wire_events();
 
 			$("#generic-alert").removeClass()
 				.addClass("alert")
