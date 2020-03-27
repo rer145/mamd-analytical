@@ -18,8 +18,8 @@
 
 		"travis-pack": "electron-builder --dir",
 		"travis-dist": "electron-builder --macos --windows -p always",
-		"travis-dist-win": "electron-builder --windows",
-		"travis-dist-mac": "electron-builder --macos"
+		"travis-dist-win": "electron-builder --windows -p always",
+		"travis-dist-mac": "electron-builder --macos -p always"
 
 	},
 	"dependencies": {
