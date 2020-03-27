@@ -19,7 +19,8 @@ function sudo(command, options, error_callback, result_callback) {
 function batch(file, parameters) {
 	let params = ['/c', file];
 	$.each(parameters, function(k,v) {
-		params.push(v.replace(/\s/g, "+"));
+		//params.push(v.replace(/\s/g, "+"));
+		params.push(v)
 	});
 
 	return cp.spawn('cmd.exe', params);
