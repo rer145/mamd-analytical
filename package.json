@@ -1,7 +1,7 @@
 {
 	"name": "mamd-analytical",
 	"productName": "MaMD Analytical",
-	"version": "0.4.2",
+	"version": "0.4.3",
 	"description": "MaMDAnalytical uses an artificial neural network (aNN) to classify an unknown cranium into a reference group.",
 	"license": "",
 	"repository": "rer145/mamd-analytical",
@@ -12,20 +12,29 @@
 	"scripts": {
 		"postinstall": "electron-builder install-app-deps",
 		"start": "electron .",
-		"pack": "node build/dist/build-app.js --dir",
-		"dist-win": "node build/dist/build-app.js --win",
-		"dist-mac": "node build/dist/build-app.js --mac",
+		"start-d": "electron . --debug",
+		"start-di": "electron . --debug --forceInstall",
+		"start-i": "electron . --forceInstall",
+		"start-test": "electron . --debug --resources \"D:\\Test Path Windows\\Inner Path\"",
+		"gh-pack": "node build/dist/build-app.js --dir",
+		"gh-dist-win": "node build/dist/build-app.js --win",
+		"gh-dist-mac": "node build/dist/build-app.js --mac",
+
+		"pack": "electron-builder --dir",
+		"dist": "electron-builder --macos --windows -p always",
+		"dist-win": "electron-builder --windows",
+		"dist-mac": "electron-builder --macos",
 
 		"travis-pack": "electron-builder --dir",
 		"travis-dist": "electron-builder --macos --windows -p always",
 		"travis-dist-win": "electron-builder --windows -p always",
 		"travis-dist-mac": "electron-builder --macos -p always"
-
 	},
 	"dependencies": {
 		"bootstrap": "^4.3.1",
 		"chart.js": "^2.9.2",
 		"chartjs-plugin-colorschemes": "^0.4.0",
+		"command-line-args": "^5.1.1",
 		"electron-context-menu": "^0.12.1",
 		"electron-debug": "^3.0.0",
 		"electron-log": "^3.0.9",

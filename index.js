@@ -16,6 +16,8 @@ const menu = require('./menu');
 const Store = require('electron-store');
 const store = new Store();
 
+const cla = require('./assets/js/cla');
+
 unhandled();
 debug();
 contextMenu();
@@ -71,6 +73,8 @@ const createMainWindow = async () => {
 
 	await win.loadFile(path.join(__dirname, 'index.html'));
 
+	
+
 	return win;
 };
 
@@ -107,6 +111,8 @@ app.on('activate', () => {
 	await app.whenReady();
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
+
+	mainWindow.webContents.send('application-ready', cla.options);
 })();
 
 
@@ -114,17 +120,28 @@ function prep_files_and_settings() {
 	const appVersion = require(path.join(app.getAppPath(), "package.json")).version;
 	store.set("version", appVersion);
 
-	if (!store.has("settings.auto_check_for_updates")) {
-		store.set("settings.auto_check_for_updates", true);
-	}
+	let autoUpdates = !store.has("settings.auto_check_for_updates") ? true : store.get("settings.auto_check_for_updates");
+	let firstRun = !store.has("settings.first_run");
+	if (cla.options.forceInstall)
+		firstRun = true;
 
-	if (!store.has("settings.first_run")) {
-		store.set("settings.first_run", true);
-	} else {
-		store.set("settings.first_run", false);
-	}
+	let devMode = store.has("settings.dev_mode");
+	
+	store.set("settings", {
+		"auto_check_for_updates": autoUpdates,
+		"first_run": firstRun,
+		"dev_mode": devMode
+	});
 
 	let resourcesPath = process.resourcesPath;
+
+	if (cla.options && cla.options.resources && cla.options.resources.length > 0) {
+		resourcesPath = cla.options.resources;
+	} else {
+		if (is.development) {
+			resourcesPath = path.join(__dirname, "build");	
+		}
+	}
 
 	let RPortablePath = path.join(resourcesPath, "R-Portable", "bin", "RScript.exe");
 	let RPath = path.join(resourcesPath, "R-Portable", "bin", "R.exe");
@@ -133,8 +150,6 @@ function prep_files_and_settings() {
 	let RAnalysisPath = path.join(resourcesPath, "scripts");
 	
 	if (is.development) {
-		resourcesPath = path.join(__dirname, "build");
-
 		RPortablePath = path.join(
 			resourcesPath, 
 			"R-Portable", 
@@ -154,23 +169,24 @@ function prep_files_and_settings() {
 		// 	is.macos ? "R-Portable-Mac" : "R-Portable-Win",
 		// 	"Rtools.exe");
 
-		RPackageSourcePath = path.join(
-			resourcesPath,
-			"packages"
-		);
+		// RPackageSourcePath = path.join(
+		// 	resourcesPath,
+		// 	"packages"
+		// );
 
-		RAnalysisPath = path.join(
-			resourcesPath,
-			"scripts"
-		);
+		// RAnalysisPath = path.join(
+		// 	resourcesPath,
+		// 	"scripts"
+		// );
 	}
 
-	store.set("app.resources_path", resourcesPath);
-	store.set("app.rscript_path", RPortablePath);
-	store.set("app.r_path", RPath);
-	//store.set("app.rtools_path", RToolsPath);
-	store.set("app.r_package_source_path", RPackageSourcePath);
-	store.set("app.r_analysis_path", RAnalysisPath);
+	store.set("app", {
+		"resources_path": resourcesPath,
+		"rscript_path": RPortablePath,
+		"r_path": RPath,
+		"r_package_source_path": RPackageSourcePath,
+		"r_analysis_path": RAnalysisPath
+	});
 
 
 	//let userDataPath = path.join(app.getPath("userData");
@@ -179,10 +195,12 @@ function prep_files_and_settings() {
 
 	let userPackagesPath = path.join(userDataPath, "packages");
 	let userAnalysisPath = path.join(userDataPath, "analysis");
-	
-	store.set("user.userdata_path", userDataPath);
-	store.set("user.packages_path", userPackagesPath);
-	store.set("user.analysis_path", userAnalysisPath);
+
+	store.set("user", {
+		"userdata_path": userDataPath,
+		"packages_path": userPackagesPath,
+		"analysis_path": userAnalysisPath
+	});
 
 	make_directory(userPackagesPath);
 	make_directory(userAnalysisPath);

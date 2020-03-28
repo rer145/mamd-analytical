@@ -14,6 +14,7 @@ const {
 
 const Store = require('electron-store');
 const store = new Store();
+const cla = require('./assets/js/cla');
 
 //window.$ = window.jQuery = require('jquery');
 //const lib = require('./assets/js/modules');
@@ -263,7 +264,7 @@ const otherTemplate = [
 
 const template = process.platform === 'darwin' ? macosTemplate : otherTemplate;
 
-if (is.development || store.has("settings.dev_mode")) {
+if (is.development || store.has("settings.dev_mode") || cla.options.debug) {
 	template.push({
 		label: 'Debug',
 		submenu: debugSubmenu

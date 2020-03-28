@@ -19,15 +19,10 @@ function check_installation(forceInstall) {
 	reset();
 
 	if (is.windows) {
-		if (store.get("settings.first_run")) {
+		if (forceInstall)
 			return false;
-		} else {
-			if (forceInstall) {
-				return false;
-			} else {
-				return true;
-			}
-		}
+		else
+			return !store.get("settings.first_run");
 	}
 
 	return true;
@@ -122,35 +117,50 @@ function install_rportable() {
 		console.log("Installing R-Portable:", batch_file);
 		start_progress("setup-r");
 
-		const bat = exec.batch(batch_file, []);
-		bat.stdout.on('data', (data) => {
-			let str = String.fromCharCode.apply(null, data);
-			console.info(str);
-		});
-		bat.stderr.on('data', (data) => {
-			let str = String.fromCharCode.apply(null, data);
-			console.error(str);
-		});
-		bat.on('exit', (code) => {
-			let msg = "";
-			switch (code) {
-				case 0:
-					msg = "R-Portable (v3.6.2) installation was successful.";
-					break;
-				// case 1:
-				// 	msg = "There was an error setting up R environment.";
-				// 	break;
-				default:
-					msg = `There was an error setting up R environment (${code}).`;
-					break;
-			}
-			end_progress("setup-r", code, msg);
-
-			if (code === 0)
+		exec.exec(
+			batch_file, 
+			[], 
+			function(error, stdout, stderr) {
+				console.error(error);
+				end_progress("setup-r", -1, stderr);
+				reject(stderr);
+			}, 
+			function(stdout, stderr) {
+				console.log(stdout);
+				end_progress("setup-r", 0, "R-Portable (v3.6.2) installation was successful.");
 				resolve();
-			else
-				reject(code);
-		});
+			});
+
+
+		// const bat = exec.batch(batch_file, []);
+		// bat.stdout.on('data', (data) => {
+		// 	let str = String.fromCharCode.apply(null, data);
+		// 	console.info(str);
+		// });
+		// bat.stderr.on('data', (data) => {
+		// 	let str = String.fromCharCode.apply(null, data);
+		// 	console.error(str);
+		// });
+		// bat.on('exit', (code) => {
+		// 	let msg = "";
+		// 	switch (code) {
+		// 		case 0:
+		// 			msg = "R-Portable (v3.6.2) installation was successful.";
+		// 			break;
+		// 		// case 1:
+		// 		// 	msg = "There was an error setting up R environment.";
+		// 		// 	break;
+		// 		default:
+		// 			msg = `There was an error setting up R environment (${code}).`;
+		// 			break;
+		// 	}
+		// 	end_progress("setup-r", code, msg);
+
+		// 	if (code === 0)
+		// 		resolve();
+		// 	else
+		// 		reject(code);
+		// });
 	});
 }
 
@@ -241,55 +251,69 @@ function install_packages() {
 			store.get("app.r_analysis_path")
 		];
 
-		const bat = exec.batch(batch_file, params);
-		bat.stdout.on('data', (data) => {
-			let str = String.fromCharCode.apply(null, data);
-			console.info(str);
-		});
-		bat.stderr.on('data', (data) => {
-			let str = String.fromCharCode.apply(null, data);
-			console.error(str);
-		});
-		bat.on('exit', (code) => {
-			let msg = "";
-			switch (code) {
-				case 0:
-					msg = "Installation of packages were successful.";
-					break;
-				case 11:
-					msg = "Argument 1 is missing -- Full path to Rscript.exe";
-					break;
-				case 12:
-					msg = "Path for Rscript.exe does not exist on file system.";
-					break;
-				case 21:
-					msg = "Argument 2 is missing -- Full path to package installation";
-					break;
-				case 22:
-					msg = "Path for package installation does not exist on file system.";
-					break;
-				case 31:
-					msg = "Argument 3 is missing -- Full path to install/verify scripts";
-					break;
-				case 32:
-					msg = "Path for install script does not exist on file system.";
-					break;
-				case 33:
-					msg = "Path for verify script does not exist on file system.";
-					break;
-				case 44:
-					msg = "Path for install/verify scripts does not exist on file system.";
-					break;
-				default:
-					msg = `There was an error installing the R packages (${code}).`;
-					break;
-			}
-			console.log("Batch Execution Done:", code, msg);
-			if (code === 0)
+		exec.exec(
+			batch_file, 
+			params, 
+			function(error, stdout, stderr) {
+				console.error(error);
+				end_progress("setup-packages", -1, stderr);
+				reject(stderr);
+			}, 
+			function(stdout, stderr) {
+				console.log(stdout);
+				end_progress("setup-packages", 0, "R package installation was successful.");
 				resolve();
-			else
-				reject(code);
-		});
+			});
+
+		// const bat = exec.batch(batch_file, params);
+		// bat.stdout.on('data', (data) => {
+		// 	let str = String.fromCharCode.apply(null, data);
+		// 	console.info(str);
+		// });
+		// bat.stderr.on('data', (data) => {
+		// 	let str = String.fromCharCode.apply(null, data);
+		// 	console.error(str);
+		// });
+		// bat.on('exit', (code) => {
+		// 	let msg = "";
+		// 	switch (code) {
+		// 		case 0:
+		// 			msg = "Installation of packages were successful.";
+		// 			break;
+		// 		case 11:
+		// 			msg = "Argument 1 is missing -- Full path to Rscript.exe";
+		// 			break;
+		// 		case 12:
+		// 			msg = "Path for Rscript.exe does not exist on file system.";
+		// 			break;
+		// 		case 21:
+		// 			msg = "Argument 2 is missing -- Full path to package installation";
+		// 			break;
+		// 		case 22:
+		// 			msg = "Path for package installation does not exist on file system.";
+		// 			break;
+		// 		case 31:
+		// 			msg = "Argument 3 is missing -- Full path to install/verify scripts";
+		// 			break;
+		// 		case 32:
+		// 			msg = "Path for install script does not exist on file system.";
+		// 			break;
+		// 		case 33:
+		// 			msg = "Path for verify script does not exist on file system.";
+		// 			break;
+		// 		case 44:
+		// 			msg = "Path for install/verify scripts does not exist on file system.";
+		// 			break;
+		// 		default:
+		// 			msg = `There was an error installing the R packages (${code}).`;
+		// 			break;
+		// 	}
+		// 	console.log("Batch Execution Done:", code, msg);
+		// 	if (code === 0)
+		// 		resolve();
+		// 	else
+		// 		reject(code);
+		// });
 	});
 }
 

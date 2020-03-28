@@ -12,6 +12,8 @@ const {is} = require('electron-util');
 //const win = require('electron').BrowserWindow;
 
 const Store = require('electron-store');
+const store = new Store();
+
 //const lib = require('./assets/js/modules');
 
 //var sudo = require('sudo-prompt');
@@ -22,7 +24,7 @@ var Chart = require('chart.js');
 var ColorSchemes = require('chartjs-plugin-colorschemes');
 // color schemes: https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
 
-const store = new Store();
+
 const requiredPackages = [
 	'ModelMetrics',
 	'nnet',
@@ -32,6 +34,8 @@ const requiredPackages = [
 ];
 
 var probs_chart = null;
+
+var cla_args = {};
 
 // const groups = [
 // 	{"short": "AmericanBlack", "long": "American Black"},
@@ -59,13 +63,6 @@ $(document).ready(function() {
 	window.current_file = "";
 	window.current_results = "";
 	$("#app-version").text(store.get("version"));
-	
-	let is_installed = setup.check_installation(false);
-	if (is_installed) {
-		app_init();
-	} else {
-		app_install();
-	}
 });
 
 function app_install() {
@@ -98,6 +95,8 @@ function wire_setup_events() {
 		}, function(error) {
 			store.set("settings.first_run", true);	// set to force install on next run
 			console.error(error);
+			$("#setup-error-log pre").html(error);
+			$("#setup-error-log").show();
 			enable_button("setup-start");
 		});
 	});
@@ -1187,4 +1186,18 @@ ipcRenderer.on('setup-rtools-exit', (event, args) => {
 	console.log("RTOOLS EXIT");
 	console.log(event);
 	console.log(args);
+});
+
+
+ipcRenderer.on('application-ready', (event, arg) => {
+	cla_args = arg;
+	//console.log(cla_args);
+	
+	let forceInstall = cla_args.forceInstall;
+	let is_installed = setup.check_installation(forceInstall);
+	if (is_installed) {
+		app_init();
+	} else {
+		app_install();
+	}
 });
