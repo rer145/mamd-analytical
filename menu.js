@@ -264,7 +264,7 @@ const otherTemplate = [
 
 const template = process.platform === 'darwin' ? macosTemplate : otherTemplate;
 
-if (is.development || store.has("settings.dev_mode") || cla.options.debug) {
+if (is.development || store.get("settings.dev_mode") || cla.options.debug) {
 	template.push({
 		label: 'Debug',
 		submenu: debugSubmenu
