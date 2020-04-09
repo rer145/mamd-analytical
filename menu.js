@@ -75,8 +75,22 @@ ${debugInfo()}`;
 //}
 
 const debugSubmenu = [
-	{ role: 'reload' },
-	{ role: 'forcereload' },
+	//{ role: 'reload' },
+	{
+		label: 'Force Reload',
+		click() {
+			app.relaunch();
+			app.quit();
+		},
+		accelerator: 'CmdOrCtrl+Shift+R'
+	},
+	{
+		label: 'Developer Tools',
+		click() {
+			win.getFocusedWindow().toggleDevTools()
+		},
+		accelerator: 'CmdOrCtrl+Shift+I'
+	},
 	{ type: 'separator' },
 	{
 		label: 'Show App Data',
@@ -112,7 +126,10 @@ const debugSubmenu = [
 	{
 		label: 'Run Installer',
 		click() {
-			win.getFocusedWindow().webContents.send('check-installation');
+			store.set("settings.first_run", true);
+			app.relaunch();
+			app.quit();
+			//win.getFocusedWindow().webContents.send('check-installation');
 		}
 	}
 ];

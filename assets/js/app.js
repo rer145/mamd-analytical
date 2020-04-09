@@ -24,6 +24,7 @@ var Chart = require('chart.js');
 var ColorSchemes = require('chartjs-plugin-colorschemes');
 // color schemes: https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
 
+const MIN_SELECTIONS = 3;
 
 const requiredPackages = [
 	'ModelMetrics',
@@ -302,6 +303,8 @@ function new_case() {
 	init_results();
 	show_traits();
 	$('#tabs a[href="#analysis"]').tab('show');
+
+	validate_selections();
 }
 
 function open_case() {
@@ -356,6 +359,8 @@ function open_case() {
 
 					// set properties for file checking
 					window.current_file = filePath;
+
+					validate_selections();
 				});
 			}
 		}
@@ -608,6 +613,8 @@ function toggleTraitUISelection(obj, code, value) {
 		obj.addClass("btn-primary");
 		toggleSelection(code, value, false);
 	}
+
+	validate_selections();
 }
 
 function toggleSelection(code, value, isExplicit) {
@@ -666,90 +673,82 @@ function generate_outputfile(input_file) {
 	return filepath;
 }
 
+function validate_selections() {
+	if (valid_selections() >= MIN_SELECTIONS) {
+		enable_button("analysis-button");
+		$("#min-selection-warning").hide();
+	} else {
+		disable_button("analysis-button");
+		$("#min-selection-warning").empty().html(`Please score ${MIN_SELECTIONS} or more traits before running the analysis.`).show();
+	}
+}
+
+function valid_selections() {
+	let selection_count = 0;
+	for (var key in window.selections) {
+		if (window.selections[key] != "NA")
+			selection_count++;
+	}
+	return selection_count;
+}
+
 function run_analysis() {
 	$("#analysis-pending").hide();
 	$("#analysis-results").hide();
 	$("#analysis-error").hide();
 	$("#analysis-loading").show();
-	
-	var packages_path = store.get("user.packages_path");
-	//var data_path = store.get("userdata_path");
-	var analysis_path = store.get("app.r_analysis_path");
-	var input_file = generate_inputfile();
-	var output_file = generate_outputfile(input_file);
-	var r_script = path.join(analysis_path, "mamd.R");
 
-	var parameters = [
-		r_script,
-		packages_path,
-		analysis_path,
-		input_file,
-		output_file
-	];
+	if (valid_selections() >= MIN_SELECTIONS) {
+		var packages_path = store.get("user.packages_path");
+		//var data_path = store.get("userdata_path");
+		var analysis_path = store.get("app.r_analysis_path");
+		var input_file = generate_inputfile();
+		var output_file = generate_outputfile(input_file);
+		var r_script = path.join(analysis_path, "mamd.R");
 
-	if (input_file.length > 0) {
-		// proc.execFile(store.get("app.rscript_path"), parameters, function(err, data) {
-		// 	if(err){
-		// 		$("#analysis-error-message").empty().text(err);
-		// 		$("#analysis-error").show();
-		// 		return;
-		// 	}
+		var parameters = [
+			r_script,
+			packages_path,
+			analysis_path,
+			input_file,
+			output_file
+		];
 
-		// 	$("#analysis-results-1").text(data);
-		// 	show_results(output_file);
-		// });
-
-		var options = {
-			name: 'MaMD Analysis Subprocess'
-		};
-		var cmd = '"' + store.get("app.rscript_path") + '"';
-		$.each(parameters, function(i,v) {
-			cmd = cmd + ' "' + v + '"';
-		});
-		//cmd = cmd.replace("\\", "\\\\g");
-
-		exec.execFile(store.get("app.rscript_path"), parameters, 
-			function(error, stdout, stderr) {
-				// console.error(error);
-				// console.log(stderr);
-				$("#analysis-error-message").empty().text(error);
-				$("#analysis-error").show();
-				return;
-			},
-			function(stdout, stderr) {
-				fs.readFile(output_file, 'utf8', (err, data) => {
-					if (err) console.error(err);
-					show_results(null, data);
-				});
+		if (input_file.length > 0) {
+			var options = {
+				name: 'MaMD Analysis Subprocess'
+			};
+			var cmd = '"' + store.get("app.rscript_path") + '"';
+			$.each(parameters, function(i,v) {
+				cmd = cmd + ' "' + v + '"';
 			});
+			//cmd = cmd.replace("\\", "\\\\g");
 
-		// sudo.exec(cmd, options,
-		// 	function(error, stdout, stderr) {
-		// 		if (error) {
-		// 			console.error(error);
-		// 			console.log(stderr);
-		// 			$("#analysis-error-message").empty().text(error);
-		// 			$("#analysis-error").show();
-		// 			return;
-		// 		}
-		// 		// console.log('stdout: ' + JSON.stringify(stdout));
-		// 		// console.log('stderr: ' + JSON.stringify(stderr));
-		// 		//$("#analysis-results-1").text(stdout);
+			exec.execFile(store.get("app.rscript_path"), parameters, 
+				function(error, stdout, stderr) {
+					// console.error(error);
+					// console.log(stderr);
+					$("#analysis-error-message").empty().text(error);
+					$("#analysis-error").show();
+					return;
+				},
+				function(stdout, stderr) {
+					fs.readFile(output_file, 'utf8', (err, data) => {
+						if (err) console.error(err);
+						show_results(null, data);
+					});
+				});
+		} else {
+			$("#analysis-error-message").empty().text("No inut file was generated.");
+			$("#analysis-error").show();
+			return;
+		}
 
-		// 		fs.readFile(output_file, 'utf8', (err, data) => {
-		// 			if (err) console.error(err);
-		// 			show_results(null, data);
-		// 		});
-		// 	}
-		// );
-
+		//var timeout = setTimeout(show_results, 5000);
 	} else {
-		$("#analysis-error-message").empty().text("No inut file was generated.");
+		$("#analysis-error-message").empty().text(`Please score ${MIN_SELECTIONS} or more traits before running the analysis.`);
 		$("#analysis-error").show();
-		return;
 	}
-
-	//var timeout = setTimeout(show_results, 5000);
 }
 
 function show_results(fullJson, data) {
@@ -798,7 +797,7 @@ function show_results(fullJson, data) {
 	$("#results-probability").text(parseFloat(prob).toFixed(4));
 
 	probs_chart.clear();
-	console.log(probs_chart.data.datasets.length);
+	//console.log(probs_chart.data.datasets.length);
 
 	probs_chart.data.labels = probs_labels;
 	probs_chart.data.datasets[0].data = probs_data;
