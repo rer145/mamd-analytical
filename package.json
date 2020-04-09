@@ -19,12 +19,10 @@
 		"gh-pack": "node build/dist/build-app.js --dir",
 		"gh-dist-win": "node build/dist/build-app.js --win",
 		"gh-dist-mac": "node build/dist/build-app.js --mac",
-
 		"pack": "electron-builder --dir",
 		"dist": "electron-builder --macos --windows -p always",
 		"dist-win": "electron-builder --windows",
 		"dist-mac": "electron-builder --macos",
-
 		"travis-pack": "electron-builder --dir",
 		"travis-dist": "electron-builder --macos --windows -p always",
 		"travis-dist-win": "electron-builder --windows -p always",
@@ -52,7 +50,8 @@
 		"popper.js": "^1.15.0",
 		"q": "^1.5.1",
 		"sudo-prompt": "^9.0.0",
-		"tether": "^1.4.6"
+		"tether": "^1.4.6",
+		"universal-analytics": "^0.4.20"
 	},
 	"devDependencies": {
 		"@fortawesome/fontawesome-free": "^5.9.0",

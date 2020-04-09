@@ -17,6 +17,13 @@ const Store = require('electron-store');
 const store = new Store();
 
 const cla = require('./assets/js/cla');
+const uuid = require('uuid/v4');
+const { 
+	trackEvent, 
+	trackScreenView,
+	trackTime,
+	trackException
+} = require('./assets/js/analytics');
 
 unhandled();
 debug();
@@ -24,6 +31,11 @@ contextMenu();
 
 // Note: Must match `build.appId` in package.json
 app.setAppUserModelId('edu.msu.MaMDAnalytical');
+
+// global.trackEvent = trackEvent;
+// global.trackScreenView = trackScreenView;
+// global.trackTime = trackTime;
+// global.trackException = trackException;
 
 
 // Prevent window from being garbage collected
@@ -112,13 +124,18 @@ app.on('activate', () => {
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
 
+	trackEvent("Application", "Launch", "OS", process.platform);
+
 	mainWindow.webContents.send('application-ready', cla.options);
 })();
 
 
 function prep_files_and_settings() {
 	const appVersion = require(path.join(app.getAppPath(), "package.json")).version;
-	store.set("version", appVersion);
+	//store.set("version", appVersion);
+
+	let uid = store.get("uuid", uuid());
+	let analytics = store.get("settings.analytics", true);
 
 	let autoUpdates = !store.has("settings.auto_check_for_updates") ? true : store.get("settings.auto_check_for_updates");
 	let firstRun = !store.has("settings.first_run");
@@ -127,11 +144,11 @@ function prep_files_and_settings() {
 
 	let devMode = store.has("settings.dev_mode");
 	
-	store.set("settings", {
-		"auto_check_for_updates": autoUpdates,
-		"first_run": firstRun,
-		"dev_mode": devMode
-	});
+	// store.set("settings", {
+	// 	"auto_check_for_updates": autoUpdates,
+	// 	"first_run": firstRun,
+	// 	"dev_mode": devMode
+	// });
 
 	let resourcesPath = process.resourcesPath;
 
@@ -180,13 +197,13 @@ function prep_files_and_settings() {
 		// );
 	}
 
-	store.set("app", {
-		"resources_path": resourcesPath,
-		"rscript_path": RPortablePath,
-		"r_path": RPath,
-		"r_package_source_path": RPackageSourcePath,
-		"r_analysis_path": RAnalysisPath
-	});
+	// store.set("app", {
+	// 	"resources_path": resourcesPath,
+	// 	"rscript_path": RPortablePath,
+	// 	"r_path": RPath,
+	// 	"r_package_source_path": RPackageSourcePath,
+	// 	"r_analysis_path": RAnalysisPath
+	// });
 
 
 	//let userDataPath = path.join(app.getPath("userData");
@@ -196,14 +213,40 @@ function prep_files_and_settings() {
 	let userPackagesPath = path.join(userDataPath, "packages");
 	let userAnalysisPath = path.join(userDataPath, "analysis");
 
-	store.set("user", {
-		"userdata_path": userDataPath,
-		"packages_path": userPackagesPath,
-		"analysis_path": userAnalysisPath
-	});
+	// store.set("user", {
+	// 	"userdata_path": userDataPath,
+	// 	"packages_path": userPackagesPath,
+	// 	"analysis_path": userAnalysisPath
+	// });
 
 	make_directory(userPackagesPath);
 	make_directory(userAnalysisPath);
+
+
+	// save settings to disk in one shot
+	let settings = {
+		"version": appVersion,
+		"uuid": uid,
+		"settings": {
+			"analytics": analytics,
+			"auto_check_for_updates": autoUpdates,
+			"first_run": firstRun,
+			"dev_mode": devMode
+		},
+		"app": {
+			"resources_path": resourcesPath,
+			"rscript_path": RPortablePath,
+			"r_path": RPath,
+			"r_package_source_path": RPackageSourcePath,
+			"r_analysis_path": RAnalysisPath
+		},
+		"user": {
+			"userdata_path": userDataPath,
+			"packages_path": userPackagesPath,
+			"analysis_path": userAnalysisPath
+		}
+	};
+	store.set(settings);
 
 	// // check if packages path is empty, if so, consider it the first run
 	// fs.readdirSync(userPackagesPath, function(err, files) {
@@ -244,6 +287,7 @@ function make_directory(dir) {
 		try {
 			fs.mkdirSync(dir);
 		} catch (err) {
+			trackException(err, true);
 			console.log("Unable to create directory: " + err);
 		}
 	}
@@ -283,10 +327,27 @@ ipcMain.on('pdf-export', event => {
 		if (error) return console.error(error.message);
 
 		fs.writeFile(pdfPath, data, err => {
-			if (err) return console.error(err.message);
+			if (err) {
+				trackException(err, false);
+				return console.error(err.message);
+			}
 			//shell.openExternal('file://' + pdfPath);
 			event.sender.send('pdf-export-complete', pdfPath);
 		});
 	});
 
+});
+
+
+ipcMain.on('track-event', (event, args) => {
+	trackEvent(args.category, args.action, args.label, args.value);
+});
+ipcMain.on('track-screenview', (event, args) => {
+	trackScreenView(args.screenName);
+});
+ipcMain.on('track-time', (event, args) => {
+	trackTime(args.category, args.variable, args.time, args.label);
+});
+ipcMain.on('track-exception', (event, args) => {
+	trackException(args.description, args.fatal);
 });

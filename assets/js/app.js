@@ -7,9 +7,11 @@ const fs = require('fs');
 const find = require('find');
 const path = require('path');
 const {ipcMain, ipcRenderer} = require('electron');
-const {dialog, shell} = require('electron').remote;
+const {dialog, shell, getGlobal} = require('electron').remote;
 const {is} = require('electron-util');
 //const win = require('electron').BrowserWindow;
+
+const now = require('performance-now');
 
 const Store = require('electron-store');
 const store = new Store();
@@ -19,6 +21,11 @@ const store = new Store();
 //var sudo = require('sudo-prompt');
 var exec = require('./assets/js/exec');
 const setup = require('./assets/js/setup');
+
+// const trackEvent = getGlobal("trackEvent");
+// const trackScreenView = getGlobal("trackScreenView");
+// const trackTime = getGlobal("trackTime");
+// const trackException = getGlobal("trackException");
 
 var Chart = require('chart.js');
 var ColorSchemes = require('chartjs-plugin-colorschemes');
@@ -51,11 +58,13 @@ var cla_args = {};
 function show_setup() {
 	$("#section-setup").show();
 	$("#section-main").hide();
+	trackScreenView("setup");
 }
 
 function show_app() {
 	$("#section-setup").hide();
 	$("#section-main").show();
+	trackScreenView("analysis");
 }
 
 $(document).ready(function() {
@@ -79,8 +88,15 @@ function wire_setup_events() {
 	$("#setup-start").on('click', function(e) {
 		e.preventDefault();
 		disable_button("setup-start");
+
+		trackEvent("Setup", "Start");
+		let t0 = now();
 		
 		setup.start().then(function(response) {
+			let t1 = now();
+			trackTime("Setup", "Complete", (t1-t0));
+			trackEvent("Setup", "Complete");
+
 			store.set("settings.first_run", false);
 
 			app_init();
@@ -94,6 +110,10 @@ function wire_setup_events() {
 				.delay(3000)
 				.slideUp();
 		}, function(error) {
+			let t1 = now();
+			trackTime("Setup", "Error", (t1-t0));
+			trackException(error, true);
+
 			store.set("settings.first_run", true);	// set to force install on next run
 			console.error(error);
 			$("#setup-error-log pre").html(error);
@@ -104,32 +124,31 @@ function wire_setup_events() {
 }
 
 function wire_events() {
-	$(document).on('click', "#test", function(e) {
-		e.preventDefault();
-		alert("test");
-	});
-
 	$('[data-toggle="tooltip"]').tooltip({
 		trigger: 'focus'
 	});
 
 	$("#new-button").on('click', function(e) {
 		e.preventDefault();
+		trackEvent("Application", "New File");
 		new_case();
 	});
 
 	$("#open-button").on('click', function(e) {
 		e.preventDefault();
+		trackEvent("Application", "Open File");
 		open_case();
 	});
 
 	$("#save-button").on('click', function(e) {
 		e.preventDefault();
+		trackEvent("Application", "Save File");
 		save_case();
 	});
 
 	$("#analysis-button").on('click', function(e) {
 		e.preventDefault();
+		trackEvent("Application", "Run Analysis");
 		$("html, body").animate({ scrollTop: 0 }, "fast");
 		$('#tabs a[href="#results"]').tab('show');
 		run_analysis();
@@ -137,6 +156,7 @@ function wire_events() {
 
 	$("#export-results-pdf").on('click', function(e) {
 		e.preventDefault();
+		trackEvent("Application", "Export PDF");
 		export_to_pdf();
 	});
 
@@ -213,18 +233,25 @@ function wire_events() {
 	$(document).on('click', '#install-update-button', function(e) {
 		e.preventDefault();
 		//updater.performUpdate();
+		trackEvent("Application", "Install Update");
 		ipcRenderer.send('update-start');
 	});
 
 	$(document).on('click', '#dismiss-update-button', function(e) {
 		e.preventDefault();
+		trackEvent("Application", "Dismiss Update");
 		$("#update-alert").hide();
 	});
 
 	$(document).on('click', '#view-pdf-button', function(e) {
 		e.preventDefault();
+		trackEvent("Application", "View PDF");
 		shell.openExternal('file://' + $(this).attr("data-path"));
 		$("#generic-alert").hide();
+	});
+
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+		trackScreenView($(e.target).attr("id").replace("-tab", ""));
 	});
 
 	// ipcRenderer.on('userdata-path', (event, message) => {
@@ -322,7 +349,10 @@ function open_case() {
 				var filePath = files[0];
 			
 				fs.readFile(filePath, 'utf8', (err, data) => {
-					if (err) console.error(err);
+					if (err) {
+						console.error(err);
+						trackException(err, false);
+					}
 			
 					var json = JSON.parse(data);
 
@@ -398,6 +428,7 @@ function save_case() {
 
 	fs.writeFile(window.current_file, output, function(err) {
 		if (err) {
+			trackException(err, false);
 			console.error(err);
 		}
 		console.log("File saved");
@@ -662,6 +693,7 @@ function generate_inputfile() {
 		fs.writeFileSync(filepath, header + '\n' + inputs + '\n');
 		return filepath;
 	} catch(err) { 
+		trackException(err, true);
 		console.log(err);
 		return "";
 	}
@@ -693,6 +725,8 @@ function valid_selections() {
 }
 
 function run_analysis() {
+	trackEvent("Analysis", "Start");
+
 	$("#analysis-pending").hide();
 	$("#analysis-results").hide();
 	$("#analysis-error").hide();
@@ -724,28 +758,43 @@ function run_analysis() {
 			});
 			//cmd = cmd.replace("\\", "\\\\g");
 
+			let t0 = now();
+
 			exec.execFile(store.get("app.rscript_path"), parameters, 
 				function(error, stdout, stderr) {
 					// console.error(error);
 					// console.log(stderr);
+					let t1 = now();
+					trackTime("Analysis", JSON.stringify(window.selections), (t1-t0), "Error");
+
+					trackException(error, true);
 					$("#analysis-error-message").empty().text(error);
 					$("#analysis-error").show();
 					return;
 				},
 				function(stdout, stderr) {
+					trackEvent("Analysis", "Complete");
 					fs.readFile(output_file, 'utf8', (err, data) => {
-						if (err) console.error(err);
+						if (err) {
+							trackException(err, true);
+							console.error(err);
+						}
 						show_results(null, data);
 					});
+					
+					let t1 = now();
+					trackTime("Analysis", JSON.stringify(window.selections), (t1-t0), "Complete");
 				});
 		} else {
-			$("#analysis-error-message").empty().text("No inut file was generated.");
+			trackEvent("Analysis", "Validation", "Input File");
+			$("#analysis-error-message").empty().text("No input file was generated.");
 			$("#analysis-error").show();
 			return;
 		}
 
 		//var timeout = setTimeout(show_results, 5000);
 	} else {
+		trackEvent("Analysis", "Validation", "Too Few Selections");
 		$("#analysis-error-message").empty().text(`Please score ${MIN_SELECTIONS} or more traits before running the analysis.`);
 		$("#analysis-error").show();
 	}
@@ -1109,6 +1158,7 @@ ipcRenderer.on('message', (event, arg) => {
 });
 
 ipcRenderer.on('update-error', (event, arg) => {
+	trackException(event, false);
 	console.error(event);
 	$("#update-alert").removeClass()
 		.addClass("alert")
@@ -1200,3 +1250,36 @@ ipcRenderer.on('application-ready', (event, arg) => {
 		app_install();
 	}
 });
+
+
+
+function trackEvent(category, action, label, value) {
+	ipcRenderer.send('track-event', {
+		category: category,
+		action: action,
+		label: label,
+		value: value
+	});
+}
+
+function trackScreenView(screenName) {
+	ipcRenderer.send('track-screenview', {
+		screenName: screenName
+	});
+}
+
+function trackTime(category, variable, time, label) {
+	ipcRenderer.send('track-time', {
+		category: category,
+		variable: variable,
+		time: time,
+		label: label
+	});
+}
+
+function trackException(description, fatal) {
+	ipcRenderer.send('track-exception', {
+		description: description,
+		fatal: fatal
+	});
+}
