@@ -3,7 +3,7 @@ const path = require('path');
 const {app, BrowserWindow, Menu, ipcMain, dialog, shell} = require('electron');
 // const {autoUpdater} = require('electron-updater');
 // const log = require('electron-log');
-const {is} = require('electron-util');
+const {is, openNewGitHubIssue, debugInfo} = require('electron-util');
 const unhandled = require('electron-unhandled');
 const debug = require('electron-debug');
 const contextMenu = require('electron-context-menu');
@@ -25,7 +25,16 @@ const {
 	trackException
 } = require('./assets/js/analytics');
 
-unhandled();
+unhandled({
+	reportButton: error => {
+		openNewGitHubIssue({
+			user: 'rer145',
+			repo: 'mamd-analytical',
+			body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`
+		});
+	}
+});
+
 debug();
 contextMenu();
 
