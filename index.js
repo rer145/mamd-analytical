@@ -231,12 +231,16 @@ function prep_files_and_settings() {
 	make_directory(userPackagesPath);
 	make_directory(userAnalysisPath);
 
-	// TODO: check if packages path is empty and set firstRun = true
-
+	if (fs.readdirSync(userPackagesPath).length == 0)
+		firstRun = true;
 
 	if (is.macos) {
-		make_directory(path.join(userDataPath, "R-Portable"));
-		
+		let RPortable = path.join(userDataPath, "R-Portable");
+		make_directory(RPortable);
+
+		if (fs.readdirSync(RPortable).length == 0)
+			firstRun = true;
+
 		RPortablePath = path.join(
 			userDataPath, 
 			"R-Portable", 
@@ -291,38 +295,6 @@ function prep_files_and_settings() {
 		}
 	};
 	store.set(settings);
-
-	// // check if packages path is empty, if so, consider it the first run
-	// fs.readdirSync(userPackagesPath, function(err, files) {
-	// 	console.log("checking for packages", err, files);
-	// 	if (!err) {
-	// 		if (!files.length) {
-	// 			store.set("settings.first_run", true);
-	// 		}
-	// 	}
-	// });
-	
-	// var r_path = path.join(__dirname, "assets/r");
-	// copy_file(
-    //     path.join(r_path, "mamd.csv"), 
-    //     path.join(analysis_path, "mamd.csv"), 
-	// 	true);
-	// copy_file(
-	// 	path.join(r_path, "Geo.Origin.csv"), 
-	// 	path.join(analysis_path, "Geo.Origin.csv"), 
-	// 	true);
-	// copy_file(
-	// 	path.join(r_path, "mamd.R"), 
-	// 	path.join(analysis_path, "mamd.R"), 
-	// 	true);
-	// copy_file(
-	// 	path.join(r_path, "install_package.R"), 
-	// 	path.join(analysis_path, "install_package.R"), 
-	// 	true);
-	// copy_file(
-	// 	path.join(r_path, "verify_package.R"), 
-	// 	path.join(analysis_path, "verify_package.R"), 
-	// 	true);
 };
 
 

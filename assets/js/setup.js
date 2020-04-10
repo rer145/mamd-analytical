@@ -131,7 +131,7 @@ function install_rportable() {
 				source_root = path.join(store.get("app.resources_path"), "R-Portable", "R-Portable-Mac");
 			}
 
-			batch_file = 'cp -a ' + source_root + '/. ' + dest_root + '/';
+			batch_file = 'cp -a "' + source_root + '/." "' + dest_root + '/"';
 		}
 
 		if (is.windows || is.macos) {
@@ -197,7 +197,7 @@ function install_packages() {
 				}
 			);
 
-			batch_file = store.get("app.rscript_path") + ' ' + path.join(store.get("app.r_analysis_path"), "install.R") + ' ' + store.get("user.packages_path");
+			batch_file = '"' + store.get("app.rscript_path") + '" "' + path.join(store.get("app.r_analysis_path"), "install.R") + '" "' + store.get("user.packages_path") + '"';
 			params = [];
 		}
 

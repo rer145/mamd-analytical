@@ -32,17 +32,19 @@ function sudo(command, options, error_callback, result_callback) {
 	);
 }
 
-function exec(file, parameters, error_callback, result_callback, ismac) {
+function exec(file, parameters, error_callback, result_callback, unquoteFile) {
 	//this should do a UAC prompt
 	//let cmd = 'cmd.exe /c "' + file + '"';
 	let cmd = '"' + file + '"';
+	if (unquoteFile != undefined && unquoteFile) {
+		cmd = file;
+	}
+
 	$.each(parameters, function(i,v) {
 		cmd = cmd + ' "' + v + '"';
 	});
 
-	if (ismac != undefined && ismac) {
-		cmd = file;
-	}
+	
 
 	console.warn("Executing [" + cmd + "]");
 
