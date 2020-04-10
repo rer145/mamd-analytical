@@ -3,7 +3,7 @@ const path = require('path');
 const {app, BrowserWindow, Menu, ipcMain, dialog, shell} = require('electron');
 // const {autoUpdater} = require('electron-updater');
 // const log = require('electron-log');
-const {is, openNewGitHubIssue, debugInfo} = require('electron-util');
+const {is, openNewGitHubIssue, debugInfo, fixPathForAsarUnpack} = require('electron-util');
 const unhandled = require('electron-unhandled');
 const debug = require('electron-debug');
 const contextMenu = require('electron-context-menu');
@@ -235,6 +235,8 @@ function prep_files_and_settings() {
 
 
 	if (is.macos) {
+		make_directory(path.join(userDataPath, "R-Portable"));
+		
 		RPortablePath = path.join(
 			userDataPath, 
 			"R-Portable", 
@@ -242,6 +244,28 @@ function prep_files_and_settings() {
 			"RScript");
 	}
 
+	// copy executable files over to user home path as well
+	// if (is.macos) {
+	// 	copy_file(
+	// 		path.join("assets", "install_rportable.sh"), 
+	// 		path.join(userDataPath, "install_rportable.sh"), 
+	// 		true);
+	// 	copy_file(
+	// 		path.join("assets", "install_packages.sh"), 
+	// 		path.join(userDataPath, "install_packages.sh"), 
+	// 		true);
+	// }
+
+	if (is.windows) {
+		copy_file(
+			path.join(resourcesPath, "setup", "install_rportable.bat"), 
+			path.join(userDataPath, "install_rportable.bat"), 
+			true);
+		copy_file(
+			path.join(resourcesPath, "setup", "install_packages.bat"), 
+			path.join(userDataPath, "install_packages.bat"), 
+			true);
+	}
 
 	// save settings to disk in one shot
 	let settings = {
