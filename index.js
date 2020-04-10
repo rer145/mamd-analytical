@@ -231,6 +231,8 @@ function prep_files_and_settings() {
 	make_directory(userPackagesPath);
 	make_directory(userAnalysisPath);
 
+	// TODO: check if packages path is empty and set firstRun = true
+
 
 	// save settings to disk in one shot
 	let settings = {
