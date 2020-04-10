@@ -234,6 +234,15 @@ function prep_files_and_settings() {
 	// TODO: check if packages path is empty and set firstRun = true
 
 
+	if (is.macos) {
+		RPortablePath = path.join(
+			userDataPath, 
+			"R-Portable", 
+			"bin", 
+			"RScript");
+	}
+
+
 	// save settings to disk in one shot
 	let settings = {
 		"version": appVersion,

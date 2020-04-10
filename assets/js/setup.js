@@ -139,9 +139,24 @@ function install_rportable() {
 		}
 
 		if (is.windows || is.macos) {
+			let params = [];
+			if (is.macos) {
+				let source_root = path.join(store.get("app.resources_path"), "R-Portable");
+				let dest_root = path.join(store.get("user.userdata_path"), "R-Portable");
+
+				if (is.development) {
+					source_root = path.join(store.get("app.resources_path"), "R-Portable", "R-Portable-Mac");
+				}
+
+				params = [
+					source_root + "/.",
+					dest_root + "/"
+				];
+			}
+
 			exec.exec(
 				batch_file, 
-				[], 
+				params, 
 				function(error, stdout, stderr) {
 					console.error(error);
 					end_progress("setup-r", -1, stderr);

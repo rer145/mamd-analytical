@@ -56,7 +56,7 @@
 	"devDependencies": {
 		"@fortawesome/fontawesome-free": "^5.9.0",
 		"electron": "^5.0.3",
-		"electron-builder": "^20.43.0"
+		"electron-builder": "^22.4.1"
 	},
 	"build": {
 		"appId": "edu.msu.MaMDAnalytical",
