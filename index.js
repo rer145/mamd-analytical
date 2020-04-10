@@ -147,11 +147,11 @@ function prep_files_and_settings() {
 	let analytics = store.get("settings.analytics", true);
 
 	let autoUpdates = !store.has("settings.auto_check_for_updates") ? true : store.get("settings.auto_check_for_updates");
-	let firstRun = !store.has("settings.first_run");
+	let firstRun = store.get("settings.first_run", true);
 	if (cla.options.forceInstall)
 		firstRun = true;
 
-	let devMode = store.has("settings.dev_mode");
+	let devMode = store.get("settings.dev_mode", false);
 	
 	// store.set("settings", {
 	// 	"auto_check_for_updates": autoUpdates,
@@ -181,14 +181,14 @@ function prep_files_and_settings() {
 			"R-Portable", 
 			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
 			"bin", 
-			"RScript.exe");
+			is.macos ? "RScript" : "RScript.exe");
 
 		RPath = path.join(
 			resourcesPath, 
 			"R-Portable", 
 			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
 			"bin", 
-			"R.exe");
+			is.macos ? "R" : "R.exe");
 
 		// RToolsPath = path.join(
 		// 	resourcesPath, 

@@ -1,7 +1,23 @@
 'use strict';
 
-var sp = require('sudo-prompt');
-var cp = require('child_process');
+const sp = require('sudo-prompt');
+const cp = require('child_process');
+const fs = require('fs');
+
+function chmod(path, mode, error_callback, result_callback) {
+	// fs.access(path, fs.constants.X_OK, (err) => {
+	// 	if (err) {
+	// 		error_callback(err);
+	// 	} else {
+			fs.chmod(path, mode, (err2) => {
+				if (err2)
+					error_callback(err2);
+				else
+					result_callback();
+			});
+	// 	}
+	// });
+}
 
 function sudo(command, options, error_callback, result_callback) {
 	sp.exec(
@@ -95,4 +111,4 @@ function spawn(file, parameters, error_callback, result_callback) {
 	// );
 }
 
-module.exports = { sudo, exec, batch, execBat, execFile, spawn };
+module.exports = { chmod, sudo, exec, batch, execBat, execFile, spawn };

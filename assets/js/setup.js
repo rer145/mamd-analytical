@@ -14,11 +14,16 @@ const exec = require('./exec');
 
 let scripts_path = path.join(store.get("app.resources_path"), "setup");
 
+let sudo_options = {
+	name: "MaMD Analytical",
+	icns: "./assets/icons/mac/icon.icns"
+}
+
 // returns if the installation is completed
 function check_installation(forceInstall) {
 	reset();
 
-	if (is.windows) {
+	if (is.windows || is.macos) {
 		if (forceInstall)
 			return false;
 		else
@@ -38,7 +43,7 @@ function start() {
 	reset();
 	
 	return new Promise(function(resolve, reject) {
-		if (is.windows) {
+		if (is.windows || is.macos) {
 			setTimeout(function() {
 				install_rtools()
 					.then(function(response) {
@@ -57,9 +62,6 @@ function start() {
 						reject("RTools install error:", error);
 					});
 			});
-		}
-		else if (is.macos) {
-			resolve("No installation configured for MacOS");
 		}
 		else {
 			resolve("Operating System not compatible.");
@@ -114,134 +116,53 @@ function install_rtools() {
 function install_rportable() {
 	return new Promise(function(resolve, reject) {
 		let batch_file = path.join(scripts_path, "install_rportable.bat");
+		if (is.macos) {
+			batch_file = path.join(scripts_path, "install_rportable.sh");
+		}
+
 		console.log("Installing R-Portable:", batch_file);
 		start_progress("setup-r");
 
-		exec.exec(
-			batch_file, 
-			[], 
-			function(error, stdout, stderr) {
-				console.error(error);
-				end_progress("setup-r", -1, stderr);
-				reject(stderr);
-			}, 
-			function(stdout, stderr) {
-				console.log(stdout);
-				end_progress("setup-r", 0, "R-Portable (v3.6.2) installation was successful.");
-				resolve();
-			});
+		if (is.macos) {
+			exec.chmod(
+				batch_file, 
+				0o777, 
+				function(error) {
+					console.error(error);
+					end_progress("setup-r", -1, error);
+					reject(error);
+				},
+				function() {
+					console.log("Set execution permissions on install_rportable.sh successfully.");
+				}
+			);
+		}
 
-
-		// const bat = exec.batch(batch_file, []);
-		// bat.stdout.on('data', (data) => {
-		// 	let str = String.fromCharCode.apply(null, data);
-		// 	console.info(str);
-		// });
-		// bat.stderr.on('data', (data) => {
-		// 	let str = String.fromCharCode.apply(null, data);
-		// 	console.error(str);
-		// });
-		// bat.on('exit', (code) => {
-		// 	let msg = "";
-		// 	switch (code) {
-		// 		case 0:
-		// 			msg = "R-Portable (v3.6.2) installation was successful.";
-		// 			break;
-		// 		// case 1:
-		// 		// 	msg = "There was an error setting up R environment.";
-		// 		// 	break;
-		// 		default:
-		// 			msg = `There was an error setting up R environment (${code}).`;
-		// 			break;
-		// 	}
-		// 	end_progress("setup-r", code, msg);
-
-		// 	if (code === 0)
-		// 		resolve();
-		// 	else
-		// 		reject(code);
-		// });
+		if (is.windows || is.macos) {
+			exec.exec(
+				batch_file, 
+				[], 
+				function(error, stdout, stderr) {
+					console.error(error);
+					end_progress("setup-r", -1, stderr);
+					reject(stderr);
+				}, 
+				function(stdout, stderr) {
+					console.log(stdout);
+					end_progress("setup-r", 0, "R-Portable (v3.6.2) installation was successful.");
+					resolve();
+				});
+		}
 	});
 }
-
-// function install_package(pkg_name, idx, total) {
-// 	return new Promise(function(resolve, reject) {
-// 		let batch_file = path.join(scripts_path, "install_package.bat");
-// 		console.log("Installing Package:", batch_file, pkg_name);
-// 		update_progress("setup-packages", pkg_name, idx, total);
-		
-// 		var params = [
-// 			store.get("app.rscript_path"),
-// 			store.get("app.r_package_source_path"),
-// 			store.get("user.packages_path"),
-// 			store.get("app.r_analysis_path"),
-// 			pkg_name
-// 		];
-
-// 		const bat = exec.batch(batch_file, params);
-// 		bat.stdout.on('data', (data) => {
-// 			let str = String.fromCharCode.apply(null, data);
-// 			console.info(str);
-// 		});
-// 		bat.stderr.on('data', (data) => {
-// 			let str = String.fromCharCode.apply(null, data);
-// 			console.error(str);
-// 		});
-// 		bat.on('exit', (code) => {
-// 			let msg = "";
-// 			switch (code) {
-// 				case 0:
-// 					msg = "Installation of " + pkg_name + " was successful.";
-// 					break;
-// 				case 11:
-// 					msg = "Argument 1 is missing -- Full path to Rscript.exe";
-// 					break;
-// 				case 12:
-// 					msg = "Path for Rscript.exe does not exist on file system.";
-// 					break;
-// 				case 21:
-// 					msg = "Argument 2 is missing -- Full path to package source files";
-// 					break;
-// 				case 22:
-// 					msg = "Path for package source files does not exist on file system.";
-// 					break;
-// 				case 31:
-// 					msg = "Argument 3 is missing -- Full path to package installation";
-// 					break;
-// 				case 32:
-// 					msg = "Path for package installation does not exist on file system.";
-// 					break;
-// 				case 41:
-// 					msg = "Argument 1 is missing -- Full path to install/verify scripts";
-// 					break;
-// 				case 42:
-// 					msg = "Path for install script does not exist on file system.";
-// 					break;
-// 				case 43:
-// 					msg = "Path for verify script does not exist on file system.";
-// 					break;
-// 				case 44:
-// 					msg = "Path for install/verify scripts does not exist on file system.";
-// 					break;
-// 				case 51:
-// 					msg = "Argument 5 is missing -- Name of package to install";
-// 					break;
-// 				default:
-// 					msg = `There was an error installing ${pkg_name} (${code}).`;
-// 					break;
-// 			}
-			
-// 			if (code === 0)
-// 				resolve();
-// 			else
-// 				reject(code);
-// 		});
-// 	});
-// }
 
 function install_packages() {
 	return new Promise(function(resolve, reject) {
 		let batch_file = path.join(scripts_path, "install_packages.bat");
+		if (is.macos) {
+			batch_file = path.join(scripts_path, "install_packages.sh");
+		}
+
 		console.log("Installing Packages:", batch_file);
 		start_progress("setup-packages");
 		
@@ -251,101 +172,51 @@ function install_packages() {
 			store.get("app.r_analysis_path")
 		];
 
-		exec.exec(
-			batch_file, 
-			params, 
-			function(error, stdout, stderr) {
-				console.error(error);
-				end_progress("setup-packages", -1, stderr);
-				reject(stderr);
-			}, 
-			function(stdout, stderr) {
-				console.log(stdout);
-				end_progress("setup-packages", 0, "R package installation was successful.");
-				resolve();
-			});
+		if (is.macos) {
+			exec.chmod(
+				batch_file, 
+				0o777, 
+				function(error) {
+					console.error(error);
+					end_progress("setup-packages", -1, error);
+					reject(error);
+				},
+				function() {
+					console.log("Set execution permissions on install_packages.sh successfully.");
+				}
+			);
 
-		// const bat = exec.batch(batch_file, params);
-		// bat.stdout.on('data', (data) => {
-		// 	let str = String.fromCharCode.apply(null, data);
-		// 	console.info(str);
-		// });
-		// bat.stderr.on('data', (data) => {
-		// 	let str = String.fromCharCode.apply(null, data);
-		// 	console.error(str);
-		// });
-		// bat.on('exit', (code) => {
-		// 	let msg = "";
-		// 	switch (code) {
-		// 		case 0:
-		// 			msg = "Installation of packages were successful.";
-		// 			break;
-		// 		case 11:
-		// 			msg = "Argument 1 is missing -- Full path to Rscript.exe";
-		// 			break;
-		// 		case 12:
-		// 			msg = "Path for Rscript.exe does not exist on file system.";
-		// 			break;
-		// 		case 21:
-		// 			msg = "Argument 2 is missing -- Full path to package installation";
-		// 			break;
-		// 		case 22:
-		// 			msg = "Path for package installation does not exist on file system.";
-		// 			break;
-		// 		case 31:
-		// 			msg = "Argument 3 is missing -- Full path to install/verify scripts";
-		// 			break;
-		// 		case 32:
-		// 			msg = "Path for install script does not exist on file system.";
-		// 			break;
-		// 		case 33:
-		// 			msg = "Path for verify script does not exist on file system.";
-		// 			break;
-		// 		case 44:
-		// 			msg = "Path for install/verify scripts does not exist on file system.";
-		// 			break;
-		// 		default:
-		// 			msg = `There was an error installing the R packages (${code}).`;
-		// 			break;
-		// 	}
-		// 	console.log("Batch Execution Done:", code, msg);
-		// 	if (code === 0)
-		// 		resolve();
-		// 	else
-		// 		reject(code);
-		// });
+			exec.chmod(
+				store.get("app.rscript_path"), 
+				0o777, 
+				function(error) {
+					console.error(error);
+					end_progress("setup-packages", -1, error);
+					reject(error);
+				},
+				function() {
+					console.log("Set execution permissions on RScript successfully.");
+				}
+			);
+		}
+
+		if (is.windows || is.macos) {
+			exec.exec(
+				batch_file, 
+				params, 
+				function(error, stdout, stderr) {
+					console.error(error);
+					end_progress("setup-packages", -1, stderr);
+					reject(stderr);
+				}, 
+				function(stdout, stderr) {
+					console.log(stdout);
+					end_progress("setup-packages", 0, "R package installation was successful.");
+					resolve();
+				});
+		}
 	});
 }
-
-// function install_packages() {
-// 	let total = 5;
-// 	return install_package("ModelMetrics", 1, total)
-// 			.then(function(response) {
-// 				install_package("nnet", 2, total)
-// 					.then(function(response) {
-// 						install_package("dplyr", 3, total)
-// 							.then(function(response) {
-// 								install_package("caret", 4, total)
-// 									.then(function(response) {
-// 										install_package("e1071", 5, total)
-// 											.then(function(response) {
-// 												resolve(response);
-// 											}, function(error) {
-// 												reject(error);
-// 											});
-// 									}, function(error) {
-// 										reject(error);
-// 									});
-// 							}, function(error) {
-// 								reject(error);
-// 							});
-// 					}, function(error) {
-// 						reject(error);
-// 					});
-// 			}, function(error) {
-// 				reject(error);
-// 			});
-// }
 
 function reset_progress(id) {
 	$("#" + id + " .setup-item-status").html("");
