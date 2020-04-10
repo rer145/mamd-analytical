@@ -67,7 +67,7 @@ const createMainWindow = async () => {
 		backgroundColor: '#4e5d6c',
 		transparent: false,
 		show: false,
-		icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
+		//icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
 		webPreferences: {
 			nodeIntegration: true,
 			defaultEncoding: 'UTF-8',

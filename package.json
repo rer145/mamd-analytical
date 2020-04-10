@@ -61,7 +61,7 @@
 	"build": {
 		"appId": "edu.msu.MaMDAnalytical",
 		"productName": "MaMD Analytical",
-		"copyright": "Copyright 2020 ${author}",
+		"copyright": "Copyright ${author}",
 		"directories": {
 			"buildResources": "build",
 			"output": "dist"
@@ -74,7 +74,6 @@
 			}
 		],
 		"win": {
-			"icon": "build/icon.ico",
 			"verifyUpdateCodeSignature": false,
 			"extraResources": [
 				{
@@ -94,7 +93,6 @@
 		"mac": {
 			"category": "public.app-category.education",
 			"darkModeSupport": false,
-			"icon": "build/icon.icns",
 			"extraResources": [
 				{
 					"from": "./build/R-Portable/R-Portable-Mac",

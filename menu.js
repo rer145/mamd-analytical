@@ -6,6 +6,7 @@ const {
 	is,
 	appMenu,
 	aboutMenuItem,
+	showAboutWindow,
 	openUrlMenuItem,
 	openNewGitHubIssue,
 	debugInfo
@@ -59,20 +60,21 @@ ${debugInfo()}`;
 		click(menuItem, focusedWindow, event) {
 			updater.checkForUpdates(menuItem, focusedWindow, event);
 		}
+	},
+	{
+		type: 'separator'
 	}
 ];
 
-//if (!is.macos) {
+if (!is.macos) {
 	helpSubmenu.push(
-		{
-			type: 'separator'
-		},
 		aboutMenuItem({
-			icon: path.join(__dirname, 'assets', 'icons', 'png', '128x128.png'),
-			text: 'Created by Dr. Joe Hefner and Ron Richardson'
+			icon: path.join(__dirname, "assets", "icons", "png", "96x96.png"),
+			//copyright: "",
+			text: "Created by Dr. Joe Hefner (Michigan State University) and Ron Richardson"
 		})
 	);
-//}
+}
 
 const debugSubmenu = [
 	//{ role: 'reload' },
@@ -147,16 +149,19 @@ const macosTemplate = [
 	{
 		label: appName,
 		submenu: [
-			{ role: 'about' },
-			{ type: 'separator' },
-			{
-				label: 'Preferences...',
-				accelerator: 'Command+,',
-				click() {
-					showPreferences();
-				}
-			},
-			{ type: 'separator' },
+			// aboutMenuItem({
+			// 	icon: path.join(__dirname, "assets", "icons", "mac", "icon.icns"),
+			// 	text: "Created by Dr. Joe Hefner (Michigan State University) and Ron Richardson"
+			// }),
+			// { type: 'separator' },
+			// {
+			// 	label: 'Preferences...',
+			// 	accelerator: 'Command+,',
+			// 	click() {
+			// 		showPreferences();
+			// 	}
+			// },
+			// { type: 'separator' },
 			{ role: 'services', submenu: [] },
 			{ type: 'separator' },
 			{ role: 'hide' },
