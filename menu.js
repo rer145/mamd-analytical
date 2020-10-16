@@ -32,10 +32,25 @@ const helpSubmenu = [
 		label: 'Website',
 		url: 'http://macromorphoscopic.com/'
 	}),
-	openUrlMenuItem({
-		label: 'Source Code',
-		url: 'https://github.com/rer145/mamd-analytical'
-	}),
+	// openUrlMenuItem({
+	// 	label: 'Source Code',
+	// 	url: 'https://github.com/rer145/mamd-analytical'
+	// }),
+	{
+		label: 'Help File',
+		click(menuItem, focusedWindow, event) {
+			const PDFWindow = require('electron-pdf-window');
+			const pdfWin = new PDFWindow({
+				width: 800,
+				height: 600,
+				title: app.getName() + " - Help File",
+				backgroundColor: '#ffffff',
+				transparent: false,
+				icon: path.join(__dirname, '/assets/img/icons/icon.png')
+			});
+			pdfWin.loadURL(path.join(__dirname, '/assets/pdf/helpfile.pdf'));
+		}
+	},
 	{
 		label: 'Report an Issue…',
 		click() {

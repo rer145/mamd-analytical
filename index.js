@@ -18,8 +18,8 @@ const store = new Store();
 
 const cla = require('./assets/js/cla');
 const uuid = require('uuid/v4');
-const { 
-	trackEvent, 
+const {
+	trackEvent,
 	trackScreenView,
 	trackTime,
 	trackException
@@ -58,7 +58,7 @@ const createMainWindow = async () => {
 
 	const win = new BrowserWindow({
 		title: app.getName(),
-		// width: 1024, 
+		// width: 1024,
 		// height: 768,
 		x: mainWindowState.x,
 		y: mainWindowState.y,
@@ -86,7 +86,7 @@ const createMainWindow = async () => {
 	win.webContents.on('did-finish-load', () => {
         win.webContents.setZoomFactor(1);
 	});
-	
+
 	win.once('ready-to-show', () => {
         //win.setMenu(null);
         win.show();
@@ -94,7 +94,7 @@ const createMainWindow = async () => {
 
 	await win.loadFile(path.join(__dirname, 'index.html'));
 
-	
+
 
 	return win;
 };
@@ -128,7 +128,7 @@ app.on('activate', () => {
 
 (async () => {
 	prep_files_and_settings();
-	
+
 	await app.whenReady();
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
@@ -152,7 +152,7 @@ function prep_files_and_settings() {
 		firstRun = true;
 
 	let devMode = store.get("settings.dev_mode", false);
-	
+
 	// store.set("settings", {
 	// 	"auto_check_for_updates": autoUpdates,
 	// 	"first_run": firstRun,
@@ -165,7 +165,7 @@ function prep_files_and_settings() {
 		resourcesPath = cla.options.resources;
 	} else {
 		if (is.development) {
-			resourcesPath = path.join(__dirname, "build");	
+			resourcesPath = path.join(__dirname, "build");
 		}
 	}
 
@@ -174,24 +174,24 @@ function prep_files_and_settings() {
 	//let RToolsPath = path.join(resourcesPath, "R-Portable", "Rtools.exe");
 	let RPackageSourcePath = path.join(resourcesPath, "packages");
 	let RAnalysisPath = path.join(resourcesPath, "scripts");
-	
+
 	if (is.development) {
 		RPortablePath = path.join(
-			resourcesPath, 
-			"R-Portable", 
+			resourcesPath,
+			"R-Portable",
 			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
-			"bin", 
+			"bin",
 			is.macos ? "RScript" : "RScript.exe");
 
 		RPath = path.join(
-			resourcesPath, 
-			"R-Portable", 
+			resourcesPath,
+			"R-Portable",
 			is.macos ? "R-Portable-Mac" : "R-Portable-Win",
-			"bin", 
+			"bin",
 			is.macos ? "R" : "R.exe");
 
 		// RToolsPath = path.join(
-		// 	resourcesPath, 
+		// 	resourcesPath,
 		// 	is.macos ? "R-Portable-Mac" : "R-Portable-Win",
 		// 	"Rtools.exe");
 
@@ -242,32 +242,32 @@ function prep_files_and_settings() {
 			firstRun = true;
 
 		RPortablePath = path.join(
-			userDataPath, 
-			"R-Portable", 
-			"bin", 
+			userDataPath,
+			"R-Portable",
+			"bin",
 			"RScript");
 	}
 
 	// copy executable files over to user home path as well
 	// if (is.macos) {
 	// 	copy_file(
-	// 		path.join("assets", "install_rportable.sh"), 
-	// 		path.join(userDataPath, "install_rportable.sh"), 
+	// 		path.join("assets", "install_rportable.sh"),
+	// 		path.join(userDataPath, "install_rportable.sh"),
 	// 		true);
 	// 	copy_file(
-	// 		path.join("assets", "install_packages.sh"), 
-	// 		path.join(userDataPath, "install_packages.sh"), 
+	// 		path.join("assets", "install_packages.sh"),
+	// 		path.join(userDataPath, "install_packages.sh"),
 	// 		true);
 	// }
 
 	if (is.windows) {
 		copy_file(
-			path.join(resourcesPath, "setup", "install_rportable.bat"), 
-			path.join(userDataPath, "install_rportable.bat"), 
+			path.join(resourcesPath, "setup", "install_rportable.bat"),
+			path.join(userDataPath, "install_rportable.bat"),
 			true);
 		copy_file(
-			path.join(resourcesPath, "setup", "install_packages.bat"), 
-			path.join(userDataPath, "install_packages.bat"), 
+			path.join(resourcesPath, "setup", "install_packages.bat"),
+			path.join(userDataPath, "install_packages.bat"),
 			true);
 	}
 
@@ -299,7 +299,7 @@ function prep_files_and_settings() {
 
 
 function make_directory(dir) {
-	if (!fs.existsSync(dir)){ 
+	if (!fs.existsSync(dir)){
 		try {
 			fs.mkdirSync(dir);
 		} catch (err) {
@@ -336,21 +336,25 @@ ipcMain.on('pdf-export', event => {
 			{name: 'PDF File', extensions: ['pdf']}
 		]
 	};
-	
-	const pdfPath = dialog.showSaveDialog(null, options);
-	const win = BrowserWindow.fromWebContents(event.sender);
-	mainWindow.webContents.printToPDF({}, (error, data) => {
-		if (error) return console.error(error.message);
 
-		fs.writeFile(pdfPath, data, err => {
-			if (err) {
-				trackException(err, false);
-				return console.error(err.message);
-			}
-			//shell.openExternal('file://' + pdfPath);
-			event.sender.send('pdf-export-complete', pdfPath);
+	const pdfPath = dialog.showSaveDialog(null, options);
+	if (pdfPath != null && pdfPath.length > 0) {
+		const win = BrowserWindow.fromWebContents(event.sender);
+		mainWindow.webContents.printToPDF({}, (error, data) => {
+			if (error) return console.error(error.message);
+
+			fs.writeFile(pdfPath, data, err => {
+				if (err) {
+					trackException(err, false);
+					return console.error(err.message);
+				}
+				//shell.openExternal('file://' + pdfPath);
+				event.sender.send('pdf-export-complete', pdfPath);
+			});
 		});
-	});
+	} else {
+		event.sender.send('pdf-export-error');
+	}
 
 });
 

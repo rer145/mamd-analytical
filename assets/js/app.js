@@ -91,7 +91,7 @@ function wire_setup_events() {
 
 		trackEvent("Setup", "Start");
 		let t0 = now();
-		
+
 		setup.start().then(function(response) {
 			let t1 = now();
 			trackTime("Setup", "Complete", (t1-t0));
@@ -170,12 +170,12 @@ function wire_events() {
 	// $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
 	// 	// console.log(e.target.id);
 	// 	// console.log(e.relatedTarget.id);
-		
+
 	// });
 
 	$("#settings-modal").on('show.bs.modal', function(e) {
 		$("#rscript-current-path").text(store.get("app.rscript_path"));
-		
+
 		if (store.has("settings.auto_check_for_updates")) {
 			$("#settings-auto-update-check").prop("checked", Boolean(store.get("settings.auto_check_for_updates")));
 		} else {
@@ -188,7 +188,7 @@ function wire_events() {
 	$(document).on('click', "#settings-auto-update-check", function(e) {
 		store.set("settings.auto_check_for_updates", $(this).is(':checked'));
 	});
-	
+
 	$(document).on('click', "input.group-checkbox", function(e) {
 		var group = $(this).val();
 		if ($(this).is(':checked')) {
@@ -200,7 +200,7 @@ function wire_events() {
 
 	$(document).on('click', ".trait-image-button", function(e) {
 		e.preventDefault();
-		
+
 		var code = $(this).parent().attr("data-trait");
 		var value = $(this).parent().attr("data-value");
 		toggleTraitUISelection($(this), code, value);
@@ -267,12 +267,12 @@ function app_preload() {
 
 function app_setupselections() {
 	var output = {};
-	
+
 	var traits = window.appdb["traits"];
 	for (var i = 0; i < traits.length; i++) {
 		output[traits[i].abbreviation] = "NA";
 	}
-	
+
 	// var groups = window.appdb["groups"];
 	// for (var i = 0; i < groups.length; i++) {
 	// 	output[groups[i].code] = 0;
@@ -287,11 +287,11 @@ function app_init() {
 	//show_groups();
 	show_traits();
 	//check_offline_status();
-	
+
 	//check_installation();
 	//check_settings();
 	//check_for_updates();
-	
+
 	//check_packages();
 
 	enable_button("save-button");
@@ -347,26 +347,26 @@ function open_case() {
 			if (files.length == 1) {
 				new_case();
 				var filePath = files[0];
-			
+
 				fs.readFile(filePath, 'utf8', (err, data) => {
 					if (err) {
 						console.error(err);
 						trackException(err, false);
 					}
-			
+
 					var json = JSON.parse(data);
 
 					// TODO: populate case info
 					$("#case_number_input").val(json['properties']['case_number']);
 					$("#observation_date_input").val(json['properties']['observation_date']);
 					$("#analyst_input").val(json['properties']['analyst']);
-			
+
 					$.each(json['traits'], function(key, data) {
 						if (data != "NA") {
 							var row = $("#trait-" + key);
 							//console.log("searching in " + key);
 							$.each(row.find(".trait-image-button"), function (i, v) {
-								if ($(this).attr("data-trait") === key && 
+								if ($(this).attr("data-trait") === key &&
 									$(this).attr("data-value") === data) {
 										toggleTraitUISelection($(this), key, data);
 									}
@@ -433,7 +433,7 @@ function save_case() {
 		}
 		console.log("File saved");
 	});
-	
+
 	window.is_dirty = false;
 	disable_button("save-button");
 }
@@ -499,7 +499,7 @@ function check_for_updates() {
 }
 
 function check_settings() {
-	// TODO: if no rscript selected, 
+	// TODO: if no rscript selected,
 	//   go to settings tab
 	//   disable run analysis button
 	console.log("RPath", store.get("app.rscript_path"));
@@ -535,7 +535,7 @@ function toggle_package_status(pkg, template, installed) {
 	var badge = template.find(".badge");
 	var button = template.find(".r-package-install-button");
 	button.attr("data-package", pkg);
-	
+
 	if (installed) {
 		badge.removeClass("badge-danger").addClass("badge-success").html("Installed");
 		button.hide();
@@ -563,7 +563,7 @@ function show_suggested_rscript_paths() {
 		search_for_rscript('/usr/bin/Rscript');
         search_for_rscript("/Library/Frameworks/R.framework/Versions/3.5.1-MRO/Resources/bin/");
 	}
-	
+
 	span.find("p.loading").remove();
 }
 
@@ -576,7 +576,7 @@ function show_groups() {
 	for (var i = 0; i < groups.length; i++) {
 		var wrapper = $("<div></div>");
 		wrapper.addClass("form-check").addClass("form-check-inline");
-		
+
 		var input = $("<input></input>");
 		input
 			.addClass("form-check-input")
@@ -584,7 +584,7 @@ function show_groups() {
 			.attr("type", "checkbox")
 			.attr("id", "chk" + groups[i].code)
 			.attr("value", groups[i].code);
-		
+
 		var label = $("<label></label>");
 		label
 			.addClass("form-check-label")
@@ -610,7 +610,7 @@ function show_traits() {
 		ttemplate.find(".trait-abbreviation").text(traits[i].abbreviation);
 		// ttemplate.find(".trait-title").attr("title", traits[i].name + " (" + traits[i].abbreviation + ")");
 		// ttemplate.find(".trait-title").attr("data-content", traits[i].description);
-		
+
 		for (var j = 0; j < traits[i].images.length; j++) {
 			var itemplate = $("#trait-image-template").clone();
 			itemplate.removeClass("template")
@@ -651,16 +651,16 @@ function toggleTraitUISelection(obj, code, value) {
 function toggleSelection(code, value, isExplicit) {
 	window.is_dirty = true;
 	enable_button("save-button");
-	
+
 	if (isExplicit) {
 		window.selections[code] = value;
 	} else {
-		if (window.selections[code] === value) 
+		if (window.selections[code] === value)
 			window.selections[code] = "NA";
 		else
 			window.selections[code] = value;
 	}
-	
+
 	//console.log(window.selections);
 }
 
@@ -692,7 +692,7 @@ function generate_inputfile() {
 		var filepath = path.join(store.get("user.analysis_path"), new Date().valueOf().toString() + "-input.csv");
 		fs.writeFileSync(filepath, header + '\n' + inputs + '\n');
 		return filepath;
-	} catch(err) { 
+	} catch(err) {
 		trackException(err, true);
 		console.log(err);
 		return "";
@@ -760,7 +760,7 @@ function run_analysis() {
 
 			let t0 = now();
 
-			exec.execFile(store.get("app.rscript_path"), parameters, 
+			exec.execFile(store.get("app.rscript_path"), parameters,
 				function(error, stdout, stderr) {
 					// console.error(error);
 					// console.log(stderr);
@@ -781,7 +781,7 @@ function run_analysis() {
 						}
 						show_results(null, data);
 					});
-					
+
 					let t1 = now();
 					trackTime("Analysis", JSON.stringify(window.selections), (t1-t0), "Complete");
 				});
@@ -873,7 +873,7 @@ function show_results(fullJson, data) {
 
 	var matrix_head_row = $("<tr></tr>");
 	matrix_head_row.append($("<th></th>"));
-	
+
 	for (var i = 0; i < groups.length; i++) {
 		matrix_head_row.append($("<th></th>").addClass("text-center").text(groups[i].display));
 	}
@@ -918,7 +918,7 @@ function show_results(fullJson, data) {
 		$("#results-observation-date").html(json['properties']['observation_date']);
 		$("#results-analyst").html(json['properties']['analyst']);
 	//}
-	
+
 	// handle messaging
 	$("#analysis-pending").hide();
 	$("#analysis-loading").hide();
@@ -952,7 +952,7 @@ function install_package(pkg, template) {
 		cmd = cmd + ' "' + v + '"';
 	});
 
-	exec.execFile(store.get("app.rscript_path"), parameters, 
+	exec.execFile(store.get("app.rscript_path"), parameters,
 		function(error, stdout, stderr) {
 			console.error(error);
 			console.log(stderr);
@@ -967,8 +967,8 @@ function install_package(pkg, template) {
 		});
 
 	// exec.sudo(
-	// 	cmd, 
-	// 	options, 
+	// 	cmd,
+	// 	options,
 	// 	function(error, stdout, stderr) {
 	// 		console.error(error);
 	// 		console.log(stderr);
@@ -982,12 +982,12 @@ function install_package(pkg, template) {
 	// 		return true;
 	// 	});
 
-	// sudo.exec(cmd, options, 
+	// sudo.exec(cmd, options,
 	// 	function(error, stdout, stderr) {
 	// 		if (error) {
 	// 			console.error(error);
 	// 			console.log(stderr);
-	// 			toggle_package_status(pkg, template, false); 
+	// 			toggle_package_status(pkg, template, false);
 	// 			return false;
 	// 		}
 	// 		console.log('stdout: ' + JSON.stringify(stdout));
@@ -1027,9 +1027,9 @@ function verify_package_install(pkg, template) {
 		cmd = cmd + ' "' + v + '"';
 	});
 
-	
 
-	// exec.sudo(cmd, options, 
+
+	// exec.sudo(cmd, options,
 	// 	function(error, stdout, stderr) {
 	// 		console.error(error);
 	// 		console.error(stdout);
@@ -1042,7 +1042,7 @@ function verify_package_install(pkg, template) {
 	// 		toggle_package_status(pkg, template, output.includes("TRUE"));
 	// 	});
 
-	// sudo.exec(cmd, options, 
+	// sudo.exec(cmd, options,
 	// 	function(error, stdout, stderr) {
 	// 		if (error) {
 	// 			console.error(error);
@@ -1059,7 +1059,7 @@ function verify_package_install(pkg, template) {
 	// 	}
 	// );
 
-	exec.execFile(store.get("app.rscript_path"), parameters, 
+	exec.execFile(store.get("app.rscript_path"), parameters,
 		function(error, stdout, stderr) {
 			console.error(error);
 			console.error(stdout);
@@ -1084,7 +1084,7 @@ function verify_package_install(pkg, template) {
 	// 		if (data.includes("TRUE"))
 	// 			return true;
 	// 	}
-		
+
 	// 	// fallthrough
 	// 	return false;
 	// });
@@ -1097,7 +1097,7 @@ function export_to_pdf() {
 	var date = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
 	var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 	var dateTime = date + ' ' + time;
-	
+
 	$("#results-export-on").html(dateTime);
 
 	$("#generic-alert").removeClass()
@@ -1105,7 +1105,7 @@ function export_to_pdf() {
 		.addClass("alert-info")
 		.html("Please wait while the PDF file is being exported.")
 		.show();
-	
+
 	ipcRenderer.send('pdf-export');
 }
 
@@ -1213,6 +1213,18 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
 		});
 });
 
+ipcRenderer.on('pdf-export-error', (event, arg) => {
+	$("#generic-alert").removeClass()
+		.addClass("alert")
+		.addClass("alert-warning")
+		.html(`There was an issue exporting the PDF file. Please select a folder and provide a name for the file.`)
+		.show()
+		.delay(5000)
+		.slideUp(200, function() {
+			$(this).hide();
+		});
+});
+
 ipcRenderer.on('pdf-export-complete', (event, arg) => {
 	$("#generic-alert").removeClass()
 		.addClass("alert")
@@ -1241,7 +1253,7 @@ ipcRenderer.on('setup-rtools-exit', (event, args) => {
 ipcRenderer.on('application-ready', (event, arg) => {
 	cla_args = arg;
 	//console.log(cla_args);
-	
+
 	let forceInstall = cla_args.forceInstall;
 	let is_installed = setup.check_installation(forceInstall);
 	if (is_installed) {
