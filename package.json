@@ -106,6 +106,10 @@
 				{
 					"from": "./build/scripts",
 					"to": "scripts"
+				},
+				{
+					"from": "./build/setup",
+					"to": "setup"
 				}
 			]
 		},

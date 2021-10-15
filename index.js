@@ -271,6 +271,17 @@ function prep_files_and_settings() {
 			true);
 	}
 
+	if (is.macos) {
+		copy_file(
+			path.join(resourcesPath, "setup", "mac-check-r.sh"),
+			path.join(userDataPath, "mac-check-r.sh"),
+			true);
+		copy_file(
+			path.join(resourcesPath, "setup", "mac-check-r-version.sh"),
+			path.join(userDataPath, "mac-check-r-version.sh"),
+			true);
+	}
+
 	// save settings to disk in one shot
 	let settings = {
 		"version": appVersion,

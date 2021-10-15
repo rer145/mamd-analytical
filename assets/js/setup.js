@@ -11,6 +11,7 @@ const Store = require('electron-store');
 const store = new Store();
 
 const exec = require('./exec');
+const { reject } = require('q');
 
 let scripts_path = path.join(store.get("user.userdata_path"));
 
@@ -41,7 +42,7 @@ function reset() {
 
 function start() {
 	reset();
-	
+
 	return new Promise(function(resolve, reject) {
 		if (is.windows || is.macos) {
 			setTimeout(function() {
@@ -77,9 +78,9 @@ function install_rtools() {
 	// return new Promise(function(resolve, reject) {
 	// 	let batch_file = path.join(scripts_path, "install_rtools.bat");
 	// 	console.log("Installing RTools:", batch_file);
-	
+
 	// 	start_progress("setup-rtools");
-	
+
 	// 	const bat = exec.batch(batch_file, []);
 	// 	// bat.stdout.on('data', (data) => {
 	// 	// 	let str = String.fromCharCode.apply(null, data);
@@ -89,7 +90,7 @@ function install_rtools() {
 	// 	// 	let str = String.fromCharCode.apply(null, data);
 	// 	// 	console.error(str);
 	// 	// });
-	
+
 	// 	bat.on('exit', (code) => {
 	// 		let msg = "";
 	// 		switch (code) {
@@ -124,6 +125,18 @@ function install_rportable() {
 		start_progress("setup-r");
 
 		if (is.macos) {
+			// check for R installed
+			// if installed
+			//   check R version
+			//     if 3.6.2 = ok
+			//     if <3.6.2 = prompt to download/install
+			//     if >3.6.2 = give warning
+			// if not installed
+			//   prompt to download/install
+
+			console.log("Checking for R...");
+			check_for_r().then(() => check_r_version());
+
 			let source_root = path.join(store.get("app.resources_path"), "R-Portable");
 			let dest_root = path.join(store.get("user.userdata_path"), "R-Portable");
 
@@ -137,13 +150,13 @@ function install_rportable() {
 		if (is.windows || is.macos) {
 			console.log("Executing", batch_file);
 			exec.exec(
-				batch_file, 
-				[], 
+				batch_file,
+				[],
 				function(error, stdout, stderr) {
 					console.error(error);
 					end_progress("setup-r", -1, stderr);
 					reject(stderr);
-				}, 
+				},
 				function(stdout, stderr) {
 					console.log(stdout);
 					end_progress("setup-r", 0, "R-Portable (v3.6.2) installation was successful.");
@@ -163,7 +176,7 @@ function install_packages() {
 
 		console.log("Installing Packages:", batch_file);
 		start_progress("setup-packages");
-		
+
 		var params = [
 			store.get("app.rscript_path"),
 			store.get("user.packages_path"),
@@ -172,8 +185,8 @@ function install_packages() {
 
 		if (is.macos) {
 			// exec.chmod(
-			// 	batch_file, 
-			// 	0o777, 
+			// 	batch_file,
+			// 	0o777,
 			// 	function(error) {
 			// 		console.error(error);
 			// 		end_progress("setup-packages", -1, error);
@@ -185,8 +198,8 @@ function install_packages() {
 			// );
 
 			exec.chmod(
-				store.get("app.rscript_path"), 
-				0o777, 
+				store.get("app.rscript_path"),
+				0o777,
 				function(error) {
 					console.error(error);
 					end_progress("setup-packages", -1, error);
@@ -204,13 +217,13 @@ function install_packages() {
 		if (is.windows || is.macos) {
 			console.log("Executing", batch_file);
 			exec.exec(
-				batch_file, 
-				params, 
+				batch_file,
+				params,
 				function(error, stdout, stderr) {
 					console.error(error);
 					end_progress("setup-packages", -1, stderr);
 					reject(stderr);
-				}, 
+				},
 				function(stdout, stderr) {
 					console.log(stdout);
 					end_progress("setup-packages", 0, "R package installation was successful.");
@@ -224,7 +237,7 @@ function install_packages() {
 function reset_progress(id) {
 	$("#" + id + " .setup-item-status").html("");
 	$("#" + id + " .setup-item-package").html("");
-		
+
 	$("#" + id + " .progress-bar")
 		.attr("aria-valuenow", 0)
 		.removeClass("w-100")
@@ -244,13 +257,25 @@ function start_progress(id) {
 		.addClass("progress-bar-animated");
 }
 
+function set_progress(id, value, msg) {
+	$("#" + id + " .progress-bar")
+		.attr("aria-valuenow", value)
+		.addClass("w-" + value)
+		.addClass("bg-warning")
+		.addClass("progress-bar-striped")
+		.addClass("progress-bar-animated");
+
+	$("#" + id + " .err pre").html(msg);
+	$("#" + id + " .err").show();
+}
+
 function update_progress(id, pkg_name, idx, total) {
 	console.log("BEGIN");
 	let percentage = idx / total;
-	
+
 	$("#" + id + " .setup-item-status").html(`${idx} of ${total}`);
 	$("#" + id + " .setup-item-package").html(`(${pkg_name})`);
-	
+
 	$("#" + id + " .progress-bar")
 		.attr("aria-valuenow", percentage)
 		.attr("style", "width: " + percentage + "%")
@@ -264,7 +289,7 @@ function update_progress(id, pkg_name, idx, total) {
 function end_progress(id, code, msg) {
 	if (code === 0) {
 		$("#" + id + " .setup-item-status").html("OK");
-		
+
 		$("#" + id + " .progress-bar")
 			.attr("aria-valuenow", 100)
 			.addClass("w-100")
@@ -288,12 +313,47 @@ function end_progress(id, code, msg) {
 	}
 }
 
-module.exports = { 
-	check_installation, 
+function check_for_r() {
+	let check_r_path = path.join(scripts_path, "mac-check-r.sh");
+	exec.exec(
+		check_r_path,
+		[],
+		function(error, stdout, stderr) {
+			console.error(error);
+			end_progress("setup-r", -1, stderr);
+			reject(stderr);
+		},
+		function(stdout, stderr) {
+			console.log(stdout);
+			set_progress("setup-r", 33, "Found R installed, checking version: " + stdout);
+			resolve();
+		},
+		is.macos);
+}
+
+function check_r_version() {
+	let check_r_version_path = path.join(scripts_path, "mac-check-r-version.sh");
+	exec.exec(
+		check_r_version_path,
+		[],
+		function(error, stdout, stderr) {
+			console.error(error);
+			end_progress("setup-r", -1, stderr);
+			reject(stderr);
+		},
+		function(stdout, stderr) {
+			console.log(stdout);
+			set_progress("setup-r", 66, "R version installed: " + stdout);
+			resolve();
+		},
+		is.macos);
+}
+
+module.exports = {
+	check_installation,
 	reset,
-	start, 
-	install_rtools, 
-	install_rportable, 
-	install_packages,
-	install_package
+	start,
+	install_rtools,
+	install_rportable,
+	install_packages
 };
