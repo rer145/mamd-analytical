@@ -2,10 +2,11 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
 # command arguments
 args = commandArgs(trailingOnly=TRUE)
-packages_path<-trim(args[1])	# path to package install 
+packages_path<-trim(args[1])	# path to package install
 analysis_path<-trim(args[2])	# path to analysis files
 input_file<-trim(args[3])	# file where user inputs will be saved
 output_file<-trim(args[4])	# file where analysis output will be saved
+groups<-trim(args[5])		# comma separated list of groups to include in analysis
 
 .libPaths(c(packages_path, .libPaths()))
 
@@ -37,11 +38,11 @@ output_file<-trim(args[4])	# file where analysis output will be saved
 
 
 # load packages after installation
-library("ModelMetrics", lib.loc=packages_path)
-library("nnet", lib.loc=packages_path)
-library("dplyr", lib.loc=packages_path)
-library("caret", lib.loc=packages_path)
-library("e1071", lib.loc=packages_path)
+suppressMessages(library("ModelMetrics", lib.loc=packages_path))
+suppressMessages(library("nnet", lib.loc=packages_path))
+suppressMessages(library("dplyr", lib.loc=packages_path))
+suppressMessages(library("caret", lib.loc=packages_path))
+suppressMessages(library("e1071", lib.loc=packages_path))
 
 
 # global options
@@ -52,6 +53,9 @@ options(scipen = 999)
 
 # settings and configuration files
 aNN_data<-read.csv(file.path(analysis_path, "mamd.csv"))
+#aNN_data<-subset(aNN_data, Group %in% unlist(strsplit(groups, split=',')))
+aNN_data<-aNN_data[aNN_data$Group %in% unlist(strsplit(groups, split=',')),] %>% droplevels()
+
 #geo.origin<-read.csv(file.path(analysis_path, "Geo.Origin.csv"), sep=',', header = T)
 inputs<-read.csv(input_file, sep=',', header=T)
 
@@ -64,7 +68,7 @@ aNN_data$Group<-as.factor(aNN_data$Group)
 
 aNN_formula<-as.formula(Group ~ .)
 
-fit<-nnet::nnet(aNN_formula, data=aNN_data, size=10, rang=0.1, decay=5e-4, maxit=2000, trace=FALSE)
+fit<-suppressWarnings(nnet::nnet(aNN_formula, data=aNN_data, size=10, rang=0.1, decay=5e-4, maxit=2000, trace=FALSE))
 f<-fitted(fit)
 mod<-predict(fit, type="class")
 mod<-as.factor(mod)
@@ -106,10 +110,10 @@ for(row in rownames(ctab$table)) {
   write(paste("\"", trimws(row), "\": ["), file=output_file, append=TRUE, sep="")
   rcounter<-rcounter+1
   ccounter<-0
-  
+
   for (col in colnames(ctab$table)) {
     ccounter<-ccounter+1
-    write(paste("{\"group\": \"", trimws(col), "\", \"score\":", trimws(ctab$table[row,col]), "}", ifelse(ccounter!=length(colnames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")  
+    write(paste("{\"group\": \"", trimws(col), "\", \"score\":", trimws(ctab$table[row,col]), "}", ifelse(ccounter!=length(colnames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")
   }
   write(paste("]", ifelse(rcounter!=length(rownames(ctab$table)), ",", "")), file=output_file, append=TRUE, sep="")
 }

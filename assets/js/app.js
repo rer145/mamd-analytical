@@ -29,9 +29,11 @@ const setup = require('./assets/js/setup');
 
 var Chart = require('chart.js');
 var ColorSchemes = require('chartjs-plugin-colorschemes');
+const { param } = require('jquery');
 // color schemes: https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
 
 const MIN_SELECTIONS = 3;
+const MIN_GROUPS = 3;	// nnet requires 2, but with 2 additional coding for ctab$byClass is required in R.
 
 const requiredPackages = [
 	'ModelMetrics',
@@ -191,11 +193,7 @@ function wire_events() {
 
 	$(document).on('click', "input.group-checkbox", function(e) {
 		var group = $(this).val();
-		if ($(this).is(':checked')) {
-			toggleSelection(group, 1, true);
-		} else {
-			toggleSelection(group, 0, true);
-		}
+		toggleGroupSelection(group, $(this).is(':checked'));
 	});
 
 	$(document).on('click', ".trait-image-button", function(e) {
@@ -265,6 +263,17 @@ function app_preload() {
 	return db;
 }
 
+function app_setupgroups() {
+	var output = [];
+
+	var groups = window.appdb["groups"];
+	for (var i = 0; i < groups.length; i++) {
+		output.push(groups[i].code);
+	}
+
+	return output;
+}
+
 function app_setupselections() {
 	var output = {};
 
@@ -284,7 +293,7 @@ function app_setupselections() {
 function app_init() {
 	wire_events();
 	//show_suggested_rscript_paths();
-	//show_groups();
+	show_groups();
 	show_traits();
 	//check_offline_status();
 
@@ -320,6 +329,7 @@ function app_init() {
 }
 
 function new_case() {
+	window.groups = app_setupgroups();
 	window.selections = app_setupselections();
 	window.is_dirty = false;
 	window.current_file = "";
@@ -328,6 +338,7 @@ function new_case() {
 
 	init_case_info();
 	init_results();
+	show_groups();
 	show_traits();
 	$('#tabs a[href="#analysis"]').tab('show');
 
@@ -583,7 +594,8 @@ function show_groups() {
 			.addClass("group-checkbox")
 			.attr("type", "checkbox")
 			.attr("id", "chk" + groups[i].code)
-			.attr("value", groups[i].code);
+			.attr("value", groups[i].code)
+			.attr("checked", "yes");
 
 		var label = $("<label></label>");
 		label
@@ -636,19 +648,32 @@ function toggleTraitUISelection(obj, code, value) {
 
 	if (obj.hasClass("btn-primary")) {
 		obj.removeClass("btn-primary");
-		toggleSelection(code, "NA", false);
+		toggleTraitSelection(code, "NA", false);
 	} else {
 		$.each(parent.find(".trait-image-button"), function(i,v) {
 			$(v).removeClass("btn-primary").addClass("btn-default");
 		});
 		obj.addClass("btn-primary");
-		toggleSelection(code, value, false);
+		toggleTraitSelection(code, value, false);
 	}
 
 	validate_selections();
 }
 
-function toggleSelection(code, value, isExplicit) {
+function toggleGroupSelection(group, include) {
+	window.is_dirty = true;
+	enable_button("save-button");
+
+	let idx = window.groups.indexOf(group);
+	if (include && idx <= -1) window.groups.push(group);
+	if (!include && idx > -1) window.groups.splice(idx, 1);
+
+	validate_selections();
+
+	//console.log(window.groups);
+}
+
+function toggleTraitSelection(code, value, isExplicit) {
 	window.is_dirty = true;
 	enable_button("save-button");
 
@@ -706,13 +731,24 @@ function generate_outputfile(input_file) {
 }
 
 function validate_selections() {
-	if (valid_selections() >= MIN_SELECTIONS) {
-		enable_button("analysis-button");
-		$("#min-selection-warning").hide();
-	} else {
-		disable_button("analysis-button");
+	let isSelectionsValid = valid_selections() >= MIN_SELECTIONS;
+	let isGroupsValid = valid_groups() >= MIN_GROUPS;
+
+	$("#min-selection-warning").hide();
+	$("#min-group-warning").hide();
+	disable_button("analysis-button");
+
+	if (!isSelectionsValid)
 		$("#min-selection-warning").empty().html(`Please score ${MIN_SELECTIONS} or more traits before running the analysis.`).show();
-	}
+
+	if (!isGroupsValid)
+		$("#min-group-warning").empty().html(`Please select ${MIN_GROUPS} or more groups before running the analysis.`).show();
+
+	if (isSelectionsValid && isGroupsValid) enable_button("analysis-button");
+}
+
+function valid_groups() {
+	return window.groups.length;
 }
 
 function valid_selections() {
@@ -739,13 +775,15 @@ function run_analysis() {
 		var input_file = generate_inputfile();
 		var output_file = generate_outputfile(input_file);
 		var r_script = path.join(analysis_path, "mamd.R");
+		var groups = window.groups.join();
 
 		var parameters = [
 			r_script,
 			packages_path,
 			analysis_path,
 			input_file,
-			output_file
+			output_file,
+			groups
 		];
 
 		if (input_file.length > 0) {
@@ -814,7 +852,7 @@ function show_results(fullJson, data) {
 	var prob = 0;
 	var stats = json['statistics'];
 	var matrix = json['matrix'];
-	var groups = window.appdb["groups"];
+	var groups = window.groups; //window.appdb["groups"];
 	var traits = window.appdb["traits"];
 
 	var acc = (parseFloat(stats[' Accuracy ']) * 100).toFixed(2) + "%";
@@ -875,23 +913,29 @@ function show_results(fullJson, data) {
 	matrix_head_row.append($("<th></th>"));
 
 	for (var i = 0; i < groups.length; i++) {
-		matrix_head_row.append($("<th></th>").addClass("text-center").text(groups[i].display));
+		let grp = window.appdb['groups'].find(x => { return x.code == groups[i]; });
+		matrix_head_row.append($("<th></th>").addClass("text-center").text(grp.display));
 	}
 	matrix_head.addClass("thead-dark").append(matrix_head_row);
 
 	matrix_body.empty();
 	for (var i = 0; i < groups.length; i++) {
-		var row = $("<tr></tr>");
-		row.append($("<td></td>").text(groups[i].display));
+		let grp = window.appdb['groups'].find(x => { return x.code == groups[i]; });
 
-		var group_key_i = " " + groups[i].code + " ";
+		var row = $("<tr></tr>");
+		row.append($("<td></td>").text(grp.display));
+
+		var group_key_i = " " + grp.code + " ";
 		for (var j = 0; j < groups.length; j++) {
-			var group_key_j = " " + groups[j].code + " ";
+			let grp2 = window.appdb['groups'].find(x => { return x.code == groups[j]; });
+			var group_key_j = " " + grp2.code + " ";
 			var temp = "0";
 
-			for (var k = 0; k < matrix[group_key_i].length; k++) {
-				if (matrix[group_key_i][k].group === group_key_j) {
-					temp = matrix[group_key_i][k].score;
+			if (matrix[group_key_i]) {
+				for (var k = 0; k < matrix[group_key_i].length; k++) {
+					if (matrix[group_key_i][k].group === group_key_j) {
+						temp = matrix[group_key_i][k].score;
+					}
 				}
 			}
 

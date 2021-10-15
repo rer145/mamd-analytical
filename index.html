@@ -23,7 +23,7 @@
 					</li>
 				</ul>
 				<form class="my-2 my-lg-0">
-					<a id="new-button" class="btn btn-secondary" href="#"><i class="far fa-plus-square"></i> New</a> 
+					<a id="new-button" class="btn btn-secondary" href="#"><i class="far fa-plus-square"></i> New</a>
 					<a id="open-button" class="btn btn-secondary" href="#"><i class="far fa-folder-open"></i> Open</a>
 					<a id="save-button" class="btn btn-secondary" href="#"><i class="far fa-save"></i> Save</a>
 				</form>
@@ -132,7 +132,7 @@
 										</div>
 									</div>
 								</div>
-								
+
 							</div>
 						</div>
 					</div>
@@ -197,14 +197,12 @@
 						</div>
 					</div>
 					<div class="tab-pane fade show active" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
-						<!-- <div class="card">
+						<div class="card">
 							<div class="card-header">Groups (select all that apply)</div>
 							<div class="card-body">
-								<form>
-									<div id="group-list"></div>
-								</form>
+								<div id="group-list"></div>
 							</div>
-						</div> -->
+						</div>
 						<div class="card">
 							<div class="card-header">MMS Traits</div>
 							<div class="card-body">
@@ -214,8 +212,9 @@
 						<div class="card">
 							<div class="card-header">Run Analysis</div>
 							<div class="card-body">
-								<a id="analysis-button" href="#" class="btn btn-success">Run Analysis</a> 
+								<a id="analysis-button" href="#" class="btn btn-success">Run Analysis</a>
 								<span id="min-selection-warning" style="display:none;" class="inline-warning"></span>
+								<span id="min-group-warning" style="display:none;" class="inline-warning"></span>
 							</div>
 						</div>
 					</div>
@@ -389,7 +388,7 @@
 		<div id="trait-template" class="template">
 			<div class="row">
 				<div class="col">
-					<span class="trait-name"></span> (<span class="trait-abbreviation"></span>) 
+					<span class="trait-name"></span> (<span class="trait-abbreviation"></span>)
 					<!-- <a href="#" class="trait-title" data-toggle="popover" data-placement="right"><i class="far fa-question-circle"></i></a> -->
 				</div>
 				<div class="col text-center trait-col1"></div>
@@ -407,7 +406,7 @@
 		</div>
 		<div id="r-package-template" class="template">
 			<div class="r-package">
-				<strong class="r-package-name"></strong> <span class="badge"></span> 
+				<strong class="r-package-name"></strong> <span class="badge"></span>
 				<a href="#" class="r-package-install-button">Install Package</a>
 			</div>
 		</div>
