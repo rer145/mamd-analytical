@@ -4,13 +4,25 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 args<-commandArgs(trailingOnly=TRUE)
 
 do.package.install<-function(pkg_name, build_date) {
+	print(paste("  Removing package:", pkg_name))
+	tryCatch(
+		{
+			remove.packages(pkg_name, lib=dest_path)
+			print("    Package removed successfully!")
+		},
+		error=function(cond) {
+			print("    ERROR: Could not remove package")
+    	print(cond)
+		}
+	)
+
   print(paste("  Installing package:", pkg_name))
   # if (!require(pkg_name, lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
   if (!require(pkg_name, lib.loc=dest_path, character.only=TRUE, warn.conflicts=FALSE)) {
     tryCatch(
       {
         install.packages(
-          pkg_name, 
+          pkg_name,
           repos=paste("https://mran.microsoft.com/snapshot/", build_date, sep=""),
           lib=dest_path,
           verbose=FALSE,
@@ -40,7 +52,7 @@ if (is.na(dest_path)) {
 
 
 if (
-#  !is.na(src_path) && 
+#  !is.na(src_path) &&
   !is.na(dest_path)
 ) {
   #print(paste("Installing FROM", src_path))
@@ -49,7 +61,7 @@ if (
 
   .libPaths(c(dest_path, .libPaths()))
   print(paste(".libPaths()", .libPaths()))
-  
+
   # if (is.na(pkg_to_install)) {
     do.package.install("ModelMetrics", "2020-02-20")
     do.package.install("nnet", "2020-02-20")

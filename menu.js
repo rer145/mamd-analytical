@@ -76,12 +76,28 @@ ${debugInfo()}`;
 			updater.checkForUpdates(menuItem, focusedWindow, event);
 		}
 	},
+	{ type: 'separator' },
 	{
-		type: 'separator'
+		label: 'Delete Settings',
+		click() {
+			store.clear();
+			app.relaunch();
+			app.quit();
+		}
+	},
+	{
+		label: 'Run Installer',
+		click() {
+			store.set("settings.first_run", true);
+			app.relaunch();
+			app.quit();
+			//win.getFocusedWindow().webContents.send('check-installation');
+		}
 	}
 ];
 
 if (!is.macos) {
+	helpSubmenu.push({ type: 'separator' });
 	helpSubmenu.push(
 		aboutMenuItem({
 			icon: path.join(__dirname, "assets", "icons", "png", "96x96.png"),

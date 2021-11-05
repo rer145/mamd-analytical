@@ -14,7 +14,7 @@ setlocal ENABLEDELAYEDEXPANSION
 ::     (PROD=process.resourcesPath/scripts)
 
 :: Example
-:: install.bat "D:\work\hefner\mamd-analytical\build\R-Portable\R-Portable-Win\bin\Rscript.exe" "D:\work\hefner\mamd-analytical\build\R-Portable\Rtools35.exe" "D:\work\hefner\mamd-analytical\build\packages" "C:\Users\ronri\AppData\Roaming\MaMD Analytical\packages" "D:\work\hefner\mamd-analytical\build\scripts" "D:\work\hefner\mamd-analytical\build\R-Portable\R-Portable-Win\bin\R.exe" 
+:: install.bat "D:\work\hefner\mamd-analytical\build\R-Portable\R-Portable-Win\bin\Rscript.exe" "D:\work\hefner\mamd-analytical\build\R-Portable\Rtools35.exe" "D:\work\hefner\mamd-analytical\build\packages" "C:\Users\ronri\AppData\Roaming\MaMD Analytical\packages" "D:\work\hefner\mamd-analytical\build\scripts" "D:\work\hefner\mamd-analytical\build\R-Portable\R-Portable-Win\bin\R.exe"
 
 
 :: Other Requirements
@@ -85,10 +85,10 @@ REM 		REM SET SCRIPTS_INSTALL_PATH=!SCRIPTS_PATH:"=!\install.R
 REM 		REM SET SCRIPTS_VERIFY_PATH=!SCRIPTS_PATH:"=!\verify.R
 REM 		SET SCRIPTS_INSTALL_PATH="%SCRIPTS_PATH%\install.R"
 REM 		SET SCRIPTS_VERIFY_PATH="%SCRIPTS_PATH%\verify.R"
-		
+
 REM 		REM echo install : !SCRIPTS_INSTALL_PATH!
 REM 		REM echo verify : !SCRIPTS_VERIFY_PATH!
-		
+
 REM 		IF NOT EXIST !SCRIPTS_INSTALL_PATH! (
 REM 			EXIT /B 32
 REM 		)
@@ -100,6 +100,12 @@ REM 		EXIT /B 34
 REM 	)
 REM )
 
+
+REM Delete packages locally
+REM IF EXIST "%PKG_INSTALL_PATH%" (
+REM 	cd /d %PKG_INSTALL_PATH%
+REM 	for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+REM )
 
 
 
