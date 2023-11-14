@@ -14,7 +14,7 @@ The research team would like to thank the following individuals and institutions
 - Drs. David Hunt and Christopher J. Dudar – National Museum of Natural History, Smithsonian Institution, Washington D.C.
 - Dr. Heather Edgar – Maxwell Museum, University of New Mexico
 - Dr. Janet M. Monge – Physical Anthropology Section, Penn Museum, Philadelphia, PA
-- Drs. Lee Meadows-Jantz, Richard L. Jantz, and Dawnie Steadman – William M. Bass Skeletal Collection; University of Tennessee, Knoxville, TN
+- Drs. Lee Meadows-Jantz, Richard L. Jantz, and Dawnie Steadman – UTK Donated Collection; University of Tennessee, Knoxville, TN
 - Dr. M. Kate Spradley – Donated Skeletal Collection, Texas State University, San Marcos, TX
 - Dr. Nawaporn Techataweewan – Khon Kaen, Khon Kaen University
 - Dr. Rachel Ives – Natural History Museum of London 
