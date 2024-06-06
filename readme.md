@@ -1,3 +1,10 @@
+# Important! Project Archived and Moved
+
+This desktop application project has been discontinued. The project has a new home at https://mamdanalytical.com/. All future updates will take place at that location.
+
+Using the desktop application is at your own risk and may provide inaccurate results.
+
+
 # MaMD Analytical
 
 *MaMD Analytical* uses an artificial neural network (aNN) to classify an unknown cranium into a reference group. The reference data are housed in the Macromorphoscopic Databank, established in 2018 by Hefner (2018).
@@ -17,9 +24,9 @@ The research team would like to thank the following individuals and institutions
 - Drs. Lee Meadows-Jantz, Richard L. Jantz, and Dawnie Steadman – William M. Bass Skeletal Collection; University of Tennessee, Knoxville, TN
 - Dr. M. Kate Spradley – Donated Skeletal Collection, Texas State University, San Marcos, TX
 - Dr. Nawaporn Techataweewan – Khon Kaen, Khon Kaen University
-- Dr. Rachel Ives – Natural History Museum of London 
+- Dr. Rachel Ives – Natural History Museum of London
 - Dr. Rebecca Redfern and Jelena Bekvalac – Centre for Human Bioarchaeology, Museum of London
-- Dr. Todd W. Fenton – the Mis Island Medieval Nubian Skeletal Collection and the Donated Skeletal Collection, Michigan State University, East Lansing 
+- Dr. Todd W. Fenton – the Mis Island Medieval Nubian Skeletal Collection and the Donated Skeletal Collection, Michigan State University, East Lansing
 - Dr. Yohannes Haile-Selassie and Lyman Jellema – Hamann-Todd Skeletal Collection, Cleveland Museum of Natural History
 
 ## Research Contributors
@@ -29,13 +36,13 @@ The research team would also like to thank the following individuals who contrib
 - Centre for Human Bioarchaeology, Museum of London – Micayla Spiros, Rebecca Redfern
 - Hamman-Todd Collection – Grace Kilroy, Michael Kenyhercz, Alexandra Klales
 - Khon Kaen University – Amber Plemons, Kelly Kamnikar, Emily Streetman, Kandus Linde
-- Maxwell Museum – Felicia Wun, Kelly Kamnikar 
+- Maxwell Museum – Felicia Wun, Kelly Kamnikar
 - Mis Island, Nubia Collection – Maureen Moffitt
 - Natural History Museum of London – Amber Plemons
 - PCOME – Caitlin Vogelsberg, Bruce Anderson, Jennifer Vollner, Felicia Wun
 - Penn Museum – Melody Ratliff
 - Smithsonian – Repatriation Office Staff, Christopher Dudar, Melody Ratliff, Steven Ousley, Ericka B. Jones, Paul Emanovsky
-- Texas State University – Amber Plemons, Kelly Kamnikar, Felicia Wun, Cassidy Skipper 
+- Texas State University – Amber Plemons, Kelly Kamnikar, Felicia Wun, Cassidy Skipper
 - University of Tennessee – Kelly Kamnikar, Micayla Spiros, Felicia Wun
 - La Verbena Cemetery, Guatemala – Cullen Black
 
